@@ -14,7 +14,7 @@ export const showcase = {
     faq:[['¿Puedo verlo antes de solicitar una presentación?','Sí. La página de demo reúne un recorrido del producto para conocer sus pantallas y su forma de organizar el mantenimiento.'],['¿Sirve para valorar mi caso de planta?','La demo permite una primera aproximación. Para revisar equipos, procesos, usuarios o integraciones concretas, solicita una presentación y explica cómo trabajáis actualmente.'],['¿Los datos de las imágenes son de un cliente?','No. Las capturas proceden del entorno de demostración de ForgeOps y muestran datos de ejemplo.']]
   },
   deleteguard: {
-    image:'deleteguard-history.png',alt:'Historial de DeleteGuard con incidencias de prueba eliminadas y sus metadatos.',caption:'Captura real de DeleteGuard · Incidencias de prueba.',
+    image:'deleteguard-history.jpg',alt:'Historial de DeleteGuard con incidencias de prueba eliminadas y sus metadatos.',caption:'Captura real de DeleteGuard · Incidencias de prueba.',
     short:['Historial de eliminaciones','Búsqueda por contexto','Integrado en Jira Cloud'],
     heading:'Recupera contexto cuando una incidencia desaparece.',
     benefits:[['Consulta qué se eliminó','Revisa el registro de las incidencias que la aplicación haya capturado: clave, resumen, proyecto y momento de la eliminación.'],['Localiza el registro que buscas','Utiliza la búsqueda para acotar el historial y encontrar referencias sin revisar manualmente toda la lista.'],['Investiga con más información','Consulta quién realizó la eliminación cuando esa información esté disponible. Un apoyo para responder a las consultas del equipo.']],
@@ -22,7 +22,7 @@ export const showcase = {
     example:'Alguien pregunta por una incidencia que ya no aparece en Jira. Buscas su clave o una parte del resumen en DeleteGuard y consultas la información registrada al eliminarla.',
     steps:['Abre DeleteGuard desde tu instalación de Jira.','Actualiza el historial y busca la referencia.','Consulta los metadatos disponibles del registro.'],
     flow:['Eliminación en Jira','Registro','Consulta'],
-    gallery:[['deleteguard-search.png','Búsqueda de una incidencia de prueba en el historial.']],
+    gallery:[['deleteguard-search.jpg','Búsqueda de una incidencia de prueba en el historial.']],
     access:'DeleteGuard está en revisión en Atlassian Marketplace. Puedes consultar la guía y escribirnos para conocer su disponibilidad.',cta:'Ver cómo funciona',url:'/apps/deleteguard/ayuda/',
     faq:[['¿Restaura las incidencias eliminadas?','No. DeleteGuard conserva información de contexto sobre las eliminaciones registradas. No es una copia de seguridad ni restaura la incidencia original.'],['¿Aparecen eliminaciones anteriores a la instalación?','No recupera retroactivamente las incidencias eliminadas antes de que la aplicación estuviera instalada y pudiera registrar sus eventos.'],['¿Puedo instalarlo ya desde Marketplace?','La aplicación está en revisión. Publicaremos el acceso a la ficha de Marketplace cuando esté disponible. Mientras tanto puedes consultar la guía y los documentos del producto.']]
   },

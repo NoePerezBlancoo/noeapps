@@ -22,6 +22,16 @@ for(const e of entries){
     if(b.length<30)throw new Error(`Empty or incomplete image: ${name}`);
     let w,h;
     if(name.endsWith('.png')){w=b.readUInt32BE(16);h=b.readUInt32BE(20);}
+    else if(name.endsWith('.jpg')){
+      let offset=2;
+      while(offset<b.length){
+        if(b[offset]!==0xff)throw new Error(`Invalid JPEG: ${name}`);
+        const marker=b[offset+1],length=b.readUInt16BE(offset+2);
+        if([0xc0,0xc1,0xc2].includes(marker)){h=b.readUInt16BE(offset+5);w=b.readUInt16BE(offset+7);break;}
+        offset+=2+length;
+      }
+      if(!w||!h)throw new Error(`Missing JPEG dimensions: ${name}`);
+    }
     else if(b.toString('ascii',12,16)==='VP8 '){w=b.readUInt16LE(26)&0x3fff;h=b.readUInt16LE(28)&0x3fff;}
     else if(b.toString('ascii',12,16)==='VP8X'){w=b.readUIntLE(24,3)+1;h=b.readUIntLE(27,3)+1;}
     else throw new Error(`Unknown image dimensions: ${name}`);
