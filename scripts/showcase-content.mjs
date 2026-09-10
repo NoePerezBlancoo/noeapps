@@ -27,7 +27,8 @@ export const showcase = {
     faq:[['¿Restaura las incidencias eliminadas?','No. DeleteGuard conserva información de contexto sobre las eliminaciones registradas. No es una copia de seguridad ni restaura la incidencia original.'],['¿Aparecen eliminaciones anteriores a la instalación?','No recupera retroactivamente las incidencias eliminadas antes de que la aplicación estuviera instalada y pudiera registrar sus eventos.'],['¿Puedo instalarlo ya desde Marketplace?','La aplicación está en revisión. Publicaremos el acceso a la ficha de Marketplace cuando esté disponible. Mientras tanto puedes consultar la guía y los documentos del producto.']]
   },
   fivaki: {
-    image:'fivaki-icon.webp',alt:'Identidad visual de Fivaki.',caption:'Identidad visual de Fivaki · Consulta la experiencia en la beta Android.',brand:true,
+    image:'fivaki-splash-original.png',logo:'fivaki-icon-original.png',previewHome:'fivaki-home-app-v31.png',alt:'Logo completo de Fivaki con el lema «Tus hábitos. Tus éxitos.» sobre su fondo original.',caption:'Marca original y captura real de la beta Android con una cuenta de prueba.',brand:true,
+    gallery:[['fivaki-welcome-app-v2.png','Pantalla de bienvenida de Fivaki en Android.'],['fivaki-home-app-v31.png','Inicio de la app: actividad, misiones y hábitos de una cuenta de prueba.']],
     short:['Hábitos y objetivos','Progreso gamificado','Beta para Android'],
     heading:'Haz espacio para la constancia.',
     benefits:[['Pon tus hábitos en primer plano','Reúne las acciones y objetivos personales que quieres tener presentes en tu día a día.'],['Da sentido a cada avance','Explora una experiencia gamificada que acompaña el progreso y aporta una forma visual de seguir tu actividad.'],['Participa desde el principio','Prueba la beta Android y comparte cómo encaja en tu rutina. Las primeras experiencias ayudan a orientar la evolución del producto.']],
@@ -50,7 +51,7 @@ export const showcase = {
     faq:[['¿Puedo usarlo ya como sistema principal de mi negocio?','La demo está en validación. Primero conviene revisar tus procesos y comprobar el encaje del producto en una presentación.'],['¿Cómo puedo ver la demo?','Solicítala por correo indicando el tipo de negocio y las tareas que más te interesa revisar. Prepararemos el recorrido a partir de ese contexto.'],['¿Las imágenes incluyen información de clientes reales?','No. Las capturas seleccionadas pertenecen a un negocio de demostración.']]
   },
   'quitar-fondo': {
-    image:'creative-tools.png',alt:'Ilustración de herramientas creativas con una imagen de una hoja y elementos de audio.',caption:'Ilustración conceptual · Herramientas para preparar contenido visual.',concept:true,
+    image:'remove-background.png',alt:'Ilustración de una zapatilla separada de su fondo para preparar una imagen de producto.',caption:'Ilustración conceptual sobre eliminación de fondos.',concept:true,
     short:['Selección de imagen','Fondo automático','Resultado para componer'],heading:'Del archivo original a una imagen lista para trabajar.',
     benefits:[['Elige la imagen','Abre el archivo que quieres preparar desde una interfaz de escritorio.'],['Separa el protagonista','Aplica la eliminación automática del fondo y revisa cómo queda el contorno del elemento principal.'],['Continúa tu composición','Utiliza el resultado en el material que estés preparando, revisando los detalles antes de publicarlo.']],
     audience:'Creadores y pequeños negocios que preparan imágenes de producto, composiciones o materiales para redes y catálogos.',
@@ -59,7 +60,7 @@ export const showcase = {
     faq:[['¿Puedo subir una imagen aquí?','Esta página presenta la herramienta. El procesamiento se realiza desde la aplicación de escritorio; solicita acceso para conocer su instalación.'],['¿El resultado es siempre perfecto?','El resultado depende de la imagen. Los bordes finos, transparencias y fondos complejos pueden necesitar una revisión posterior.'],['¿Cómo consigo la herramienta?','Escribe indicando tu sistema operativo y el uso que tienes en mente para consultar la versión y los requisitos disponibles.']]
   },
   'texto-audio': {
-    image:'creative-tools.png',alt:'Ilustración de un altavoz y una onda de sonido junto a herramientas creativas.',caption:'Ilustración conceptual · Del contenido escrito al audio.',concept:true,
+    image:'text-to-audio.png',alt:'Una hoja de papel se transforma en una onda de sonido que llega a unos auriculares.',caption:'Ilustración conceptual sobre conversión de texto a voz.',concept:true,
     short:['Texto a voz','Reproducción integrada','Aplicación de escritorio'],heading:'Escucha lo que has escrito.',
     benefits:[['Parte de tu contenido','Introduce el texto que quieres convertir desde la aplicación.'],['Genera una versión hablada','Utiliza la conversión a voz para explorar otra forma de consumir o revisar el contenido.'],['Revisa escuchando','Reproduce el resultado desde la interfaz y comprueba si encaja con el uso que tienes previsto.']],
     audience:'Personas que quieren escuchar textos, revisar contenidos en voz alta o explorar materiales en formato de audio.',
@@ -68,7 +69,7 @@ export const showcase = {
     faq:[['¿Funciona sin conexión?','La conversión utiliza un servicio de voz en línea, por lo que requiere conexión.'],['¿Puedo usar textos confidenciales?','Antes de introducir información confidencial hay que revisar el servicio utilizado y sus condiciones. No debe asumirse que la conversión se realiza exclusivamente en tu equipo.'],['¿Dónde consulto idiomas y requisitos?','Solicita acceso indicando el idioma, el sistema operativo y el uso previsto. Así podemos revisar las opciones de la versión disponible.']]
   },
   'descargas-multimedia': {
-    image:'creative-tools.png',alt:'Ilustración de elementos de imagen, sonido y reproducción multimedia.',caption:'Ilustración conceptual · Organización de contenido multimedia.',concept:true,
+    image:'media-downloads.png',alt:'Ilustración de una película y una pista de audio que descienden hacia una bandeja de archivos.',caption:'Ilustración conceptual sobre descargas de audio y vídeo.',concept:true,
     short:['Consulta por dirección','Audio y vídeo','Destino de descarga'],heading:'Un recorrido claro para guardar tu contenido.',
     benefits:[['Consulta antes de descargar','Introduce la dirección de un recurso para consultar la información multimedia disponible.'],['Elige el tipo de contenido','Revisa las opciones de audio o vídeo que admite cada fuente antes de iniciar la descarga.'],['Localiza el archivo','Selecciona la ubicación de destino y abre la carpeta para continuar trabajando con el material.']],
     audience:'Personas que necesitan guardar y organizar contenido propio o para el que cuentan con permiso de descarga.',
@@ -77,7 +78,7 @@ export const showcase = {
     faq:[['¿Puedo descargar cualquier vídeo?','No. Utiliza la herramienta únicamente con contenido propio o con autorización, respetando las condiciones de la fuente.'],['¿Todas las plataformas son compatibles?','La compatibilidad depende de cada servicio y puede cambiar. Consulta primero las fuentes y opciones que necesitas.'],['¿Las descargas se hacen desde NoeApps.com?','No. Esta ficha presenta una herramienta de uso local. Solicita acceso para revisar su instalación y requisitos.']]
   },
   iagentes: {
-    image:'connected-work.png',alt:'Ilustración de bloques conectados con documentos y engranajes.',caption:'Ilustración conceptual · Agentes y tareas conectadas.',concept:true,
+    image:'ai-agents.png',alt:'Tres núcleos luminosos conectados e intercambiando mensajes representan agentes de inteligencia artificial.',caption:'Ilustración conceptual sobre colaboración entre agentes de IA.',concept:true,
     short:['Conversaciones','Instrucciones configurables','Experimentación con IA'],heading:'Prueba una idea de asistente antes de ampliarla.',
     benefits:[['Define el punto de partida','Configura instrucciones para explorar cómo debería responder un agente ante una tarea concreta.'],['Conversa y observa','Envía mensajes y revisa las respuestas en una interfaz de conversación.'],['Aprende de cada prueba','Utiliza el prototipo para estudiar el comportamiento y concretar qué haría falta en una adaptación.']],
     audience:'Equipos y profesionales que quieren explorar asistentes de IA y necesitan una demostración para concretar un posible caso de uso.',
@@ -104,7 +105,7 @@ export const showcase = {
     faq:[['¿Las ubicaciones están disponibles para contratar?','No se confirma disponibilidad real. Las ubicaciones de esta demo son ilustrativas.'],['¿Puedo reservar o pagar una campaña?','La demo es conceptual y no permite contratar ni pagar campañas reales.'],['¿Se puede estudiar una adaptación?','Sí. Puedes contactar para comentar el catálogo, el tipo de cliente y el proceso de consulta que necesitaría un proyecto real.']]
   },
   tugta: {
-    image:'creative-tools.png',alt:'Ilustración de medios visuales y contenidos digitales.',caption:'Ilustración editorial · Visita TuGTA para ver la web real.',concept:true,
+    image:'gta-editorial.png',alt:'Escena ficticia de una ciudad costera al atardecer, con un deportivo y edificios iluminados.',caption:'Ilustración editorial original; no es una captura de un videojuego.',concept:true,
     short:['Actualidad GTA','Lectura y descubrimiento','Medio independiente'],heading:'Contenido pensado para una comunidad concreta.',
     benefits:[['Una temática reconocible','La web centra su propuesta editorial en noticias y contenidos del universo Grand Theft Auto.'],['Descubre y lee','Explora una experiencia de publicación orientada a encontrar contenidos y continuar la lectura.'],['Un proyecto en abierto','Puedes visitar la web y conocer directamente su presentación, organización y enfoque editorial.']],
     audience:'Lectores interesados en GTA y personas que quieren conocer un ejemplo de medio digital especializado.',
@@ -113,7 +114,7 @@ export const showcase = {
     faq:[['¿Es una web oficial de GTA?','No. TuGTA es un proyecto editorial independiente, sin afiliación con los titulares de la saga.'],['¿Se puede visitar ahora?','Sí. El botón «Visitar TuGTA» abre la web pública del proyecto.'],['¿Puedo consultar sobre un proyecto editorial similar?','Sí. Puedes contactar para explicar el tipo de contenido, público y experiencia que te gustaría desarrollar.']]
   },
   'noticias-tcg': {
-    image:'creative-tools.png',alt:'Ilustración de herramientas visuales para un proyecto de contenido digital.',caption:'Ilustración editorial · La web pública muestra el contenido del proyecto.',concept:true,
+    image:'tcg-editorial.png',alt:'Cartas de fantasía originales con un bosque, una luna y cristales, dispuestas sobre una mesa.',caption:'Ilustración editorial de cartas de fantasía originales.',concept:true,
     short:['Noticias de TCG','Información de cartas','Referencias de precios'],heading:'Contenido y consulta para explorar los juegos de cartas.',
     benefits:[['Sigue la temática','Encuentra contenidos centrados en el mundo de los juegos de cartas coleccionables.'],['Consulta información','Explora referencias sobre cartas dentro de una experiencia que combina publicación y consulta.'],['Amplía el contexto','Utiliza las referencias de precios como información orientativa y contrástalas antes de tomar una decisión.']],
     audience:'Aficionados a los TCG que disfrutan leyendo sobre cartas y consultando información relacionada con sus juegos.',
@@ -122,7 +123,7 @@ export const showcase = {
     faq:[['¿Es una tienda de cartas?','La propuesta presentada es un portal de contenido y consulta. Las referencias de precios no son una oferta de compraventa.'],['¿Los precios son definitivos?','No. Pueden variar según la fuente, el momento y las características de cada carta.'],['¿La web está disponible?','Sí. Puedes visitarla desde esta ficha para conocer sus contenidos y su experiencia de consulta.']]
   },
   'itflow-manager': {
-    image:'industrial-systems.png',alt:'Ilustración de infraestructura, equipos y conexiones de sistemas.',caption:'Ilustración conceptual · Gestión y mantenimiento de sistemas IT.',concept:true,
+    image:'it-support.png',alt:'Ilustración de un puesto de soporte IT con servidores, cableado y bandejas de trabajo.',caption:'Ilustración conceptual sobre soporte y mantenimiento IT.',concept:true,
     short:['Procesos de soporte','Mantenimiento de sistemas','Aplicación de gestión'],heading:'Un caso de portfolio sobre la organización del soporte.',
     benefits:[['Acerca el proceso al equipo','Explora una aplicación orientada a la gestión del soporte y el mantenimiento de sistemas.'],['Relaciona tareas y recursos','Estudia cómo una herramienta de gestión puede dar contexto al trabajo de servicio IT.'],['Conversa sobre tu operativa','Utiliza la presentación del proyecto como base para identificar qué información y recorridos necesita tu equipo.']],
     audience:'Personas interesadas en aplicaciones de gestión IT y equipos que quieren comentar un posible flujo de soporte.',
@@ -131,7 +132,7 @@ export const showcase = {
     faq:[['¿Hay una edición comercial abierta?','No se ofrece una edición comercial abierta desde esta página. Se presenta como proyecto de portfolio.'],['¿Cómo puedo conocerlo con más detalle?','Solicita una presentación e indica qué parte de la gestión IT te interesa explorar.'],['¿Se puede adaptar a mi equipo?','Es posible estudiar una adaptación. Primero hay que revisar el alcance, el entorno y los requisitos de tu operativa.']]
   },
   opsdesk: {
-    image:'connected-work.png',alt:'Ilustración de documentos e indicadores conectados para representar el seguimiento de trabajo.',caption:'Ilustración conceptual · Atención y seguimiento de incidencias.',concept:true,
+    image:'it-support.png',alt:'Ilustración de un puesto de soporte con avisos organizados por estado y recursos informáticos.',caption:'Ilustración conceptual sobre organización del soporte.',concept:true,
     short:['Tickets y prioridades','Asignación y comentarios','Actividad y métricas'],heading:'Sigue el recorrido completo de una incidencia.',
     benefits:[['Registra y clasifica','Da contexto al aviso con su estado y prioridad para facilitar el seguimiento del trabajo.'],['Coordina la atención','Explora la asignación y los comentarios como parte de la conversación que acompaña cada ticket.'],['Observa el avance','Consulta el histórico y las métricas del prototipo para estudiar cómo se refleja la actividad del equipo.']],
     audience:'Equipos de soporte y operaciones que quieren conocer un prototipo de Service Desk y valorar un flujo de atención.',
@@ -140,7 +141,7 @@ export const showcase = {
     faq:[['¿Qué estado tiene el proyecto?','Es un prototipo funcional y demostrativo. Una presentación permite conocer su alcance antes de estudiar un uso real.'],['¿Hay una demo pública sin registro?','Desde esta ficha se solicita una presentación. El acceso y las condiciones se concretan directamente.'],['¿Puedo plantear mi flujo de soporte?','Sí. Explica cómo entran los avisos, quién los atiende y qué seguimiento necesita el equipo.']]
   },
   edulabops: {
-    image:'connected-work.png',alt:'Ilustración de servicios y procesos representados por módulos conectados.',caption:'Ilustración conceptual · Servicios y tareas en operación.',concept:true,
+    image:'background-tasks.png',alt:'Ilustración de un circuito de módulos coordinados con una tarea en proceso y otra completada.',caption:'Ilustración conceptual sobre servicios y tareas en segundo plano.',concept:true,
     short:['Servicios coordinados','Tareas en segundo plano','Observación de actividad'],heading:'Entiende qué pasa mientras una aplicación trabaja.',
     benefits:[['Observa los servicios','Estudia cómo se relacionan distintos componentes de una aplicación.'],['Sigue las tareas','Explora procesos que continúan en segundo plano y cómo se puede conocer su estado.'],['Evalúa decisiones','Utiliza un entorno demostrativo para conversar sobre arquitectura, funcionamiento y mantenimiento.']],
     audience:'Personas que aprenden o trabajan con software y quieren explorar servicios, procesos y observación de actividad en un laboratorio.',
