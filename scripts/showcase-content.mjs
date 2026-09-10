@@ -95,15 +95,6 @@ export const showcase = {
     steps:['Describe la tarea y las aplicaciones implicadas.','Revisa una propuesta de flujo y sus requisitos.','Valida el resultado con ejemplos controlados.'],flow:['Evento','Proceso','Resultado'],
     faq:[['¿Todos los flujos están creados por NoeApps?','No. La colección incluye referencias de la comunidad y de terceros. Cada adaptación debe respetar la autoría y la licencia de los componentes utilizados.'],['¿Se instalan automáticamente al contactar?','No. Primero se revisan el proceso, las conexiones, los permisos y el entorno donde se ejecutaría el flujo.'],['¿Qué información debo enviar?','Explica la tarea que repites, qué aplicaciones utilizas y qué resultado buscas. No incluyas contraseñas ni claves de acceso en el correo.']]
   },
-  tuanuncio: {
-    image:'tuanuncio-billboard.png',alt:'Imagen de una valla publicitaria junto a una carretera, utilizada en la demo de TuAnuncio.',caption:'Imagen de presentación de TuAnuncio · Ubicación ilustrativa.',concept:true,
-    short:['Exploración de ubicaciones','Presentación de campañas','Experiencia web'],heading:'Una idea de producto para la publicidad exterior.',
-    benefits:[['Presenta el espacio','Una experiencia visual ayuda a comprender el tipo de soporte publicitario que se está explorando.'],['Facilita el recorrido','Organiza la navegación alrededor de ubicaciones y campañas para acercar la propuesta al visitante.'],['Concreta una conversación','La demo sirve como punto de partida para estudiar un producto digital adaptado a este sector.']],
-    audience:'Personas interesadas en explorar cómo podría presentarse y consultarse una oferta de publicidad exterior desde una web.',
-    example:'Un visitante quiere entender las opciones de una campaña. Recorre una presentación de espacios ilustrativos y utiliza la experiencia para concretar lo que necesitaría consultar.',
-    steps:['Visita la demo del proyecto.','Explora la presentación de espacios.','Comenta cómo adaptarías el recorrido a un caso real.'],flow:['Ubicación','Campaña','Consulta'],
-    faq:[['¿Las ubicaciones están disponibles para contratar?','No se confirma disponibilidad real. Las ubicaciones de esta demo son ilustrativas.'],['¿Puedo reservar o pagar una campaña?','La demo es conceptual y no permite contratar ni pagar campañas reales.'],['¿Se puede estudiar una adaptación?','Sí. Puedes contactar para comentar el catálogo, el tipo de cliente y el proceso de consulta que necesitaría un proyecto real.']]
-  },
   tugta: {
     image:'gta-editorial.png',alt:'Escena ficticia de una ciudad costera al atardecer, con un deportivo y edificios iluminados.',caption:'Ilustración editorial original; no es una captura de un videojuego.',concept:true,
     short:['Actualidad GTA','Lectura y descubrimiento','Medio independiente'],heading:'Contenido pensado para una comunidad concreta.',
