@@ -200,3 +200,9 @@
   .story-access { padding:27px; }
 }
 @media(prefers-reduced-motion:reduce) { .product-visual-card { transition:none; } }
+
+/* NoeApps Guard identities: preserve full artwork at all widths. */
+.preview-broken-link-guard,.preview-leaver-guard,.image-broken-link-guard,.image-leaver-guard{background:#f5f8f9!important;display:flex;align-items:center;justify-content:center}
+.preview-broken-link-guard img,.preview-leaver-guard img,.image-broken-link-guard img,.image-leaver-guard img{object-fit:contain!important;width:70%!important;height:100%!important;max-height:390px;padding:24px;box-sizing:border-box}
+.document table{width:100%;border-collapse:collapse}.document th,.document td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid #d5dce4;overflow-wrap:anywhere}@media(max-width:600px){.document table,.document thead,.document tbody,.document tr,.document th,.document td{display:block}.document th,.document td{padding:8px}}
+@media(max-width:850px){.guard-doc .product-layout{grid-template-columns:1fr;gap:0}.guard-doc .product-aside{margin-bottom:40px}.guard-doc .document table,.guard-doc .document thead,.guard-doc .document tbody,.guard-doc .document tr,.guard-doc .document th,.guard-doc .document td{display:block}.guard-doc .document th,.guard-doc .document td{padding:8px}.guard-doc .document thead{display:none}.guard-doc .document td:first-child{font-weight:700;background:#edf5f7}.guard-doc .document td:nth-child(2)::before{content:"Datos: ";font-weight:700}.guard-doc .document td:nth-child(3)::before{content:"Finalidad: ";font-weight:700}}
