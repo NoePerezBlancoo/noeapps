@@ -4,24 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Soporte · NoeApps</title>
-  <meta name="description" content="Soporte para las aplicaciones de NoeApps.">
+  <meta name="description" content="Centro de soporte de NoeApps para DeleteGuard, BrokenLinkGuard, LeaverGuard y otros productos.">
   <link rel="canonical" href="https://noeapps.com/soporte/">
   <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Ir al contenido</a>
-  <header class="site-header"><div class="container nav"><a class="brand" href="/"><span class="brand-mark">N</span><span>Noe Apps</span></a><nav class="nav-links" data-menu><a href="/">Aplicaciones</a><a href="/privacidad/">Privacidad</a></nav></div></header>
+  <header class="site-header"><div class="container nav"><a class="brand" href="/"><span class="brand-symbol">N</span><span>NoeApps</span></a><button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="menu">Menú</button><nav id="menu" class="nav-links" data-menu><a href="/#productos">Productos</a><a href="/#acerca">NoeApps</a><a href="/privacidad/">Privacidad</a></nav></div></header>
   <main id="contenido">
-    <section class="page-hero container"><p class="eyebrow">Ayuda</p><h1>Soporte</h1><p class="lede">Cada aplicación mantiene su documentación y su canal de ayuda. Indica el producto y describe el problema con el mayor contexto posible.</p></section>
-    <article class="container prose">
-      <h2>DeleteGuard</h2>
-      <p>La información pública del producto está disponible en <a href="/apps/deleteguard/">su página de NoeApps</a>. Para incidencias técnicas relacionadas con el código o una versión de prueba, utiliza el repositorio de DeleteGuard en GitHub.</p>
-      <h2>Otros productos</h2>
-      <p>BrokenLinkGuard, LeaverGuard, ForgeOps y Fivaki mantienen repositorios independientes. NoeApps actúa como escaparate y punto de entrada, mientras que cada producto conserva su propio ciclo de desarrollo y soporte.</p>
-      <h2>Qué incluir</h2>
-      <p>Para acelerar el diagnóstico, incluye el nombre de la aplicación, qué estabas intentando hacer, el resultado esperado, el resultado obtenido y, cuando sea posible, capturas o mensajes de error sin datos sensibles.</p>
-    </article>
+    <section class="page-hero"><div class="container"><p class="eyebrow">Centro de ayuda</p><h1>Soporte sin rodeos.</h1><p class="lede">Empieza por el producto correspondiente. Cuanto más contexto incluyas, más fácil será reproducir el problema y encontrar una solución.</p></div></section>
+
+    <section class="section alt"><div class="container">
+      <div class="support-grid">
+        <article class="support-card reveal"><span class="pill">Jira Cloud</span><h2>DeleteGuard</h2><p>Historial de incidencias eliminadas para administradores.</p><a class="card-link" href="/apps/deleteguard/">Abrir información</a></article>
+        <article class="support-card reveal"><span class="pill">Confluence Cloud</span><h2>BrokenLinkGuard</h2><p>Diagnóstico y reparación asistida de referencias problemáticas.</p><a class="card-link" href="/apps/brokenlinkguard/">Abrir información</a></article>
+        <article class="support-card reveal"><span class="pill">Jira Cloud</span><h2>LeaverGuard</h2><p>Revisión y traspaso de responsabilidades antes de una salida.</p><a class="card-link" href="/apps/leaverguard/">Abrir información</a></article>
+      </div>
+
+      <div class="about-panel reveal">
+        <div class="about-logo"><img src="/assets/noeapps-logo.webp" alt="Símbolo de NoeApps"></div>
+        <div class="about-copy"><p class="eyebrow">Para diagnosticar más rápido</p><div class="split-copy"><h2>Incluye cinco datos básicos.</h2></div><ul class="check-list"><li>Nombre de la aplicación y versión, si la conoces.</li><li>Qué estabas intentando hacer.</li><li>Qué resultado esperabas y qué ocurrió realmente.</li><li>Mensaje de error o captura, evitando datos sensibles.</li><li>Entorno afectado: Jira, Confluence o navegador, según corresponda.</li></ul></div>
+      </div>
+    </div></section>
+
+    <section class="section"><div class="container"><div class="info-banner reveal"><div><p class="eyebrow" style="color:#9eeeff">Importante</p><h2>No compartas credenciales ni información sensible.</h2></div><div><p>Para revisar una incidencia no necesito contraseñas, tokens, claves API ni datos personales de clientes. Sustituye esos valores por ejemplos seguros antes de compartir capturas, logs o mensajes de error.</p><a class="button secondary" href="/privacidad/">Ver privacidad</a></div></div></div></section>
   </main>
-  <footer class="site-footer"><div class="container footer-row"><a class="brand" href="/"><span class="brand-mark">N</span><span>Noe Apps</span></a><span>© 2026 Noé Pérez Blanco</span><nav class="footer-links"><a href="/privacidad/">Privacidad de la web</a><a href="/soporte/">Soporte</a></nav></div></footer>
+  <footer class="site-footer"><div class="container footer-row"><a class="brand footer-brand" href="/"><span class="brand-symbol">N</span><span>NoeApps</span></a><span>© 2026 Noé Pérez Blanco</span><nav class="footer-links"><a href="/privacidad/">Privacidad</a><a href="/soporte/">Soporte</a></nav></div></footer>
 </body>
 </html>
