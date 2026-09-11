@@ -1,0 +1,7 @@
+<svg width="640" height="180" viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">NoeApps</title><desc id="desc">Logotipo NoeApps azul y cian</desc>
+<defs><linearGradient id="g" x1="70" y1="30" x2="250" y2="145" gradientUnits="userSpaceOnUse"><stop stop-color="#1C78FF"/><stop offset="1" stop-color="#20D7DD"/></linearGradient></defs>
+<path d="M52 137V43c0-11 7-19 18-19 6 0 11 2 15 7l58 66 50-67c4-5 9-7 15-7 11 0 19 8 19 19v95h-31V76l-40 54c-3 4-8 7-13 7-6 0-10-2-14-7L83 77v60H52Z" fill="url(#g)"/>
+<rect x="185" y="103" width="25" height="25" rx="7" fill="#20D7DD"/>
+<text x="265" y="118" fill="#F3F8FF" font-family="Inter,Arial,sans-serif" font-size="72" font-weight="800" letter-spacing="-4">NoeApps</text>
+</svg>

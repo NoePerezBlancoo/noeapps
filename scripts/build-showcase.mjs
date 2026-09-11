@@ -44,11 +44,11 @@ function img(name,alt,eager=false){
 }
 const productVisual=(e,eager=false)=>img(e.image,e.alt,eager)+(e.previewHome?img(e.previewHome,'Pantalla real de inicio de Fivaki en Android, con una cuenta de prueba.',eager):'');
 const nav=`<nav aria-label="Principal"><a href="/#productos">Productos</a><a href="/#herramientas">Herramientas</a><a href="/#proyectos">Proyectos</a><a class="nav-portfolio" href="${portfolio}">Quién soy <span aria-hidden="true">↗</span></a><a href="/soporte/">Soporte</a></nav>`;
-const header=`<header class="site-header wrap"><a class="brand" href="/" aria-label="NoeApps, inicio">Noe<span>Apps</span><span class="brand-mark" aria-hidden="true">/</span></a>${nav}</header>`;
-const footer=`<footer class="site-footer wrap"><a class="brand small" href="/">Noe<span>Apps</span></a><p>© 2026 Noé Pérez Blanco</p><div><a href="${portfolio}">Quién soy ↗</a><a href="/aviso-legal/">Aviso legal</a><a href="/privacidad/">Privacidad de la web</a><a href="/soporte/">Soporte</a></div></footer>`;
+const header=`<header class="site-header wrap"><a class="brand" href="/" aria-label="NoeApps, inicio"><img class="brand-logo" src="/assets/noeapps-logo.webp" alt="" width="380" height="298"><span class="brand-wordmark">Noe<span>Apps</span><span class="brand-mark" aria-hidden="true">/</span></span></a>${nav}</header>`;
+const footer=`<footer class="site-footer wrap"><a class="brand small" href="/"><img class="brand-logo" src="/assets/noeapps-logo.webp" alt="" width="380" height="298"><span class="brand-wordmark">Noe<span>Apps</span></span></a><p>© 2026 Noé Pérez Blanco</p><div><a href="${portfolio}">Quién soy ↗</a><a href="/aviso-legal/">Aviso legal</a><a href="/privacidad/">Privacidad de la web</a><a href="/soporte/">Soporte</a></div></footer>`;
 function page(title,description,route,body,cover){
   return `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — NoeApps</title><meta name="description" content="${esc(description)}"><meta name="robots" content="index,follow"><meta name="theme-color" content="#102b49"><link rel="canonical" href="https://noeapps.com${route}"><meta property="og:title" content="${esc(title)} — NoeApps"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="https://noeapps.com${route}">${cover?`<meta property="og:image" content="https://noeapps.com${asset(cover)}">`:''}<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/catalog.css"><link rel="stylesheet" href="/presentation.css"></head><body><a class="skip-link" href="#contenido">Ir al contenido</a>${header}<main id="contenido" class="wrap">${body}</main>${footer}</body></html>\n`;
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} — NoeApps</title><meta name="description" content="${esc(description)}"><meta name="robots" content="index,follow"><meta name="theme-color" content="#102b49"><link rel="canonical" href="https://noeapps.com${route}"><meta property="og:title" content="${esc(title)} — NoeApps"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="https://noeapps.com${route}">${cover?`<meta property="og:image" content="https://noeapps.com${asset(cover)}">`:''}<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/catalog.css"><link rel="stylesheet" href="/presentation.css"><link rel="stylesheet" href="/brand-refresh.css"></head><body><a class="skip-link" href="#contenido">Ir al contenido</a>${header}<main id="contenido" class="wrap">${body}</main>${footer}</body></html>\n`;
 }
 function writePage(route,html){const dest=path.join(root,route,'index.html');fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,html);}
 function card(e){
@@ -83,7 +83,7 @@ for(const f of walk(root).filter(f=>f.endsWith('.html'))){
   let html=fs.readFileSync(f,'utf8');
   html=html.replace(/<header class="site-header wrap">[\s\S]*?<\/header>/,header).replace(/<footer class="site-footer wrap">[\s\S]*?<\/footer>/,footer);
   html=html.replace('href="/showcase.css"','href="/presentation.css"');
-  if(!html.includes('href="/presentation.css"'))html=html.replace('</head>','<link rel="stylesheet" href="/presentation.css"></head>');
+  if(!html.includes('href="/presentation.css"'))html=html.replace('<link rel="stylesheet" href="/brand-refresh.css"></head>','<link rel="stylesheet" href="/presentation.css"><link rel="stylesheet" href="/brand-refresh.css"></head>');
   fs.writeFileSync(f,html);
 }
 const routes=['/',...entries.map(urlOf)];
