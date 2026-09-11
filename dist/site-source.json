@@ -1,0 +1,12 @@
+{
+  "site": "NoeApps",
+  "domain": "https://noeapps.com",
+  "site_version": "2.0.0",
+  "design_revision": "professional-redesign-2026-09-11",
+  "sites_project_id": "appgprj_6aa2b034b1048191ba9da75dbda7662e",
+  "sites_slug": "noeapps",
+  "source_version_number": 3,
+  "projection_revision": 6,
+  "recovered_from_public_projection": true,
+  "source_of_truth": "github"
+}
