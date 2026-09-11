@@ -1,3 +1,9 @@
+# 2.0.1
+
+- Recuperado todo el contenido del Site anterior a 2.0.0.
+- Logo NoeApps nuevo en todas las páginas.
+- Mejora visual azul y cian, conservando textos, enlaces, imágenes y documentación.
+
 # Changelog
 
 ## 2.0.0 — 2026-09-11

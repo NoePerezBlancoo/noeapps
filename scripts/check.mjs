@@ -4,10 +4,9 @@ import { join, extname } from 'node:path';
 const required = [
   'dist/index.html',
   'dist/styles.css',
-  'dist/app.js',
   'dist/apps/deleteguard/index.html',
-  'dist/apps/brokenlinkguard/index.html',
-  'dist/apps/leaverguard/index.html',
+  'dist/apps/broken-link-guard/index.html',
+  'dist/apps/leaver-guard/index.html',
   'dist/privacidad/index.html',
   'dist/soporte/index.html',
   'dist/assets/noeapps-logo.webp',
