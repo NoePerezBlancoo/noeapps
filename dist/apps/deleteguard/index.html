@@ -3,27 +3,81 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DeleteGuard · NoeApps</title>
-  <meta name="description" content="DeleteGuard conserva un historial administrativo de incidencias eliminadas en Jira Cloud.">
+  <title>DeleteGuard · Historial de eliminaciones para Jira Cloud · NoeApps</title>
+  <meta name="description" content="DeleteGuard registra eliminaciones de incidencias en Jira Cloud y ofrece a administradores un historial consultable sin backend externo del proveedor.">
   <link rel="canonical" href="https://noeapps.com/apps/deleteguard/">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#contenido">Ir al contenido</a>
-  <header class="site-header"><div class="container nav"><a class="brand" href="/"><span class="brand-mark">N</span><span>Noe Apps</span></a><nav class="nav-links" data-menu><a href="/">Aplicaciones</a><a href="/soporte/">Soporte</a></nav></div></header>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="/" aria-label="NoeApps, inicio"><span class="brand-symbol">N</span><span>NoeApps</span></a>
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="menu">Menú</button>
+      <nav id="menu" class="nav-links" data-menu aria-label="Navegación principal">
+        <a href="/#productos">Productos</a><a href="/#metodo">Cómo trabajamos</a><a href="/soporte/" class="nav-cta">Soporte</a>
+      </nav>
+    </div>
+  </header>
+
   <main id="contenido">
-    <section class="page-hero container">
-      <p class="eyebrow">Jira Cloud · En preparación</p>
-      <h1>DeleteGuard</h1>
-      <p class="lede">Una incidencia se elimina. Su contexto sigue disponible.</p>
+    <section class="page-hero">
+      <div class="container product-page-hero">
+        <div>
+          <div class="product-kicker"><span class="pill">Jira Cloud</span><span class="pill green">Piloto validado</span></div>
+          <h1>DeleteGuard</h1>
+          <p class="lede">Una incidencia se elimina. Su contexto sigue disponible para quien administra Jira.</p>
+          <div class="hero-actions"><a class="button" href="#como-funciona">Cómo funciona</a><a class="button secondary" href="/soporte/">Soporte</a></div>
+        </div>
+        <div class="product-page-visual reveal" aria-hidden="true">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M100 20 158 43v45c0 39-23 72-58 90-35-18-58-51-58-90V43l58-23Z" stroke="#1677EE" stroke-width="15"/>
+            <path d="m72 98 19 19 40-43" stroke="#16C8DF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
     </section>
-    <section class="section"><div class="container">
-      <div class="section-heading"><h2>Historial reservado a administradores.</h2><p class="section-copy">Consulta qué incidencia se eliminó, cuándo y quién realizó la acción. DeleteGuard está diseñado para conservar contexto administrativo sin convertir el historial en una herramienta visible para usuarios normales.</p></div>
-      <div class="features"><div class="feature"><strong>01</strong><span>Historial de eliminaciones</span></div><div class="feature"><strong>02</strong><span>Búsqueda en el historial</span></div><div class="feature"><strong>03</strong><span>Acceso de administrador</span></div></div>
-    </div></section>
-    <section class="section"><div class="container about-grid"><div><p class="eyebrow">Disponibilidad</p><h2>Todavía no disponible en Marketplace.</h2></div><div class="about-copy"><p>La aplicación está en preparación para Jira Cloud. La documentación, privacidad y soporte se mantendrán enlazados desde NoeApps.</p><a class="text-link" href="/soporte/">Ir a soporte →</a></div></div></section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="section-heading reveal"><div><p class="eyebrow">Qué resuelve</p><h2>Auditoría útil después de una eliminación.</h2></div><p class="section-copy">Jira confirma la eliminación, pero el contexto puede desaparecer justo cuando un administrador necesita responder preguntas. DeleteGuard guarda el registro mínimo útil después de instalarse y lo presenta en una página administrativa consultable.</p></div>
+        <div class="detail-grid">
+          <article class="detail-card reveal"><div class="detail-icon">01</div><h3>Qué se eliminó</h3><p>Conserva la clave, el resumen y el proyecto de la incidencia eliminada.</p></article>
+          <article class="detail-card reveal"><div class="detail-icon">02</div><h3>Cuándo ocurrió</h3><p>Registra el momento de la eliminación para reconstruir el contexto temporal.</p></article>
+          <article class="detail-card reveal"><div class="detail-icon">03</div><h3>Quién realizó la acción</h3><p>Relaciona el evento con la cuenta de Atlassian y resuelve el nombre visible al consultar.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="como-funciona">
+      <div class="container">
+        <div class="section-heading reveal"><div><p class="eyebrow">Flujo</p><h2>Tres pasos, sin convertirlo en una suite.</h2></div><p class="section-copy">DeleteGuard está diseñado como una herramienta de auditoría enfocada, no como un sistema de backup y restauración.</p></div>
+        <div class="process">
+          <article class="process-step reveal"><strong>01</strong><h3>Jira emite el evento</h3><p>La app escucha el evento oficial de eliminación de incidencias de Jira Cloud.</p></article>
+          <article class="process-step reveal"><strong>02</strong><h3>Forge conserva el registro</h3><p>El historial se guarda en almacenamiento alojado por Atlassian, asociado a la instalación.</p></article>
+          <article class="process-step reveal"><strong>03</strong><h3>El administrador consulta</h3><p>Una vista administrativa permite buscar y recorrer el historial guardado.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="container">
+        <div class="info-banner reveal">
+          <div><p class="eyebrow" style="color:#9eeeff">Privacidad y arquitectura</p><h2>Sin backend externo del proveedor.</h2></div>
+          <div><p>DeleteGuard usa funciones y almacenamiento alojados en Atlassian Forge. No necesita una base de datos externa, Redis ni un servidor propio para mantener el historial principal. El alcance comercial y la documentación de Marketplace siguen en preparación.</p><a class="button secondary" href="/privacidad/">Privacidad de NoeApps</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container about-panel reveal">
+        <div class="about-logo"><img src="/assets/noeapps-logo.webp" alt="Símbolo de NoeApps"></div>
+        <div class="about-copy"><p class="eyebrow">Estado del producto</p><div class="split-copy"><h2>MVP validado en un sitio real de Jira Cloud.</h2></div><p>La captura de eliminaciones, persistencia del historial, resolución del usuario y vista administrativa ya se han validado. La preparación actual se centra en privacidad, seguridad, búsqueda/paginación y requisitos de publicación.</p><a class="text-link" href="/soporte/">Consultar soporte →</a></div>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer"><div class="container footer-row"><a class="brand" href="/"><span class="brand-mark">N</span><span>Noe Apps</span></a><span>© 2026 Noé Pérez Blanco</span><nav class="footer-links"><a href="/privacidad/">Privacidad de la web</a><a href="/soporte/">Soporte</a></nav></div></footer>
+
+  <footer class="site-footer"><div class="container footer-row"><a class="brand footer-brand" href="/"><span class="brand-symbol">N</span><span>NoeApps</span></a><span>© 2026 Noé Pérez Blanco</span><nav class="footer-links"><a href="/privacidad/">Privacidad</a><a href="/soporte/">Soporte</a></nav></div></footer>
 </body>
 </html>
