@@ -6,6 +6,7 @@
   <title>NoeApps · Software útil, claro y mantenible</title>
   <meta name="description" content="NoeApps reúne productos de software independientes: SaaS, herramientas para negocios y aplicaciones especializadas para Jira y Confluence.">
   <link rel="canonical" href="https://noeapps.com/">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/tunegocio.css">
   <script src="/app.js" defer></script>
@@ -31,10 +32,10 @@
         <div>
           <p class="eyebrow">Software independiente · productos con foco</p>
           <h1>Software útil para <span class="gradient-text">problemas reales.</span></h1>
-          <p class="lede">NoeApps reúne productos propios pensados para resolver tareas concretas: desde crear la presencia web de un pequeño negocio hasta simplificar operaciones dentro de Jira y Confluence.</p>
+          <p class="lede">NoeApps reúne productos propios pensados para resolver tareas concretas: desde crear la presencia web de un pequeño negocio o auditar técnicamente una web hasta simplificar operaciones dentro de Jira y Confluence.</p>
           <div class="hero-actions">
             <a class="button" href="#productos">Explorar productos <span aria-hidden="true">→</span></a>
-            <a class="button secondary" href="/apps/tunegocio/">Ver TuNegocio</a>
+            <a class="button secondary" href="https://tutest.noeapps.com" target="_blank" rel="noopener">Probar TuTest</a>
           </div>
           <div class="microcopy" aria-label="Características de NoeApps">
             <span>Productos especializados</span>
@@ -47,6 +48,11 @@
           <div class="identity-card">
             <img class="identity-logo" src="/assets/noeapps-logo.webp" alt="Logotipo de NoeApps">
             <div class="product-stack" aria-label="Productos destacados">
+              <div class="mini-product mini-product-new">
+                <div class="mini-icon">TT</div>
+                <div><strong>TuTest</strong><small>Auditoría técnica pasiva de sitios web</small></div>
+                <span class="mini-state">V5</span>
+              </div>
               <div class="mini-product mini-product-new">
                 <div class="mini-icon">TN</div>
                 <div><strong>TuNegocio</strong><small>Web profesional para pequeños negocios</small></div>
@@ -69,7 +75,7 @@
               </div>
             </div>
           </div>
-          <div class="floating-badge"><strong>4 productos</strong><span>Web · SaaS · Jira · Confluence</span></div>
+          <div class="floating-badge"><strong>5 productos</strong><span>Web · SaaS · Jira · Confluence</span></div>
         </div>
       </div>
     </section>
@@ -89,7 +95,7 @@
             <p class="eyebrow">Productos</p>
             <h2>Herramientas con un objetivo claro.</h2>
           </div>
-          <p class="section-copy">NoeApps combina productos propios para pequeños negocios con una línea de utilidades especializadas para Atlassian. El criterio es el mismo: <strong>quitar trabajo, reducir fricción y hacer evidente el siguiente paso.</strong></p>
+          <p class="section-copy">NoeApps combina productos propios para web y pequeños negocios con una línea de utilidades especializadas para Atlassian. El criterio es el mismo: <strong>quitar trabajo, reducir fricción y hacer evidente el siguiente paso.</strong></p>
         </div>
 
         <article class="featured-product tunegocio-featured reveal">
@@ -110,18 +116,30 @@
               <a class="button secondary" href="https://tunegocio-beta-production.up.railway.app" target="_blank" rel="noopener">Probar la beta</a>
             </div>
           </div>
-          <div class="product-demo tunegocio-demo" aria-label="Vista ilustrativa de TuNegocio">
-            <div class="tn-browser">
-              <div class="browser-top"><i></i><i></i><i></i><span>taller-perez.noeapps.com</span></div>
-              <div class="tn-demo-page">
-                <div class="tn-demo-nav"><strong>Taller Pérez</strong><span>Servicios &nbsp; · &nbsp; Contacto</span></div>
-                <div class="tn-demo-hero">
-                  <div><small>OURENSE · TALLER MECÁNICO</small><h4>Tu vehículo, atendido sin rodeos.</h4><p>Mantenimiento, diagnosis y contacto directo.</p><b>Pedir cita →</b></div>
-                  <div class="tn-demo-art"><i></i><i></i><strong>TP</strong></div>
-                </div>
-                <div class="tn-demo-options"><span>01<br><strong>Directa</strong></span><span>02<br><strong>Editorial</strong></span><span>03<br><strong>Visual</strong></span></div>
-              </div>
+          <div class="product-demo asset-preview tunegocio-asset-preview">
+            <img src="/assets/tunegocio-preview.svg" alt="Vista previa de una web creada con TuNegocio">
+          </div>
+        </article>
+
+        <article class="featured-product tutest-featured product-spaced reveal">
+          <div class="featured-copy">
+            <div class="product-kicker">
+              <span class="pill">Auditoría web</span>
+              <span class="pill green">V5 online</span>
             </div>
+            <h3>TuTest</h3>
+            <p>Auditor web pasivo y sin registro. Introduces un dominio y TuTest analiza la página de entrada y una muestra interna del sitio para devolver un diagnóstico técnico priorizado.</p>
+            <ul class="check-list">
+              <li>Seguridad, SEO, rendimiento, accesibilidad, privacidad e infraestructura.</li>
+              <li>Causas raíz, bloqueadores, quick wins y Site Health de 0 a 100.</li>
+              <li>Análisis stateless y pasivo, sin exploits, fuerza bruta ni pruebas ofensivas.</li>
+            </ul>
+            <div class="hero-actions">
+              <a class="button" href="https://tutest.noeapps.com" target="_blank" rel="noopener">Probar TuTest</a>
+            </div>
+          </div>
+          <div class="product-demo asset-preview tutest-asset-preview">
+            <img src="/assets/tutest-preview.svg" alt="Vista previa del informe de auditoría técnica de TuTest">
           </div>
         </article>
 
