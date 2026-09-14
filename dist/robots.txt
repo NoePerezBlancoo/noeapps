@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://noeapps.com/sitemap.xml
