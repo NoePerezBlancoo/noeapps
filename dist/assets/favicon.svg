@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NoeApps">
+  <defs>
+    <linearGradient id="g" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B48B5"/>
+      <stop offset="0.55" stop-color="#1677EE"/>
+      <stop offset="1" stop-color="#16C8DF"/>
+    </linearGradient>
+  </defs>
+  <rect x="3" y="3" width="58" height="58" rx="17" fill="url(#g)"/>
+  <path d="M19 45V19h7.2l12.2 16.1V19H45v26h-6.8L25.7 28.4V45H19Z" fill="white"/>
+  <circle cx="47.5" cy="16.5" r="4.5" fill="#BDF8FF"/>
+</svg>
