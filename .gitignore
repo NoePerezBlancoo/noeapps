@@ -4,3 +4,19 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Large original assets reconstructed losslessly by the build.
+/dist/assets/deleteguard.png
+/dist/assets/showcase/ai-agents.png
+/dist/assets/showcase/background-tasks.png
+/dist/assets/showcase/connected-work.png
+/dist/assets/showcase/fivaki-icon-original.png
+/dist/assets/showcase/fivaki-splash-original.png
+/dist/assets/showcase/gta-editorial.png
+/dist/assets/showcase/industrial-systems.png
+/dist/assets/showcase/it-support.png
+/dist/assets/showcase/leaver-guard.png
+/dist/assets/showcase/media-downloads.png
+/dist/assets/showcase/remove-background.png
+/dist/assets/showcase/tcg-editorial.png
+/dist/assets/showcase/text-to-audio.png

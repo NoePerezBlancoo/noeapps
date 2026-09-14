@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.0 — 2026-09-14
+
+- Restaurado el catálogo anterior completo: ForgeOps, Fivaki, Pequeño Comercio, herramientas y proyectos, con sus capturas, guías y documentos.
+- Organizadas las 19 entradas en aplicaciones, herramientas, integraciones Atlassian y proyectos, con destacados separados.
+- Validación que protege la presencia de las 19 fichas en portada, soporte y sitemap.
+- TuTest integrado en portada, catálogo, navegación y soporte.
+- Nueva ficha /apps/tutest/ con CTA al auditor y explicación de Audit Intelligence V5.
+- SEO, datos estructurados, sitemap y metadatos sociales actualizados.
+- Conservados TuNegocio y los tres productos Atlassian.
+- Corregido el desbordamiento móvil de títulos largos.
+- Configuración estática de Sites incluida en la fuente y validación ampliada.
+
 ## 2.1.0 — 2026-09-14
 
 - TuNegocio pasa a formar parte del catálogo público de NoeApps.

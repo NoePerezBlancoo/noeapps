@@ -1,15 +1,13 @@
 import { access, readFile, readdir } from 'node:fs/promises';
 import { join, extname } from 'node:path';
+import { entries as catalog } from './catalog-data.mjs';
 
 const required = [
   'dist/index.html',
   'dist/styles.css',
-  'dist/tunegocio.css',
-  'dist/app.js',
-  'dist/apps/tunegocio/index.html',
   'dist/apps/deleteguard/index.html',
-  'dist/apps/brokenlinkguard/index.html',
-  'dist/apps/leaverguard/index.html',
+  'dist/apps/broken-link-guard/index.html',
+  'dist/apps/leaver-guard/index.html',
   'dist/privacidad/index.html',
   'dist/soporte/index.html',
   'dist/assets/noeapps-logo.webp',
@@ -62,5 +60,22 @@ for (const htmlPath of (await walk('dist')).filter((path) => path.endsWith('.htm
   }
 }
 
+// Protect the complete catalog, including projects recovered from the previous publication.
+const expectedSlugs = ['tutest','tunegocio','forgeops','fivaki','pequeno-comercio','deleteguard','broken-link-guard','leaver-guard','quitar-fondo','texto-audio','descargas-multimedia','iagentes','automatizaciones-n8n','tugta','noticias-tcg','itflow-manager','opsdesk','edulabops','laboratorio-industrial'];
+const home = await readFile('dist/index.html','utf8');
+const support = await readFile('dist/soporte/index.html','utf8');
+const sitemap = await readFile('dist/sitemap.xml','utf8');
+for (const slug of expectedSlugs) {
+ const entry = catalog.find(e=>e.slug===slug);
+ const route = entry && `/${entry.group}/${slug}/`;
+ if (!entry || !home.includes(`href="${route}"`) || !support.includes(`href="${route}"`) || !sitemap.includes(`https://noeapps.com${route}`)) {
+  console.error(`CATALOG ENTRY MISSING: ${slug}`); failed=true;
+ }
+}
+const tutest = await readFile('dist/apps/tutest/index.html','utf8');
+if (!tutest.includes('href="https://tutest.noeapps.com"') || !tutest.includes('Analizar una web') || !tutest.includes('application/ld+json')) { console.error('TuTest CTA or metadata missing'); failed=true; }
+for (const match of tutest.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)) JSON.parse(match[1]);
+for (const category of ['productos','herramientas','atlassian','proyectos']) if (!home.includes(`id="${category}"`)) { console.error(`Missing category: ${category}`); failed=true; }
+console.log(`Verified ${expectedSlugs.length} catalog entries, support, sitemap and TuTest metadata.`);
 if (failed) process.exit(1);
 console.log('NoeApps integrity check passed.');

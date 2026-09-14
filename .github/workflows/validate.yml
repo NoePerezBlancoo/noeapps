@@ -18,5 +18,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check required site files
-        run: npm run check
+      - name: Build and validate complete catalog
+        run: npm run build

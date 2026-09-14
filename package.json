@@ -1,12 +1,13 @@
 {
   "name": "noeapps",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "serve": "python -m http.server 8080 --directory dist",
     "check": "node scripts/check.mjs",
-    "dev": "node scripts/preview.mjs"
+    "dev": "node scripts/preview.mjs",
+    "build": "node scripts/restore-assets.mjs && node scripts/build-catalog.mjs && node scripts/check.mjs"
   },
   "engines": {
     "node": ">=22"
