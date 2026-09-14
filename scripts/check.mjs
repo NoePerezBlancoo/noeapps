@@ -4,7 +4,9 @@ import { join, extname } from 'node:path';
 const required = [
   'dist/index.html',
   'dist/styles.css',
+  'dist/tunegocio.css',
   'dist/app.js',
+  'dist/apps/tunegocio/index.html',
   'dist/apps/deleteguard/index.html',
   'dist/apps/brokenlinkguard/index.html',
   'dist/apps/leaverguard/index.html',
