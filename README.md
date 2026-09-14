@@ -6,15 +6,16 @@ Este repositorio es la **fuente de código/backup independiente** de la web. Per
 
 ## Versión actual
 
-**NoeApps 2.0.0** — rediseño visual publicado en el código el 11 de septiembre de 2026.
+**NoeApps 2.1.0** — catálogo ampliado con TuNegocio el 14 de septiembre de 2026.
 
-La versión 2 incorpora una identidad visual basada en el nuevo logotipo NoeApps, una portada más explicativa, navegación más clara y fichas públicas para DeleteGuard, BrokenLinkGuard y LeaverGuard.
+La versión 2.1 incorpora **TuNegocio** como nuevo producto destacado de NoeApps, amplía la portada para representar una cartera más amplia que la línea Atlassian, añade su ficha pública, soporte, sitemap y validación de integridad.
 
 ## Estructura
 
 | Ruta | Contenido |
 | --- | --- |
 | `dist/` | Web estática completa y lista para servir. |
+| `dist/apps/tunegocio/` | Presentación pública de TuNegocio. |
 | `dist/apps/deleteguard/` | Presentación pública de DeleteGuard. |
 | `dist/apps/brokenlinkguard/` | Presentación pública de BrokenLinkGuard. |
 | `dist/apps/leaverguard/` | Presentación pública de LeaverGuard. |
@@ -42,10 +43,11 @@ Producción continúa en **ChatGPT Sites** con el dominio `noeapps.com`. GitHub 
 
 | Producto | Código |
 | --- | --- |
+| TuNegocio | [NoePerezBlancoo/TuNegocio](https://github.com/NoePerezBlancoo/TuNegocio) |
 | DeleteGuard | [NoePerezBlancoo/DeleteGuard](https://github.com/NoePerezBlancoo/DeleteGuard) |
 | BrokenLinkGuard | [NoePerezBlancoo/BrokenLinkGuard](https://github.com/NoePerezBlancoo/BrokenLinkGuard) |
 | LeaverGuard | [NoePerezBlancoo/LeaverGuard](https://github.com/NoePerezBlancoo/LeaverGuard) |
 | ForgeOps | [NoePerezBlancoo/ForgeOps](https://github.com/NoePerezBlancoo/ForgeOps) |
 | Fivaki | [NoePerezBlancoo/Fitnex](https://github.com/NoePerezBlancoo/Fitnex) |
 
-El código de las aplicaciones no se duplica dentro de este repositorio; cada producto conserva su repositorio, historial y despliegue independiente.
+El código de los productos no se duplica dentro de este repositorio; cada uno conserva su repositorio, historial y despliegue independiente.

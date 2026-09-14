@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0 — 2026-09-14
+
+- TuNegocio pasa a formar parte del catálogo público de NoeApps.
+- Nueva ficha pública para TuNegocio con acceso a la beta y al repositorio.
+- Portada reposicionada para representar una cartera más amplia que la línea Atlassian.
+- TuNegocio se convierte en el producto destacado de la home.
+- DeleteGuard, BrokenLinkGuard y LeaverGuard quedan agrupados como línea Atlassian.
+- Centro de soporte actualizado con TuNegocio.
+- Sitemap e integridad del repositorio ampliados para incluir la nueva ficha.
+- Metadatos y fuente de respaldo actualizados a NoeApps 2.1.0.
+
 ## 2.0.0 — 2026-09-11
 
 - Rediseño completo de la interfaz con una estética más clara y profesional.
