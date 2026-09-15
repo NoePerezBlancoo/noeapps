@@ -50,6 +50,11 @@ function localTarget(url) {
 
 for (const htmlPath of (await walk('dist')).filter((path) => path.endsWith('.html'))) {
   const html = await readFile(htmlPath, 'utf8');
+  const adsenseScripts = html.match(/https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-2728247953803725/g) ?? [];
+  if (adsenseScripts.length !== 1) {
+    console.error(`ADSENSE ${htmlPath}: expected one verification script, found ${adsenseScripts.length}`);
+    failed = true;
+  }
   const urls = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]);
   for (const url of urls) {
     const target = localTarget(url);

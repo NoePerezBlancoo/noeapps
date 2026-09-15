@@ -15,6 +15,7 @@ const urlOf=e=>`/${e.group}/${e.slug}/`;
 const anchorOf=e=>categoryOf(e)==='apps'?'productos':categoryOf(e);
 const accessOf=e=>e.url||contact(e.name,e.cta);
 const asset=name=>`/assets/showcase/${name}`;
+const adsenseScript='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2728247953803725" crossorigin="anonymous"></script>';
 const dimensions=new Map();
 for(const e of entries){
   for(const name of [e.image,e.logo,e.previewHome,...(e.gallery||[]).map(g=>g[0])].filter(Boolean)){
@@ -97,6 +98,7 @@ for(const f of walk(root).filter(f=>f.endsWith('.html'))){
   html=html.replace(/<header class="site-header wrap">[\s\S]*?<\/header>/,header).replace(/<footer class="site-footer wrap">[\s\S]*?<\/footer>/,footer);
   html=html.replace('href="/showcase.css"','href="/presentation.css"');
   if(!html.includes('href="/presentation.css"'))html=html.replace('<link rel="stylesheet" href="/brand-refresh.css"></head>','<link rel="stylesheet" href="/presentation.css"><link rel="stylesheet" href="/brand-refresh.css"></head>');
+  if(!html.includes('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'))html=html.replace('</head>',`${adsenseScript}</head>`);
   fs.writeFileSync(f,html);
 }
 const routes=walk(root).filter(f=>f.endsWith('index.html')).map(f=>'/'+path.relative(root,f).split(path.sep).join('/').replace(/index\.html$/,'')).filter(route=>!['/apps/brokenlinkguard/','/apps/leaverguard/'].includes(route));
