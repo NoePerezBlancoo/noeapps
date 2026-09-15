@@ -4,6 +4,7 @@ import { entries as catalog } from './catalog-data.mjs';
 
 const required = [
   'dist/index.html',
+  'dist/ads.txt',
   'dist/styles.css',
   'dist/apps/deleteguard/index.html',
   'dist/apps/broken-link-guard/index.html',
@@ -27,6 +28,12 @@ for (const path of required) {
     console.error(`MISSING ${path}`);
     failed = true;
   }
+}
+
+const adsTxt = await readFile('dist/ads.txt', 'utf8');
+if (adsTxt.trim() !== 'google.com, pub-2728247953803725, DIRECT, f08c47fec0942fa0') {
+  console.error('INVALID dist/ads.txt');
+  failed = true;
 }
 
 async function walk(dir) {
