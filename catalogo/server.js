@@ -2,6 +2,14 @@ const http=require('http');
 const fs=require('fs');
 const path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
+function validateCatalogHtml(buffer){
+  const source=buffer.toString('utf8');
+  const match=source.match(/<script>([\s\S]*)<\/script>\s*<\/body>/i);
+  if(!match)throw new Error('Catalog inline script not found');
+  // Parse before accepting the deployment. A syntax error would otherwise render a black shell.
+  new Function(match[1]);
+}
+validateCatalogHtml(html);
 const port=process.env.PORT||3000;
 const LIBRARY_ORIGIN='https://catalog-production-53f9.up.railway.app';
 
