@@ -172,7 +172,7 @@ function back(){return '<a class="back" href="/">← Catálogo</a>'}
 function catalog(){
 return `<main class="catalog"><div class="shell">
 <nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill"><b id="totalCatalogCount">10</b> diseños · catálogo vivo</span><button id="surpriseBtn" class="surprise-btn" type="button">✦ Sorpréndeme</button><button id="shareSelectionBtn" class="selection-btn" type="button">Crear selección</button></div></nav>
-<section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Una biblioteca amplia de diseños reales y referencias visuales para distintos sectores. Las 10 primeras son demos NoeApps creadas a medida; debajo puedes explorar cientos de diseños y referencias adicionales.</p><div class="cat-meta"><span>Desde 390 €</span><span>Responsive</span><span>Diseño adaptado</span><span>Precio según complejidad</span><span>Identidad propia</span></div></section>
+<section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Una biblioteca amplia de diseños reales y referencias visuales para distintos sectores. Las 10 primeras son demos NoeApps creadas a medida; debajo puedes explorar cientos de diseños y referencias adicionales.</p><div class="cat-meta"><span>Desde 39 €</span><span>Responsive</span><span>Diseño adaptado</span><span>Precio según complejidad</span><span>Identidad propia</span></div></section>
 
 <section>
 <div class="cat-kicker" style="margin:0 0 16px">Colección NoeApps · 10 demos artesanales</div>
@@ -252,13 +252,13 @@ function catalogAdaptationMode(x){
 function catalogTier(x){
  const tags=(x.style||[]).map(v=>String(v).toLowerCase());
  const impact=Number(x.impact_score||0);
- if(tags.some(t=>t.includes("3d")||t.includes("experimental")))return {key:"signature",label:"Signature",price:1090};
- if(tags.includes("premium")||impact>=24)return {key:"premium",label:"Premium",price:790};
- if(tags.includes("animado")||impact>=18)return {key:"pro",label:"Pro",price:590};
- return {key:"esencial",label:"Esencial",price:390};
+ if(tags.some(t=>t.includes("3d")||t.includes("experimental")))return {key:"signature",label:"Signature",price:299};
+ if(tags.includes("premium")||impact>=24)return {key:"premium",label:"Premium",price:149};
+ if(tags.includes("animado")||impact>=18)return {key:"pro",label:"Pro",price:79};
+ return {key:"esencial",label:"Esencial",price:39};
 }
 function euro(value){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(value)}
-function sectorTier(){return {key:"premium",label:"Premium",price:790}}
+function sectorTier(){return {key:"premium",label:"Premium",price:149}}
 function catalogBuilderUrl(x){
  const href=libraryUrl(x.preview||x.source_url);
  const mode=catalogAdaptationMode(x),tier=catalogTier(x);
