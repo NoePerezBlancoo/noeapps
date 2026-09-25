@@ -88,9 +88,9 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .library-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .library-tags span{border:1px solid #29313d;border-radius:999px;color:#8793a4;padding:5px 7px;font:700 9px Inter}
 .library-actions{display:flex;gap:7px;margin-top:14px}
-.library-actions a{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 11px;border-radius:10px;font:800 10px Inter;border:1px solid #303846}
-.library-actions a:first-child{background:#f5f7f9;color:#0a0d12;border-color:#f5f7f9}
-.library-actions a:last-child{background:#151a22;color:#dfe5ed}
+.library-actions a,.library-actions button.quick-view{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 11px;border-radius:10px;font:800 10px Inter;border:1px solid #303846;cursor:pointer}
+.library-actions button.quick-view{background:#f5f7f9;color:#0a0d12;border-color:#f5f7f9}
+.library-actions a{background:#151a22;color:#dfe5ed}
 .library-more{display:flex;justify-content:center;padding:30px 0 12px}
 .library-more button{border:1px solid #313947;background:#121821;color:#eef2f7;border-radius:999px;padding:12px 20px;font:800 11px Inter;cursor:pointer}
 .library-empty{text-align:center;color:#858e9d;padding:60px 20px;display:none}
@@ -121,9 +121,11 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .compare-top{display:flex;align-items:center;justify-content:space-between;gap:14px;height:58px}.compare-top strong{font:700 18px Manrope}.compare-close{width:40px;height:40px;border-radius:50%;border:1px solid #39414e;background:#141922;color:#fff;font-size:20px;cursor:pointer}
 .compare-grid{flex:1;min-height:0;display:grid;gap:10px;grid-template-columns:repeat(var(--compare-cols,2),minmax(0,1fr))}
 .compare-pane{min-width:0;display:flex;flex-direction:column;border:1px solid #303744;border-radius:16px;overflow:hidden;background:#0d1117}
-.compare-pane-head{height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 13px;border-bottom:1px solid #252c36}.compare-pane-head strong{font:800 12px Inter}.compare-pane-head small{color:#788597;font:700 9px Inter;text-transform:uppercase;letter-spacing:.08em}
-.compare-frame{width:100%;flex:1;border:0;background:#fff}
-@media(max-width:900px){.compare-grid{overflow:auto;grid-template-columns:1fr}.compare-pane{min-height:72vh}.compare-dock{width:calc(100% - 24px);justify-content:center}.compare-dock span{display:none}}
+.compare-pane-head{height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 13px;border-bottom:1px solid #252c36}.compare-pane-head strong{font:800 12px Inter}.compare-pane-head small{color:#788597;font:700 9px Inter;text-transform:uppercase;letter-spacing:.08em}
+.compare-shot{aspect-ratio:16/9;background:#141922;overflow:hidden;border-bottom:1px solid #252c36}.compare-shot img{width:100%;height:100%;object-fit:cover;display:block}.compare-shot .library-fallback{min-height:100%}
+.compare-details{padding:14px;display:grid;gap:11px;flex:1}.compare-row{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid #202731;padding-bottom:9px}.compare-row:last-of-type{border-bottom:0}.compare-row span{color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em}.compare-row strong{font:800 10px Inter;text-align:right;color:#eef2f7}.compare-tags{display:flex;gap:5px;flex-wrap:wrap}.compare-tags span{border:1px solid #2d3541;border-radius:999px;padding:5px 7px;color:#aeb8c5;font:700 8px Inter}.compare-impact{display:flex;align-items:center;gap:8px}.compare-impact-track{height:7px;flex:1;background:#202731;border-radius:999px;overflow:hidden}.compare-impact-track i{display:block;height:100%;background:linear-gradient(90deg,#7b61ff,#1fe4ff);width:var(--impact,0%)}.compare-actions{display:flex;gap:7px;margin-top:auto}.compare-actions a,.compare-actions button{flex:1;height:36px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font:800 9px Inter;cursor:pointer}.compare-actions a{background:#f5f7f9;color:#0a0d12}.compare-actions button{border:1px solid #303846;background:#151a22;color:#dfe5ed}
+.quick-modal{position:fixed;z-index:170;inset:0;background:rgba(3,5,8,.92);backdrop-filter:blur(14px);display:none;padding:24px}.quick-modal.on{display:grid;place-items:center}.quick-card{width:min(980px,100%);max-height:92vh;overflow:auto;border:1px solid #343c49;border-radius:22px;background:#0d1117;box-shadow:0 30px 100px rgba(0,0,0,.65)}.quick-head{height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;border-bottom:1px solid #252c36}.quick-head strong{font:800 16px Manrope}.quick-close{width:38px;height:38px;border-radius:50%;border:1px solid #343c49;background:#151a22;color:#fff;font-size:20px;cursor:pointer}.quick-content{display:grid;grid-template-columns:1.45fr .55fr;min-height:420px}.quick-image{min-height:420px;background:#151a22}.quick-image img{width:100%;height:100%;object-fit:cover;display:block}.quick-info{padding:22px;display:flex;flex-direction:column;gap:16px}.quick-info .cat-kicker{margin:0}.quick-info h3{font:800 32px/1 Manrope;letter-spacing:-.045em;margin:0}.quick-info p{margin:0;color:#929cab;font-size:12px;line-height:1.55}.quick-info .compare-tags{margin-top:-4px}.quick-info .quick-open{margin-top:auto;height:44px;border-radius:11px;background:#f5f7f9;color:#0a0d12;display:flex;align-items:center;justify-content:center;font:900 11px Inter}
+@media(max-width:900px){.compare-grid{overflow:auto;grid-template-columns:1fr}.compare-pane{min-height:0}.compare-dock{width:calc(100% - 24px);justify-content:center}.compare-dock span{display:none}.quick-content{grid-template-columns:1fr}.quick-image{min-height:260px;aspect-ratio:16/9}}
 @media(max-width:980px){.library-grid{grid-template-columns:repeat(2,1fr)}.library-controls{grid-template-columns:1fr 1fr}.library-head{align-items:flex-start;flex-direction:column}}
 @media(max-width:650px){.cat-nav-actions .cat-pill{display:none}.selection-btn{padding:0 12px}.selection-banner{align-items:flex-start;flex-direction:column}.library-grid{grid-template-columns:1fr}.library-controls{grid-template-columns:1fr;position:relative;top:auto}.library{padding-top:46px}.library-head h2{font-size:44px}}
 
@@ -198,7 +200,7 @@ return `<main class="catalog"><div class="shell">
   <div class="library-more"><button id="libraryMore" type="button">Ver más diseños</button></div>
 </section>
 
-<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer><div id="shareToast" class="share-toast">Enlace copiado</div><div id="compareDock" class="compare-dock"><span id="compareCount">0 diseños</span><button id="compareOpen" class="compare-open" type="button">Comparar</button><button id="compareClear" class="compare-clear" type="button">Limpiar</button></div><div id="compareModal" class="compare-modal"><div class="compare-top"><strong>Comparador NoeApps</strong><button id="compareClose" class="compare-close" type="button" aria-label="Cerrar">×</button></div><div id="compareGrid" class="compare-grid"></div></div>
+<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer><div id="shareToast" class="share-toast">Enlace copiado</div><div id="compareDock" class="compare-dock"><span id="compareCount">0 diseños</span><button id="compareOpen" class="compare-open" type="button">Comparar</button><button id="compareClear" class="compare-clear" type="button">Limpiar</button></div><div id="compareModal" class="compare-modal"><div class="compare-top"><strong>Comparador NoeApps</strong><button id="compareClose" class="compare-close" type="button" aria-label="Cerrar">×</button></div><div id="compareGrid" class="compare-grid"></div></div><div id="quickModal" class="quick-modal"><section id="quickCard" class="quick-card"></section></div>
 </div></main>`}
 
 
@@ -251,7 +253,7 @@ function libraryCard(x){
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir web ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -389,6 +391,9 @@ function toggleCompare(id){
  }
  updateCompareDock();
 }
+function compareThumb(x){
+ return x.thumbnail?'<img loading="eager" decoding="async" src="'+libraryEsc(libraryUrl(x.thumbnail))+'" alt="">':'<div class="library-fallback"><b>'+libraryEsc((x.category||"N").charAt(0))+'</b><small>'+libraryEsc(x.category||"Diseño")+'</small></div>';
+}
 function openCompare(){
  const items=[...compareIds].map(id=>libraryState.items.find(x=>x.id===id)).filter(Boolean);
  if(items.length<2){showShareToast("Selecciona al menos 2 diseños");return}
@@ -398,13 +403,32 @@ function openCompare(){
  grid.innerHTML=items.map(x=>{
    const name=libraryEsc(x.commercial_name||x.title||"Diseño NoeApps");
    const href=libraryEsc(libraryUrl(x.preview||x.source_url));
-   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><iframe class="compare-frame" src="'+href+'" sandbox="allow-scripts allow-forms" loading="eager"></iframe></section>';
+   const styles=(x.style||[]).map(t=>'<span>'+libraryEsc(t)+'</span>').join("");
+   const impact=Math.max(0,Math.min(100,Math.round(((x.impact_score||0)/26)*100)));
+   const source=libraryEsc(x.source_name||x.source||"NoeApps");
+   const license=libraryEsc(x.license||"—");
+   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir web ↗</a></div></div></section>';
  }).join("");
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
 function closeCompare(){
  const modal=document.getElementById("compareModal"),grid=document.getElementById("compareGrid");
  if(modal)modal.classList.remove("on"); if(grid)grid.innerHTML=""; document.body.style.overflow="";
+}
+function openQuickView(id){
+ const x=libraryState.items.find(item=>item.id===id); if(!x)return;
+ const modal=document.getElementById("quickModal"),card=document.getElementById("quickCard"); if(!modal||!card)return;
+ const name=libraryEsc(x.commercial_name||x.title||"Diseño NoeApps");
+ const href=libraryEsc(libraryUrl(x.preview||x.source_url));
+ const styles=(x.style||[]).map(t=>'<span>'+libraryEsc(t)+'</span>').join("");
+ const img=x.thumbnail?'<img src="'+libraryEsc(libraryUrl(x.thumbnail))+'" alt="">':'<div class="library-fallback"><b>'+libraryEsc((x.category||"N").charAt(0))+'</b><small>'+libraryEsc(x.category||"Diseño")+'</small></div>';
+ card.innerHTML='<div class="quick-head"><strong>Vista rápida</strong><button class="quick-close" type="button" aria-label="Cerrar">×</button></div><div class="quick-content"><div class="quick-image">'+img+'</div><div class="quick-info"><div class="cat-kicker">'+libraryEsc(x.category||"Diseño")+' · '+libraryEsc(x.format||"Web")+'</div><h3>'+name+'</h3><p>Previsualización segura del diseño. Aquí no ejecutamos la web para evitar romper animaciones o dependencias. Usa «Abrir web» para verla funcionando.</p><div class="compare-tags">'+styles+'</div><div class="compare-row"><span>Origen</span><strong>'+libraryEsc(x.source_name||x.source||"NoeApps")+'</strong></div><div class="compare-row"><span>Impacto</span><strong>'+String(x.impact_score||0)+'/26</strong></div><a class="quick-open" href="'+href+'" target="_blank" rel="noopener">Abrir web real ↗</a></div></div>';
+ modal.classList.add("on"); document.body.style.overflow="hidden";
+}
+function closeQuickView(){
+ const modal=document.getElementById("quickModal"),card=document.getElementById("quickCard");
+ if(modal)modal.classList.remove("on"); if(card)card.innerHTML=""; 
+ if(!document.getElementById("compareModal")?.classList.contains("on"))document.body.style.overflow="";
 }
 async function initLibrary(){
  try{
@@ -472,6 +496,8 @@ async function initLibrary(){
    document.getElementById("shareSelectionBtn")?.addEventListener("click",shareSelection);
    document.getElementById("surpriseBtn")?.addEventListener("click",surpriseMe);
    document.addEventListener("click",e=>{
+     const quick=e.target.closest("[data-quick-view]");
+     if(quick){e.preventDefault();e.stopPropagation();openQuickView(quick.dataset.quickView);return}
      const b=e.target.closest("[data-compare]"); if(!b)return;
      e.preventDefault(); e.stopPropagation(); toggleCompare(b.dataset.compare);
    });
@@ -479,7 +505,8 @@ async function initLibrary(){
    document.getElementById("compareClear")?.addEventListener("click",()=>{compareIds.clear();updateCompareDock();});
    document.getElementById("compareClose")?.addEventListener("click",closeCompare);
    document.getElementById("compareModal")?.addEventListener("click",e=>{if(e.target.id==="compareModal")closeCompare();});
-   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCompare();});
+   document.getElementById("quickModal")?.addEventListener("click",e=>{if(e.target.id==="quickModal"||e.target.closest(".quick-close"))closeQuickView();});
+   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeQuickView();closeCompare();}});
    updateCompareDock();
    enableLivePreviews();
  }catch(err){
