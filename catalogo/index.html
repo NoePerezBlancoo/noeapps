@@ -255,6 +255,9 @@ async function initLibrary(){
    const visualFallback=x=>{
      const styles=x.style||[];
      const sid=x.source_id||"";
+     const hay=[x.title,x.original_title,...(x.tags||[])].join(" ").toLowerCase();
+     const forbidden=["ecommerce","e-commerce","shop","store","shopping","cart","checkout","booking","reservation","rsvp","order now"];
+     if(forbidden.some(term=>hay.includes(term)))return false;
      return x.showcase===true
        || styles.some(s=>["3D","Animado","Experimental"].includes(s))
        || (styles.includes("Premium")&&styles.length>1)
