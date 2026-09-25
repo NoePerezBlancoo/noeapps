@@ -262,7 +262,7 @@ function showcaseUrl(x){
 function builderUrl(x){
  const q=new URLSearchParams({catalogDesign:String(x.id||""),catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),catalogCategory:String(x.category||"")});
  q.set("catalogPreview",location.origin+showcaseUrl(x));
- return "https://crear.noeapps.com/?"+q.toString();
+ return "https://crear.noeapps.com/crear?"+q.toString();
 }
 function libraryFiltered(){
  const q=libraryState.query.trim().toLowerCase();
