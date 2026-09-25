@@ -261,7 +261,21 @@ function renderLibrary(reset=false){
 function renderImpact(){
  const section=document.getElementById("impactSpotlight"),grid=document.getElementById("impactGrid");
  if(!section||!grid)return;
- const items=[...libraryState.items].sort((a,b)=>(b.impact_score||0)-(a.impact_score||0)).slice(0,12);
+ const ranked=[...libraryState.items].sort((a,b)=>(b.impact_score||0)-(a.impact_score||0));
+ const byCategory=new Map();
+ ranked.forEach(x=>{if(!byCategory.has(x.category))byCategory.set(x.category,[]);byCategory.get(x.category).push(x)});
+ const cats=[...byCategory.keys()].sort((a,b)=>{
+   const sa=byCategory.get(a)?.[0]?.impact_score||0,sb=byCategory.get(b)?.[0]?.impact_score||0;
+   return sb-sa;
+ });
+ const items=[];
+ for(let round=0;items.length<12&&round<3;round++){
+   for(const cat of cats){
+     const x=byCategory.get(cat)?.[round];
+     if(x)items.push(x);
+     if(items.length>=12)break;
+   }
+ }
  section.hidden=items.length===0;
  grid.innerHTML=items.map(libraryCard).join("");
 }
