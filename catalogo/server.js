@@ -3,7 +3,7 @@ const fs=require('fs');
 const path=require('path');
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
 const port=process.env.PORT||3000;
-const LIBRARY_ORIGIN='https://raw.githubusercontent.com/NoePerezBlancoo/noeapps-web-catalog/main';
+const LIBRARY_ORIGIN='https://catalog-production-53f9.up.railway.app';
 
 function contentType(pathname,upstream){
   const ext=path.extname(pathname).toLowerCase();
