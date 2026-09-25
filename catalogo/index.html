@@ -232,7 +232,7 @@ function renderLibrary(reset=false){
 function renderImpact(){
  const section=document.getElementById("impactSpotlight"),grid=document.getElementById("impactGrid");
  if(!section||!grid)return;
- const items=libraryState.items.filter(x=>(x.style||[]).includes("Impacto")).slice(0,12);
+ const items=[...libraryState.items].sort((a,b)=>(b.impact_score||0)-(a.impact_score||0)).slice(0,12);
  section.hidden=items.length===0;
  grid.innerHTML=items.map(libraryCard).join("");
 }
@@ -243,7 +243,7 @@ function fillLibraryFilters(){
  document.getElementById("libraryStyle").innerHTML='<option value="">Todos los estilos</option>'+styles.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
  document.getElementById("libraryCount").textContent=libraryState.items.length+" diseños de alto impacto";
  document.getElementById("categoryCount").textContent=cats.length+" sectores";
- document.getElementById("impactCount").textContent=libraryState.items.filter(x=>(x.style||[]).includes("Impacto")).length+" diseños Impacto";
+ document.getElementById("impactCount").textContent=libraryState.items.length+" seleccionados";
  document.getElementById("totalCatalogCount").textContent=libraryState.items.length+sectors.length;
 }
 async function initLibrary(){
@@ -251,7 +251,19 @@ async function initLibrary(){
    const r=await fetch("/catalog-data",{cache:"no-store"});
    if(!r.ok)throw new Error("catalog data unavailable");
    const data=await r.json();
-   libraryState.items=Array.isArray(data)?data:(data.templates||[]);
+   const allItems=Array.isArray(data)?data:(data.templates||[]);
+   const visualFallback=x=>{
+     const styles=x.style||[];
+     const sid=x.source_id||"";
+     return x.showcase===true
+       || styles.some(s=>["3D","Animado","Experimental"].includes(s))
+       || (styles.includes("Premium")&&styles.length>1)
+       || sid.startsWith("formwork-")
+       || sid.startsWith("codrops-")
+       || sid.startsWith("awwwards3d-");
+   };
+   libraryState.items=allItems.filter(x=>x.showcase!==false&&visualFallback(x))
+     .sort((a,b)=>(b.impact_score||0)-(a.impact_score||0));
    fillLibraryFilters(); renderImpact(); renderLibrary(true);
    document.getElementById("librarySearch").addEventListener("input",e=>{libraryState.query=e.target.value;renderLibrary(true)});
    document.getElementById("libraryCategory").addEventListener("change",e=>{libraryState.category=e.target.value;renderLibrary(true)});
