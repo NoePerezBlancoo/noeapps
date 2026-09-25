@@ -96,8 +96,20 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .library-empty.show{display:block}
 .library-fallback{height:100%;display:grid;place-items:center;align-content:center;gap:4px;background:radial-gradient(circle at 50% 25%,#26344a,#111821)}
 .library-fallback b{font:800 42px Manrope}.library-fallback small{font:800 9px Inter;text-transform:uppercase;letter-spacing:.12em;color:#91a0b4}
+
+.cat-nav-actions{display:flex;align-items:center;gap:10px}
+.selection-btn{height:40px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:linear-gradient(135deg,#f7f8fb,#cad5ff);color:#090b10;padding:0 15px;font:800 11px Inter;cursor:pointer;box-shadow:0 10px 30px rgba(70,89,255,.18)}
+.selection-banner{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 0 28px;padding:18px 20px;border:1px solid #343b49;border-radius:18px;background:linear-gradient(135deg,rgba(123,97,255,.16),rgba(31,228,255,.07))}
+.selection-banner strong{font:700 18px Manrope}.selection-banner span{display:block;color:#9ca6b7;font-size:12px;margin-top:4px}
+.selection-banner button{border:1px solid #424b5b;background:#151a22;color:#fff;border-radius:10px;padding:10px 13px;font:800 10px Inter;cursor:pointer}
+.share-toast{position:fixed;z-index:120;left:50%;bottom:24px;transform:translate(-50%,25px);opacity:0;pointer-events:none;background:#f5f7fa;color:#0b0e13;border-radius:999px;padding:12px 18px;font:800 11px Inter;box-shadow:0 18px 60px rgba(0,0,0,.45);transition:.25s ease}
+.share-toast.on{opacity:1;transform:translate(-50%,0)}
+.library-live-preview{position:absolute;z-index:1;left:0;top:0;width:960px;height:540px;border:0;background:#0b0e13;transform-origin:0 0;pointer-events:none;opacity:0;animation:livePreviewIn .35s ease forwards}
+@keyframes livePreviewIn{to{opacity:1}}
+.library-card.has-live .library-shot:before{content:"LIVE";position:absolute;z-index:4;left:10px;top:10px;border-radius:999px;padding:5px 7px;background:#77f0c0;color:#07110d;font:900 8px Inter;letter-spacing:.1em}
+.library-card.has-live .library-sector{left:10px}
 @media(max-width:980px){.library-grid{grid-template-columns:repeat(2,1fr)}.library-controls{grid-template-columns:1fr 1fr}.library-head{align-items:flex-start;flex-direction:column}}
-@media(max-width:650px){.library-grid{grid-template-columns:1fr}.library-controls{grid-template-columns:1fr;position:relative;top:auto}.library{padding-top:46px}.library-head h2{font-size:44px}}
+@media(max-width:650px){.cat-nav-actions .cat-pill{display:none}.selection-btn{padding:0 12px}.selection-banner{align-items:flex-start;flex-direction:column}.library-grid{grid-template-columns:1fr}.library-controls{grid-template-columns:1fr;position:relative;top:auto}.library{padding-top:46px}.library-head h2{font-size:44px}}
 
 
 .impact-showcase{margin:26px 0 22px;padding:22px;border:1px solid rgba(142,121,255,.24);border-radius:24px;background:radial-gradient(circle at 90% 0%,rgba(108,76,255,.17),transparent 34%),linear-gradient(180deg,#12141b,#0d0f14)}
@@ -130,7 +142,7 @@ const sectors=[
 function back(){return '<a class="back" href="/">← Catálogo</a>'}
 function catalog(){
 return `<main class="catalog"><div class="shell">
-<nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><span class="cat-pill"><b id="totalCatalogCount">10</b> diseños · catálogo vivo</span></nav>
+<nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill"><b id="totalCatalogCount">10</b> diseños · catálogo vivo</span><button id="shareSelectionBtn" class="selection-btn" type="button">Crear selección</button></div></nav>
 <section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Una biblioteca amplia de diseños reales y referencias visuales para distintos sectores. Las 10 primeras son demos NoeApps creadas a medida; debajo puedes explorar cientos de plantillas adicionales.</p><div class="cat-meta"><span>Responsive</span><span>Diseño a medida</span><span>Conversión</span><span>Animación</span><span>Identidad propia</span></div></section>
 
 <section>
@@ -167,7 +179,7 @@ return `<main class="catalog"><div class="shell">
   <div class="library-more"><button id="libraryMore" type="button">Ver más diseños</button></div>
 </section>
 
-<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer>
+<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer><div id="shareToast" class="share-toast">Enlace copiado</div>
 </div></main>`}
 
 
@@ -207,7 +219,7 @@ function libraryFiltered(){
    const cat=!libraryState.category||x.category===libraryState.category;
    const sty=!libraryState.style||(x.style||[]).includes(libraryState.style);
    const fav=!libraryState.favoritesOnly||libraryFavorites.has(x.id);
-   const hay=[x.title,x.original_title,x.category,x.format,...(x.style||[]),...(x.tags||[])].join(" ").toLowerCase();
+   const hay=[x.commercial_name,x.title,x.original_title,x.category,x.format,...(x.style||[]),...(x.tags||[])].join(" ").toLowerCase();
    return cat&&sty&&fav&&(!q||hay.includes(q));
  });
 }
@@ -216,7 +228,9 @@ function libraryCard(x){
  const tags=[...(x.style||[]).slice(0,2),x.format].filter(Boolean);
  const fav=libraryFavorites.has(x.id);
  const href=libraryUrl(x.preview||x.source_url);
- return '<article class="library-card"><div class="library-shot">'+thumb+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(x.title||"Diseño web")+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a></div></div></article>';
+ const name=x.commercial_name||x.title||"Diseño NoeApps";
+ const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -246,12 +260,84 @@ function fillLibraryFilters(){
  document.getElementById("impactCount").textContent=libraryState.items.length+" seleccionados";
  document.getElementById("totalCatalogCount").textContent=libraryState.items.length+sectors.length;
 }
+let activeSelection=null;
+
+function encodeSelectionPayload(payload){
+ const raw=unescape(encodeURIComponent(JSON.stringify(payload)));
+ return btoa(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function decodeSelectionPath(){
+ const parts=location.pathname.split("/").filter(Boolean);
+ if(parts[0]!=="seleccion"||!parts[1])return null;
+ try{
+   let token=parts[1].replace(/-/g,"+").replace(/_/g,"/");
+   while(token.length%4)token+="=";
+   const raw=decodeURIComponent(escape(atob(token)));
+   const data=JSON.parse(raw);
+   if(!Array.isArray(data.ids)||!data.ids.length)return null;
+   return {name:String(data.n||"Cliente").slice(0,80),ids:data.ids.map(String).slice(0,20)};
+ }catch(e){return null}
+}
+function showShareToast(message){
+ const el=document.getElementById("shareToast"); if(!el)return;
+ el.textContent=message; el.classList.add("on");
+ clearTimeout(showShareToast.t); showShareToast.t=setTimeout(()=>el.classList.remove("on"),2200);
+}
+async function copyText(text){
+ try{await navigator.clipboard.writeText(text);return true}catch(e){}
+ const area=document.createElement("textarea"); area.value=text; document.body.appendChild(area); area.select();
+ try{document.execCommand("copy");area.remove();return true}catch(e){area.remove();return false}
+}
+async function shareSelection(){
+ if(activeSelection){
+   await copyText(location.href);
+   showShareToast("Enlace de selección copiado");
+   return;
+ }
+ const ids=[...libraryFavorites].filter(id=>libraryState.items.some(x=>x.id===id));
+ if(!ids.length){showShareToast("Marca primero tus favoritos ♥");return}
+ const name=prompt("Nombre del cliente para esta selección:","Cliente");
+ if(name===null)return;
+ const token=encodeSelectionPayload({n:name.trim()||"Cliente",ids});
+ const url=location.origin+"/seleccion/"+token;
+ await copyText(url);
+ showShareToast("Selección para "+(name.trim()||"Cliente")+" copiada");
+}
+function enableLivePreviews(){
+ if(!matchMedia("(hover:hover) and (pointer:fine)").matches)return;
+ let timer=null,active=null;
+ document.addEventListener("mouseover",e=>{
+   const card=e.target.closest(".library-card[data-live-preview]");
+   if(!card||card===active)return;
+   clearTimeout(timer);
+   timer=setTimeout(()=>{
+     const shot=card.querySelector(".library-shot"); if(!shot||card.querySelector(".library-live-preview"))return;
+     const frame=document.createElement("iframe");
+     frame.className="library-live-preview";
+     frame.setAttribute("sandbox","allow-scripts");
+     frame.setAttribute("aria-hidden","true");
+     frame.src=card.dataset.livePreview;
+     const scale=(shot.clientWidth||320)/960;
+     frame.style.transform="scale("+scale+")";
+     shot.appendChild(frame); active=card;
+   },420);
+ });
+ document.addEventListener("mouseout",e=>{
+   const card=e.target.closest(".library-card[data-live-preview]"); if(!card)return;
+   if(e.relatedTarget&&card.contains(e.relatedTarget))return;
+   clearTimeout(timer);
+   const frame=card.querySelector(".library-live-preview");
+   if(frame)frame.remove();
+   if(active===card)active=null;
+ });
+}
 async function initLibrary(){
  try{
    const r=await fetch("/catalog-data",{cache:"no-store"});
    if(!r.ok)throw new Error("catalog data unavailable");
    const data=await r.json();
    const allItems=Array.isArray(data)?data:(data.templates||[]);
+   activeSelection=decodeSelectionPath();
    const visualFallback=x=>{
      const styles=x.style||[];
      const sid=x.source_id||"";
@@ -265,9 +351,29 @@ async function initLibrary(){
        || sid.startsWith("codrops-")
        || sid.startsWith("awwwards3d-");
    };
-   libraryState.items=allItems.filter(x=>x.showcase!==false&&visualFallback(x))
+   let curated=allItems.filter(x=>x.showcase!==false&&visualFallback(x))
      .sort((a,b)=>(b.impact_score||0)-(a.impact_score||0));
+
+   if(activeSelection){
+     const wanted=new Set(activeSelection.ids);
+     curated=curated.filter(x=>wanted.has(x.id));
+     const collection=document.getElementById("noeappsCollection"); if(collection)collection.hidden=true;
+     const spotlight=document.getElementById("impactSpotlight"); if(spotlight)spotlight.hidden=true;
+     const controls=document.querySelector(".library-controls"); if(controls)controls.style.display="none";
+     const heroTitle=document.querySelector(".cat-hero h1"); if(heroTitle)heroTitle.innerHTML='Selección para <span>'+libraryEsc(activeSelection.name)+'</span>.';
+     const heroCopy=document.querySelector(".cat-hero p"); if(heroCopy)heroCopy.textContent="Una selección privada de diseños NoeApps preparada para comparar estilos y elegir una dirección visual.";
+     const banner=document.getElementById("selectionBanner");
+     if(banner){banner.hidden=false;banner.innerHTML='<div><strong>Selección privada · '+libraryEsc(activeSelection.name)+'</strong><span>'+curated.length+' propuestas seleccionadas</span></div><button id="copyCurrentSelection" type="button">Copiar enlace</button>';}
+     const libraryTitle=document.querySelector(".library-head h2"); if(libraryTitle)libraryTitle.innerHTML="Propuestas<br>seleccionadas.";
+     const share=document.getElementById("shareSelectionBtn"); if(share)share.textContent="Copiar selección";
+   }
+
+   libraryState.items=curated;
    fillLibraryFilters(); renderImpact(); renderLibrary(true);
+   if(activeSelection){
+     const spotlight=document.getElementById("impactSpotlight"); if(spotlight)spotlight.hidden=true;
+     document.getElementById("copyCurrentSelection")?.addEventListener("click",shareSelection);
+   }
    document.getElementById("librarySearch").addEventListener("input",e=>{libraryState.query=e.target.value;renderLibrary(true)});
    document.getElementById("libraryCategory").addEventListener("change",e=>{libraryState.category=e.target.value;renderLibrary(true)});
    document.getElementById("libraryStyle").addEventListener("change",e=>{libraryState.style=e.target.value;renderLibrary(true)});
@@ -288,6 +394,8 @@ async function initLibrary(){
      localStorage.setItem("noeappsCatalogFavorites",JSON.stringify([...libraryFavorites]));
      renderImpact(); renderLibrary();
    });
+   document.getElementById("shareSelectionBtn")?.addEventListener("click",shareSelection);
+   enableLivePreviews();
  }catch(err){
    const c=document.getElementById("libraryCount"); if(c)c.textContent="Biblioteca no disponible";
    console.warn(err);
