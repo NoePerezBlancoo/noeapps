@@ -56,16 +56,33 @@ function showcasePage(res,url){
   res.end(html);
 }
 
+function directPreviewMark(){
+  const demoId=Math.random().toString(36).slice(2,10).toUpperCase();
+  return '<style id="noeapps-direct-mark">#noeapps-direct-owner{position:fixed;right:12px;bottom:12px;z-index:2147483647;pointer-events:none;padding:8px 10px;border-radius:999px;background:rgba(7,8,12,.76);color:#fff;border:1px solid rgba(255,255,255,.2);font:800 10px/1.2 Arial,sans-serif;letter-spacing:.08em;backdrop-filter:blur(8px)}#noeapps-direct-owner:before{content:"NOEAPPS · DEMO";position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-24deg);font:900 clamp(22px,4vw,52px)/1 Arial,sans-serif;letter-spacing:.14em;color:rgba(120,120,120,.10);white-space:nowrap}</style><div id="noeapps-direct-owner">© NOEAPPS · DEMO '+esc(demoId)+'</div>';
+}
+
 async function proxy(req,res,target,pathname){
   try{
     const upstream=await fetch(target,{method:req.method,redirect:'follow'});
-    res.writeHead(upstream.status,{
-      'Content-Type':contentType(pathname,upstream.headers.get('content-type')),
-      'Cache-Control':pathname.endsWith('catalog.json')?'public, max-age=30':'public, max-age=3600',
-      'X-Content-Type-Options':'nosniff'
-    });
-    if(req.method==='HEAD')return res.end();
-    res.end(Buffer.from(await upstream.arrayBuffer()));
+    const type=contentType(pathname,upstream.headers.get('content-type'));
+    const isHtml=type.startsWith('text/html');
+    const headers={
+      'Content-Type':type,
+      'Cache-Control':pathname.endsWith('catalog.json')?'public, max-age=30':(isHtml?'no-store':'public, max-age=3600'),
+      'X-Content-Type-Options':'nosniff',
+      ...(isHtml?{'X-Robots-Tag':'noindex, nofollow, noarchive'}:{})
+    };
+    if(req.method==='HEAD'){res.writeHead(upstream.status,headers);return res.end()}
+    const buffer=Buffer.from(await upstream.arrayBuffer());
+    if(isHtml){
+      let source=buffer.toString('utf8');
+      const mark=directPreviewMark();
+      source=/<\/body>/i.test(source)?source.replace(/<\/body>/i,mark+'</body>'):source+mark;
+      res.writeHead(upstream.status,headers);
+      return res.end(source);
+    }
+    res.writeHead(upstream.status,headers);
+    res.end(buffer);
   }catch(error){
     res.writeHead(502,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});
     res.end('Catalog asset unavailable');
