@@ -99,6 +99,17 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 @media(max-width:980px){.library-grid{grid-template-columns:repeat(2,1fr)}.library-controls{grid-template-columns:1fr 1fr}.library-head{align-items:flex-start;flex-direction:column}}
 @media(max-width:650px){.library-grid{grid-template-columns:1fr}.library-controls{grid-template-columns:1fr;position:relative;top:auto}.library{padding-top:46px}.library-head h2{font-size:44px}}
 
+
+.impact-showcase{margin:26px 0 22px;padding:22px;border:1px solid rgba(142,121,255,.24);border-radius:24px;background:radial-gradient(circle at 90% 0%,rgba(108,76,255,.17),transparent 34%),linear-gradient(180deg,#12141b,#0d0f14)}
+.impact-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}
+.impact-head h3{margin:0;font:800 clamp(28px,4vw,46px)/.95 Manrope;letter-spacing:-.045em}
+.impact-head p{margin:0;max-width:520px;color:#9da5b5;font-size:13px;line-height:1.5}
+.impact-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.impact-showcase .library-card{border-color:#363042;background:linear-gradient(180deg,#171522,#0e1016)}
+.impact-showcase .library-card:hover{border-color:#765dff;box-shadow:0 18px 60px rgba(82,55,200,.16)}
+.impact-showcase .library-sector{background:rgba(94,69,255,.84)}
+@media(max-width:1050px){.impact-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.impact-grid{grid-template-columns:1fr}.impact-head{align-items:flex-start;flex-direction:column}}
+
 </style>
 </head>
 <body>
@@ -137,7 +148,14 @@ return `<main class="catalog"><div class="shell">
     <p>Busca por actividad, filtra por sector o estilo y abre cualquier diseño. Esta biblioteca se alimenta automáticamente de los repositorios que vamos incorporando.</p>
   </div>
 
-  <div class="library-controls">
+  <section class="impact-showcase" id="impactSpotlight" hidden>
+      <div class="impact-head">
+        <div><div class="cat-kicker">Colección Impacto</div><h3>Las que entran por los ojos.</h3></div>
+        <p>3D, canvas, GSAP, WebGL y scroll storytelling. Aquí solo aparecen las webs con un nivel visual claramente superior.</p>
+      </div>
+      <div id="impactGrid" class="impact-grid"></div>
+    </section>
+    <div class="library-controls">
     <input id="librarySearch" type="search" placeholder="Buscar barbería, clínica, taller, academia…">
     <select id="libraryCategory"><option value="">Todos los sectores</option></select>
     <select id="libraryStyle"><option value="">Todos los estilos</option></select>
@@ -211,6 +229,13 @@ function renderLibrary(reset=false){
  more.style.display=shown.length>=items.length?"none":"inline-flex";
  document.getElementById("libraryFavorites").textContent="♥ Favoritos ("+libraryFavorites.size+")";
 }
+function renderImpact(){
+ const section=document.getElementById("impactSpotlight"),grid=document.getElementById("impactGrid");
+ if(!section||!grid)return;
+ const items=libraryState.items.filter(x=>(x.style||[]).includes("Impacto")).slice(0,12);
+ section.hidden=items.length===0;
+ grid.innerHTML=items.map(libraryCard).join("");
+}
 function fillLibraryFilters(){
  const cats=[...new Set(libraryState.items.map(x=>x.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
  const styles=[...new Set(libraryState.items.flatMap(x=>x.style||[]))].sort((a,b)=>a.localeCompare(b,"es"));
@@ -226,18 +251,26 @@ async function initLibrary(){
    if(!r.ok)throw new Error("catalog data unavailable");
    const data=await r.json();
    libraryState.items=Array.isArray(data)?data:(data.templates||[]);
-   fillLibraryFilters(); renderLibrary(true);
+   fillLibraryFilters(); renderImpact(); renderLibrary(true);
    document.getElementById("librarySearch").addEventListener("input",e=>{libraryState.query=e.target.value;renderLibrary(true)});
    document.getElementById("libraryCategory").addEventListener("change",e=>{libraryState.category=e.target.value;renderLibrary(true)});
    document.getElementById("libraryStyle").addEventListener("change",e=>{libraryState.style=e.target.value;renderLibrary(true)});
    document.getElementById("libraryFavorites").addEventListener("click",()=>{libraryState.favoritesOnly=!libraryState.favoritesOnly;renderLibrary(true)});
    document.getElementById("libraryMore").addEventListener("click",()=>{libraryState.visible+=36;renderLibrary()});
+   const favHandler=e=>{
+     const b=e.target.closest("[data-lib-fav]"); if(!b)return;
+     const id=b.dataset.libFav;
+     if(libraryFavorites.has(id))libraryFavorites.delete(id);else libraryFavorites.add(id);
+     localStorage.setItem("noeappsCatalogFavorites",JSON.stringify([...libraryFavorites]));
+     renderImpact(); renderLibrary();
+   };
+   document.getElementById("impactGrid")?.addEventListener("click",favHandler);
    document.getElementById("libraryGrid").addEventListener("click",e=>{
      const b=e.target.closest("[data-lib-fav]"); if(!b)return;
      const id=b.dataset.libFav;
      if(libraryFavorites.has(id))libraryFavorites.delete(id);else libraryFavorites.add(id);
      localStorage.setItem("noeappsCatalogFavorites",JSON.stringify([...libraryFavorites]));
-     renderLibrary();
+     renderImpact(); renderLibrary();
    });
  }catch(err){
    const c=document.getElementById("libraryCount"); if(c)c.textContent="Biblioteca no disponible";
