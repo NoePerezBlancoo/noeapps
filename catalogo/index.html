@@ -143,7 +143,7 @@ return `<main class="catalog"><div class="shell">
     <div>
       <div class="cat-kicker">Biblioteca completa</div>
       <h2>Cientos de ideas.<br>Una sola página.</h2>
-      <div class="library-stats"><span id="libraryCount">Cargando diseños…</span><span id="categoryCount">Sectores</span><span>Frontend</span><span>Sin backend</span></div>
+      <div class="library-stats"><span id="libraryCount">Cargando diseños…</span><span id="impactCount">Impacto</span><span id="categoryCount">Sectores</span><span>Sin backend</span></div>
     </div>
     <p>Busca por actividad, filtra por sector o estilo y abre cualquier diseño. Esta biblioteca se alimenta automáticamente de los repositorios que vamos incorporando.</p>
   </div>
@@ -243,6 +243,7 @@ function fillLibraryFilters(){
  document.getElementById("libraryStyle").innerHTML='<option value="">Todos los estilos</option>'+styles.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
  document.getElementById("libraryCount").textContent=libraryState.items.length+" diseños adicionales";
  document.getElementById("categoryCount").textContent=cats.length+" sectores";
+ document.getElementById("impactCount").textContent=libraryState.items.filter(x=>(x.style||[]).includes("Impacto")).length+" diseños Impacto";
  document.getElementById("totalCatalogCount").textContent=libraryState.items.length+sectors.length;
 }
 async function initLibrary(){
