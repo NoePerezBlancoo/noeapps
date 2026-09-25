@@ -45,7 +45,7 @@ function showcasePage(res,url){
   const category=(url.searchParams.get('category')||'').slice(0,100);
   const demoId=Math.random().toString(36).slice(2,10).toUpperCase();
   const publicPreview='https://catalogo.noeapps.com/showcase?'+new URLSearchParams({src,id:designId,name,category}).toString();
-  const builder=new URL('https://crear.noeapps.com/');
+  const builder=new URL('https://crear.noeapps.com/crear');
   builder.searchParams.set('catalogDesign',designId);
   builder.searchParams.set('catalogName',name);
   if(category)builder.searchParams.set('catalogCategory',category);
