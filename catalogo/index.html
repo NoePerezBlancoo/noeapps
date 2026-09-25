@@ -79,6 +79,7 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .library-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:.35s ease}
 .library-card:hover .library-shot img{transform:scale(1.02)}
 .library-shot:after{content:"";position:absolute;inset:auto 0 0;height:38%;background:linear-gradient(transparent,rgba(3,4,7,.72));pointer-events:none}
+.wow-pill{position:absolute;z-index:5;right:52px;top:10px;padding:6px 8px;border-radius:999px;background:linear-gradient(135deg,#fff18c,#ff8c69);color:#150d05;font:900 8px Inter;letter-spacing:.1em;box-shadow:0 8px 24px rgba(255,154,93,.22)}
 .library-sector{position:absolute;z-index:2;left:10px;bottom:10px;padding:6px 9px;border-radius:999px;background:rgba(5,7,11,.76);border:1px solid rgba(255,255,255,.17);backdrop-filter:blur(10px);font:800 9px Inter;text-transform:uppercase;letter-spacing:.07em}
 .library-fav{position:absolute;z-index:3;right:10px;top:10px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(4,6,9,.7);color:#fff;cursor:pointer}
 .library-fav.on{background:#ff6c86;border-color:#ff6c86}
@@ -245,7 +246,8 @@ function libraryCard(x){
  const href=libraryUrl(x.preview||x.source_url);
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
+ const wow=(x.impact_score||0)>=17;
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
