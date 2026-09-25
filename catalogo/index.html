@@ -87,10 +87,17 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .library-body h3{margin:0;font:700 17px/1.2 Manrope;letter-spacing:-.025em}
 .library-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .library-tags span{border:1px solid #29313d;border-radius:999px;color:#8793a4;padding:5px 7px;font:700 9px Inter}
-.library-actions{display:flex;gap:7px;margin-top:14px}
+.library-actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
 .library-actions a,.library-actions button.quick-view{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 11px;border-radius:10px;font:800 10px Inter;border:1px solid #303846;cursor:pointer}
 .library-actions button.quick-view{background:#f5f7f9;color:#0a0d12;border-color:#f5f7f9}
 .library-actions a{background:#151a22;color:#dfe5ed}
+.library-actions a.catalog-sales-cta{flex-basis:100%;height:42px;background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff;border-color:#7567ff;font-size:10px;letter-spacing:.01em;box-shadow:0 10px 28px rgba(91,77,255,.22)}
+.library-actions a.catalog-sales-cta:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(91,77,255,.3)}
+.demo-sales-cta{position:fixed;z-index:80;right:18px;bottom:18px;display:flex;align-items:center;gap:10px;border-radius:999px;padding:14px 18px;background:linear-gradient(135deg,#7b61ff,#385dff);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 55px rgba(0,0,0,.35);font:900 11px Inter;letter-spacing:.01em;backdrop-filter:blur(12px)}
+.demo-sales-cta span{font-size:16px}.demo-sales-cta:hover{transform:translateY(-2px)}
+.quick-sales{margin-top:4px;height:46px;border-radius:11px;background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff!important;display:flex;align-items:center;justify-content:center;font:900 11px Inter;box-shadow:0 12px 30px rgba(91,77,255,.22)}
+.compare-sales{flex-basis:100%!important;background:linear-gradient(135deg,#7b61ff,#4d7dff)!important;color:#fff!important}
+@media(max-width:650px){.demo-sales-cta{left:12px;right:12px;bottom:12px;justify-content:center}}
 .library-more{display:flex;justify-content:center;padding:30px 0 12px}
 .library-more button{border:1px solid #313947;background:#121821;color:#eef2f7;border-radius:999px;padding:12px 20px;font:800 11px Inter;cursor:pointer}
 .library-empty{text-align:center;color:#858e9d;padding:60px 20px;display:none}
@@ -225,8 +232,9 @@ academia:()=>`<main class="demo academy">${back()}<section class="hero"><span cl
 function render(){
 const parts=location.pathname.split("/").filter(Boolean);
 const slug=parts[0]==="demo"?parts[1]:null;
-document.getElementById("app").innerHTML=slug&&demos[slug]?demos[slug]():catalog();
-document.title=slug&&sectors.find(s=>s.slug===slug)?sectors.find(s=>s.slug===slug).name+" — NoeApps Demo":"NoeApps — Catálogo web por sectores";
+const sector=slug?sectors.find(s=>s.slug===slug):null;
+document.getElementById("app").innerHTML=slug&&demos[slug]?demos[slug]()+demoSalesCta(sector):catalog();
+document.title=sector?sector.name+" — NoeApps Demo":"NoeApps — Catálogo web por sectores";
 setTimeout(()=>document.querySelectorAll(".reveal").forEach((el,i)=>setTimeout(()=>el.classList.add("on"),i*55)),40);
 }
 const libraryState={items:[],visible:36,query:"",category:"",style:"",favoritesOnly:false};
@@ -235,6 +243,35 @@ const compareIds=new Set();
 
 function libraryEsc(v=""){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function libraryUrl(path=""){if(!path)return"#";if(/^https?:\/\//i.test(path))return path;return "/library/"+path.replace(/^\/+/, "")}
+function absoluteCatalogUrl(path=""){try{return new URL(path,location.origin).toString()}catch(e){return location.origin+"/"}}
+function catalogBuilderUrl(x){
+ const href=libraryUrl(x.preview||x.source_url);
+ const q=new URLSearchParams({
+   catalogDesign:String(x.id||""),
+   catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),
+   catalogCategory:String(x.category||""),
+   catalogPreview:absoluteCatalogUrl(href),
+   catalogStyles:(x.style||[]).join(","),
+   catalogFormat:String(x.format||""),
+   catalogSource:String(x.source_name||x.source||""),
+   catalogImpact:String(x.impact_score||0)
+ });
+ return "https://crear.noeapps.com/crear?"+q.toString();
+}
+function sectorBuilderUrl(s){
+ const q=new URLSearchParams({
+   catalogDesign:"noeapps-sector-"+s.slug,
+   catalogName:s.name,
+   catalogCategory:s.name,
+   catalogPreview:absoluteCatalogUrl("/demo/"+s.slug),
+   catalogStyles:s.tag,
+   catalogFormat:"One Page",
+   catalogSource:"NoeApps Original",
+   catalogImpact:"25"
+ });
+ return "https://crear.noeapps.com/crear?"+q.toString();
+}
+function demoSalesCta(s){return s?'<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'">Quiero una web como esta <span>→</span></a>':""}
 function libraryFiltered(){
  const q=libraryState.query.trim().toLowerCase();
  return libraryState.items.filter(x=>{
@@ -253,7 +290,7 @@ function libraryCard(x){
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir web ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir demo ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -407,7 +444,7 @@ function openCompare(){
    const impact=Math.max(0,Math.min(100,Math.round(((x.impact_score||0)/26)*100)));
    const source=libraryEsc(x.source_name||x.source||"NoeApps");
    const license=libraryEsc(x.license||"—");
-   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir web ↗</a></div></div></section>';
+   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir demo ↗</a><a class="compare-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero esta web →</a></div></div></section>';
  }).join("");
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
@@ -422,7 +459,7 @@ function openQuickView(id){
  const href=libraryEsc(libraryUrl(x.preview||x.source_url));
  const styles=(x.style||[]).map(t=>'<span>'+libraryEsc(t)+'</span>').join("");
  const img=x.thumbnail?'<img src="'+libraryEsc(libraryUrl(x.thumbnail))+'" alt="">':'<div class="library-fallback"><b>'+libraryEsc((x.category||"N").charAt(0))+'</b><small>'+libraryEsc(x.category||"Diseño")+'</small></div>';
- card.innerHTML='<div class="quick-head"><strong>Vista rápida</strong><button class="quick-close" type="button" aria-label="Cerrar">×</button></div><div class="quick-content"><div class="quick-image">'+img+'</div><div class="quick-info"><div class="cat-kicker">'+libraryEsc(x.category||"Diseño")+' · '+libraryEsc(x.format||"Web")+'</div><h3>'+name+'</h3><p>Previsualización segura del diseño. Aquí no ejecutamos la web para evitar romper animaciones o dependencias. Usa «Abrir web» para verla funcionando.</p><div class="compare-tags">'+styles+'</div><div class="compare-row"><span>Origen</span><strong>'+libraryEsc(x.source_name||x.source||"NoeApps")+'</strong></div><div class="compare-row"><span>Impacto</span><strong>'+String(x.impact_score||0)+'/26</strong></div><a class="quick-open" href="'+href+'" target="_blank" rel="noopener">Abrir web real ↗</a></div></div>';
+ card.innerHTML='<div class="quick-head"><strong>Vista rápida</strong><button class="quick-close" type="button" aria-label="Cerrar">×</button></div><div class="quick-content"><div class="quick-image">'+img+'</div><div class="quick-info"><div class="cat-kicker">'+libraryEsc(x.category||"Diseño")+' · '+libraryEsc(x.format||"Web")+'</div><h3>'+name+'</h3><p>Previsualización segura del diseño. Aquí no ejecutamos la web para evitar romper animaciones o dependencias. Usa «Abrir web» para verla funcionando.</p><div class="compare-tags">'+styles+'</div><div class="compare-row"><span>Origen</span><strong>'+libraryEsc(x.source_name||x.source||"NoeApps")+'</strong></div><div class="compare-row"><span>Impacto</span><strong>'+String(x.impact_score||0)+'/26</strong></div><a class="quick-open" href="'+href+'" target="_blank" rel="noopener">Abrir demo real ↗</a><a class="quick-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div>';
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
 function closeQuickView(){
