@@ -244,8 +244,13 @@ const compareIds=new Set();
 function libraryEsc(v=""){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function libraryUrl(path=""){if(!path)return"#";if(/^https?:\/\//i.test(path))return path;return "/library/"+path.replace(/^\/+/, "")}
 function absoluteCatalogUrl(path=""){try{return new URL(path,location.origin).toString()}catch(e){return location.origin+"/"}}
+function catalogAdaptationMode(x){
+ const license=String(x.license||"").trim();
+ return /^(Original NoeApps|MIT(?:\b|\s|\())/i.test(license)?"adapt":"reference";
+}
 function catalogBuilderUrl(x){
  const href=libraryUrl(x.preview||x.source_url);
+ const mode=catalogAdaptationMode(x);
  const q=new URLSearchParams({
    catalogDesign:String(x.id||""),
    catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),
@@ -255,10 +260,13 @@ function catalogBuilderUrl(x){
    catalogStyles:(x.style||[]).join(","),
    catalogFormat:String(x.format||""),
    catalogSource:String(x.source_name||x.source||""),
+   catalogLicense:String(x.license||""),
+   catalogMode:mode,
    catalogImpact:String(x.impact_score||0)
  });
  return "https://personalizar.noeapps.com/?"+q.toString();
 }
+function catalogSalesLabel(x){return catalogAdaptationMode(x)==="adapt"?"Quiero una web como esta →":"Quiero algo con este estilo →"}
 function sectorBuilderUrl(s){
  const q=new URLSearchParams({
    catalogDesign:"noeapps-sector-"+s.slug,
@@ -269,6 +277,8 @@ function sectorBuilderUrl(s){
    catalogStyles:s.tag,
    catalogFormat:"One Page",
    catalogSource:"NoeApps Original",
+   catalogLicense:"Original NoeApps",
+   catalogMode:"adapt",
    catalogImpact:"25"
  });
  return "https://personalizar.noeapps.com/?"+q.toString();
@@ -292,7 +302,7 @@ function libraryCard(x){
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir demo ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir demo ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -446,7 +456,7 @@ function openCompare(){
    const impact=Math.max(0,Math.min(100,Math.round(((x.impact_score||0)/26)*100)));
    const source=libraryEsc(x.source_name||x.source||"NoeApps");
    const license=libraryEsc(x.license||"—");
-   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir demo ↗</a><a class="compare-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero esta web →</a></div></div></section>';
+   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir demo ↗</a><a class="compare-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></section>';
  }).join("");
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
@@ -461,7 +471,7 @@ function openQuickView(id){
  const href=libraryEsc(libraryUrl(x.preview||x.source_url));
  const styles=(x.style||[]).map(t=>'<span>'+libraryEsc(t)+'</span>').join("");
  const img=x.thumbnail?'<img src="'+libraryEsc(libraryUrl(x.thumbnail))+'" alt="">':'<div class="library-fallback"><b>'+libraryEsc((x.category||"N").charAt(0))+'</b><small>'+libraryEsc(x.category||"Diseño")+'</small></div>';
- card.innerHTML='<div class="quick-head"><strong>Vista rápida</strong><button class="quick-close" type="button" aria-label="Cerrar">×</button></div><div class="quick-content"><div class="quick-image">'+img+'</div><div class="quick-info"><div class="cat-kicker">'+libraryEsc(x.category||"Diseño")+' · '+libraryEsc(x.format||"Web")+'</div><h3>'+name+'</h3><p>Previsualización segura del diseño. Aquí no ejecutamos la web para evitar romper animaciones o dependencias. Usa «Abrir web» para verla funcionando.</p><div class="compare-tags">'+styles+'</div><div class="compare-row"><span>Origen</span><strong>'+libraryEsc(x.source_name||x.source||"NoeApps")+'</strong></div><div class="compare-row"><span>Impacto</span><strong>'+String(x.impact_score||0)+'/26</strong></div><a class="quick-open" href="'+href+'" target="_blank" rel="noopener">Abrir demo real ↗</a><a class="quick-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div>';
+ card.innerHTML='<div class="quick-head"><strong>Vista rápida</strong><button class="quick-close" type="button" aria-label="Cerrar">×</button></div><div class="quick-content"><div class="quick-image">'+img+'</div><div class="quick-info"><div class="cat-kicker">'+libraryEsc(x.category||"Diseño")+' · '+libraryEsc(x.format||"Web")+'</div><h3>'+name+'</h3><p>Previsualización segura del diseño. Aquí no ejecutamos la web para evitar romper animaciones o dependencias. Usa «Abrir web» para verla funcionando.</p><div class="compare-tags">'+styles+'</div><div class="compare-row"><span>Origen</span><strong>'+libraryEsc(x.source_name||x.source||"NoeApps")+'</strong></div><div class="compare-row"><span>Impacto</span><strong>'+String(x.impact_score||0)+'/26</strong></div><a class="quick-open" href="'+href+'" target="_blank" rel="noopener">Abrir demo real ↗</a><a class="quick-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div>';
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
 function closeQuickView(){
