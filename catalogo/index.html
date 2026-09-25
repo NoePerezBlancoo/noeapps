@@ -228,7 +228,8 @@ document.title=slug&&sectors.find(s=>s.slug===slug)?sectors.find(s=>s.slug===slu
 setTimeout(()=>document.querySelectorAll(".reveal").forEach((el,i)=>setTimeout(()=>el.classList.add("on"),i*55)),40);
 }
 const libraryState={items:[],visible:36,query:"",category:"",style:"",favoritesOnly:false};
-const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));\nconst compareIds=new Set();
+const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));
+const compareIds=new Set();
 
 function libraryEsc(v=""){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function libraryUrl(path=""){if(!path)return"#";if(/^https?:\/\//i.test(path))return path;return "/library/"+path.replace(/^\/+/, "")}
