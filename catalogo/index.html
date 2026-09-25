@@ -241,7 +241,7 @@ function fillLibraryFilters(){
  const styles=[...new Set(libraryState.items.flatMap(x=>x.style||[]))].sort((a,b)=>a.localeCompare(b,"es"));
  document.getElementById("libraryCategory").innerHTML='<option value="">Todos los sectores</option>'+cats.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
  document.getElementById("libraryStyle").innerHTML='<option value="">Todos los estilos</option>'+styles.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
- document.getElementById("libraryCount").textContent=libraryState.items.length+" diseños adicionales";
+ document.getElementById("libraryCount").textContent=libraryState.items.length+" diseños de alto impacto";
  document.getElementById("categoryCount").textContent=cats.length+" sectores";
  document.getElementById("impactCount").textContent=libraryState.items.filter(x=>(x.style||[]).includes("Impacto")).length+" diseños Impacto";
  document.getElementById("totalCatalogCount").textContent=libraryState.items.length+sectors.length;
