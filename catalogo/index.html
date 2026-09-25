@@ -251,12 +251,13 @@ function catalogBuilderUrl(x){
    catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),
    catalogCategory:String(x.category||""),
    catalogPreview:absoluteCatalogUrl(href),
+   catalogThumb:x.thumbnail?absoluteCatalogUrl(libraryUrl(x.thumbnail)):"",
    catalogStyles:(x.style||[]).join(","),
    catalogFormat:String(x.format||""),
    catalogSource:String(x.source_name||x.source||""),
    catalogImpact:String(x.impact_score||0)
  });
- return "https://crear.noeapps.com/crear?"+q.toString();
+ return "https://personalizar.noeapps.com/?"+q.toString();
 }
 function sectorBuilderUrl(s){
  const q=new URLSearchParams({
@@ -264,12 +265,13 @@ function sectorBuilderUrl(s){
    catalogName:s.name,
    catalogCategory:s.name,
    catalogPreview:absoluteCatalogUrl("/demo/"+s.slug),
+   catalogThumb:s.img,
    catalogStyles:s.tag,
    catalogFormat:"One Page",
    catalogSource:"NoeApps Original",
    catalogImpact:"25"
  });
- return "https://crear.noeapps.com/crear?"+q.toString();
+ return "https://personalizar.noeapps.com/?"+q.toString();
 }
 function demoSalesCta(s){return s?'<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'">Quiero una web como esta <span>→</span></a>':""}
 function libraryFiltered(){
