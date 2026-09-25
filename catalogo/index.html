@@ -108,6 +108,21 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 @keyframes livePreviewIn{to{opacity:1}}
 .library-card.has-live .library-shot:before{content:"LIVE";position:absolute;z-index:4;left:10px;top:10px;border-radius:999px;padding:5px 7px;background:#77f0c0;color:#07110d;font:900 8px Inter;letter-spacing:.1em}
 .library-card.has-live .library-sector{left:10px}
+
+.compare-add{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 10px;border-radius:10px;border:1px solid #303846;background:#0f141b;color:#b9c2d0;font:800 10px Inter;cursor:pointer}
+.compare-add.on{background:#7b61ff;color:#fff;border-color:#7b61ff}
+.compare-dock{position:fixed;z-index:90;left:50%;bottom:18px;transform:translate(-50%,120px);opacity:0;display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #353c49;border-radius:999px;background:rgba(10,12,17,.94);backdrop-filter:blur(18px);box-shadow:0 20px 70px rgba(0,0,0,.55);transition:.28s ease;pointer-events:none}
+.compare-dock.on{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.compare-dock span{font:800 11px Inter;color:#cbd3df;padding-left:7px}.compare-dock button{height:38px;border-radius:999px;padding:0 14px;font:900 10px Inter;cursor:pointer}
+.compare-open{border:0;background:#f5f7fa;color:#090b10}.compare-open:disabled{opacity:.45;cursor:not-allowed}.compare-clear{border:1px solid #343c49;background:#151a22;color:#9faaba}
+.compare-modal{position:fixed;z-index:150;inset:0;background:rgba(3,5,8,.94);backdrop-filter:blur(16px);display:none;padding:18px}
+.compare-modal.on{display:flex;flex-direction:column}
+.compare-top{display:flex;align-items:center;justify-content:space-between;gap:14px;height:58px}.compare-top strong{font:700 18px Manrope}.compare-close{width:40px;height:40px;border-radius:50%;border:1px solid #39414e;background:#141922;color:#fff;font-size:20px;cursor:pointer}
+.compare-grid{flex:1;min-height:0;display:grid;gap:10px;grid-template-columns:repeat(var(--compare-cols,2),minmax(0,1fr))}
+.compare-pane{min-width:0;display:flex;flex-direction:column;border:1px solid #303744;border-radius:16px;overflow:hidden;background:#0d1117}
+.compare-pane-head{height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 13px;border-bottom:1px solid #252c36}.compare-pane-head strong{font:800 12px Inter}.compare-pane-head small{color:#788597;font:700 9px Inter;text-transform:uppercase;letter-spacing:.08em}
+.compare-frame{width:100%;flex:1;border:0;background:#fff}
+@media(max-width:900px){.compare-grid{overflow:auto;grid-template-columns:1fr}.compare-pane{min-height:72vh}.compare-dock{width:calc(100% - 24px);justify-content:center}.compare-dock span{display:none}}
 @media(max-width:980px){.library-grid{grid-template-columns:repeat(2,1fr)}.library-controls{grid-template-columns:1fr 1fr}.library-head{align-items:flex-start;flex-direction:column}}
 @media(max-width:650px){.cat-nav-actions .cat-pill{display:none}.selection-btn{padding:0 12px}.selection-banner{align-items:flex-start;flex-direction:column}.library-grid{grid-template-columns:1fr}.library-controls{grid-template-columns:1fr;position:relative;top:auto}.library{padding-top:46px}.library-head h2{font-size:44px}}
 
@@ -179,7 +194,7 @@ return `<main class="catalog"><div class="shell">
   <div class="library-more"><button id="libraryMore" type="button">Ver más diseños</button></div>
 </section>
 
-<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer><div id="shareToast" class="share-toast">Enlace copiado</div>
+<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer><div id="shareToast" class="share-toast">Enlace copiado</div><div id="compareDock" class="compare-dock"><span id="compareCount">0 diseños</span><button id="compareOpen" class="compare-open" type="button">Comparar</button><button id="compareClear" class="compare-clear" type="button">Limpiar</button></div><div id="compareModal" class="compare-modal"><div class="compare-top"><strong>Comparador NoeApps</strong><button id="compareClose" class="compare-close" type="button" aria-label="Cerrar">×</button></div><div id="compareGrid" class="compare-grid"></div></div>
 </div></main>`}
 
 
@@ -209,7 +224,7 @@ document.title=slug&&sectors.find(s=>s.slug===slug)?sectors.find(s=>s.slug===slu
 setTimeout(()=>document.querySelectorAll(".reveal").forEach((el,i)=>setTimeout(()=>el.classList.add("on"),i*55)),40);
 }
 const libraryState={items:[],visible:36,query:"",category:"",style:"",favoritesOnly:false};
-const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));
+const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));\nconst compareIds=new Set();
 
 function libraryEsc(v=""){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function libraryUrl(path=""){if(!path)return"#";if(/^https?:\/\//i.test(path))return path;return "/library/"+path.replace(/^\/+/, "")}
@@ -230,7 +245,7 @@ function libraryCard(x){
  const href=libraryUrl(x.preview||x.source_url);
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -331,6 +346,39 @@ function enableLivePreviews(){
    if(active===card)active=null;
  });
 }
+function updateCompareDock(){
+ const dock=document.getElementById("compareDock"),count=document.getElementById("compareCount");
+ if(!dock||!count)return;
+ count.textContent=compareIds.size+" diseño"+(compareIds.size===1?"":"s");
+ dock.classList.toggle("on",compareIds.size>0);
+ const open=document.getElementById("compareOpen"); if(open)open.disabled=compareIds.size<2;
+ document.querySelectorAll("[data-compare]").forEach(b=>b.classList.toggle("on",compareIds.has(b.dataset.compare)));
+}
+function toggleCompare(id){
+ if(compareIds.has(id))compareIds.delete(id);
+ else{
+   if(compareIds.size>=4){showShareToast("Máximo 4 diseños para comparar");return}
+   compareIds.add(id);
+ }
+ updateCompareDock();
+}
+function openCompare(){
+ const items=[...compareIds].map(id=>libraryState.items.find(x=>x.id===id)).filter(Boolean);
+ if(items.length<2){showShareToast("Selecciona al menos 2 diseños");return}
+ const modal=document.getElementById("compareModal"),grid=document.getElementById("compareGrid");
+ if(!modal||!grid)return;
+ grid.style.setProperty("--compare-cols",String(Math.min(items.length,4)));
+ grid.innerHTML=items.map(x=>{
+   const name=libraryEsc(x.commercial_name||x.title||"Diseño NoeApps");
+   const href=libraryEsc(libraryUrl(x.preview||x.source_url));
+   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><iframe class="compare-frame" src="'+href+'" sandbox="allow-scripts allow-forms" loading="eager"></iframe></section>';
+ }).join("");
+ modal.classList.add("on"); document.body.style.overflow="hidden";
+}
+function closeCompare(){
+ const modal=document.getElementById("compareModal"),grid=document.getElementById("compareGrid");
+ if(modal)modal.classList.remove("on"); if(grid)grid.innerHTML=""; document.body.style.overflow="";
+}
 async function initLibrary(){
  try{
    const r=await fetch("/catalog-data",{cache:"no-store"});
@@ -395,6 +443,16 @@ async function initLibrary(){
      renderImpact(); renderLibrary();
    });
    document.getElementById("shareSelectionBtn")?.addEventListener("click",shareSelection);
+   document.addEventListener("click",e=>{
+     const b=e.target.closest("[data-compare]"); if(!b)return;
+     e.preventDefault(); e.stopPropagation(); toggleCompare(b.dataset.compare);
+   });
+   document.getElementById("compareOpen")?.addEventListener("click",openCompare);
+   document.getElementById("compareClear")?.addEventListener("click",()=>{compareIds.clear();updateCompareDock();});
+   document.getElementById("compareClose")?.addEventListener("click",closeCompare);
+   document.getElementById("compareModal")?.addEventListener("click",e=>{if(e.target.id==="compareModal")closeCompare();});
+   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCompare();});
+   updateCompareDock();
    enableLivePreviews();
  }catch(err){
    const c=document.getElementById("libraryCount"); if(c)c.textContent="Biblioteca no disponible";
