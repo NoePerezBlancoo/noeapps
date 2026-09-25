@@ -85,16 +85,17 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .library-fav.on{background:#ff6c86;border-color:#ff6c86}
 .library-body{padding:15px}
 .library-body h3{margin:0;font:700 17px/1.2 Manrope;letter-spacing:-.025em}
-.library-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.library-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
 .library-tags span{border:1px solid #29313d;border-radius:999px;color:#8793a4;padding:5px 7px;font:700 9px Inter}
-.library-actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
-.library-actions a,.library-actions button.quick-view{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 11px;border-radius:10px;font:800 10px Inter;border:1px solid #303846;cursor:pointer}
-.library-actions button.quick-view{background:#f5f7f9;color:#0a0d12;border-color:#f5f7f9}
-.library-actions a{background:#151a22;color:#dfe5ed}
-.library-actions a.catalog-sales-cta{flex-basis:100%;height:42px;background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff;border-color:#7567ff;font-size:10px;letter-spacing:.01em;box-shadow:0 10px 28px rgba(91,77,255,.22)}
+.library-commercial{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid #222a35}
+.library-commercial>div{display:grid;gap:2px}.library-commercial span{font:900 8px Inter;letter-spacing:.11em;text-transform:uppercase;color:#7f8a99}.library-commercial small{font:700 8px Inter;color:#687484}.library-commercial strong{font:900 22px/1 Manrope;letter-spacing:-.04em;color:#f4f6fa;white-space:nowrap}
+.library-actions{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:13px}
+.library-actions a,.library-actions button{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 11px;border-radius:10px;font:800 10px Inter;border:1px solid #303846;cursor:pointer}
+.library-actions .demo-open{background:#f5f7f9;color:#0a0d12;border-color:#f5f7f9}
+.library-actions a.catalog-sales-cta{grid-column:1/-1;height:43px;background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff;border-color:#7567ff;font-size:10px;letter-spacing:.01em;box-shadow:0 10px 28px rgba(91,77,255,.22)}
 .library-actions a.catalog-sales-cta:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(91,77,255,.3)}
-.demo-sales-cta{position:fixed;z-index:80;right:18px;bottom:18px;display:flex;align-items:center;gap:10px;border-radius:999px;padding:14px 18px;background:linear-gradient(135deg,#7b61ff,#385dff);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 55px rgba(0,0,0,.35);font:900 11px Inter;letter-spacing:.01em;backdrop-filter:blur(12px)}
-.demo-sales-cta span{font-size:16px}.demo-sales-cta:hover{transform:translateY(-2px)}
+.demo-sales-cta{position:fixed;z-index:80;right:18px;bottom:18px;display:flex;align-items:center;gap:11px;border-radius:999px;padding:12px 16px;background:linear-gradient(135deg,#7b61ff,#385dff);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 55px rgba(0,0,0,.35);font:900 11px Inter;letter-spacing:.01em;backdrop-filter:blur(12px)}
+.demo-sales-cta b{font:900 14px Manrope}.demo-sales-cta small{font:800 8px Inter;text-transform:uppercase;letter-spacing:.08em;opacity:.72}.demo-sales-cta span{font-size:16px}.demo-sales-cta:hover{transform:translateY(-2px)}
 .quick-sales{margin-top:4px;height:46px;border-radius:11px;background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff!important;display:flex;align-items:center;justify-content:center;font:900 11px Inter;box-shadow:0 12px 30px rgba(91,77,255,.22)}
 .compare-sales{flex-basis:100%!important;background:linear-gradient(135deg,#7b61ff,#4d7dff)!important;color:#fff!important}
 @media(max-width:650px){.demo-sales-cta{left:12px;right:12px;bottom:12px;justify-content:center}}
@@ -171,7 +172,7 @@ function back(){return '<a class="back" href="/">← Catálogo</a>'}
 function catalog(){
 return `<main class="catalog"><div class="shell">
 <nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill"><b id="totalCatalogCount">10</b> diseños · catálogo vivo</span><button id="surpriseBtn" class="surprise-btn" type="button">✦ Sorpréndeme</button><button id="shareSelectionBtn" class="selection-btn" type="button">Crear selección</button></div></nav>
-<section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Una biblioteca amplia de diseños reales y referencias visuales para distintos sectores. Las 10 primeras son demos NoeApps creadas a medida; debajo puedes explorar cientos de diseños y referencias adicionales.</p><div class="cat-meta"><span>Responsive</span><span>Diseño a medida</span><span>Conversión</span><span>Animación</span><span>Identidad propia</span></div></section>
+<section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Una biblioteca amplia de diseños reales y referencias visuales para distintos sectores. Las 10 primeras son demos NoeApps creadas a medida; debajo puedes explorar cientos de diseños y referencias adicionales.</p><div class="cat-meta"><span>Desde 390 €</span><span>Responsive</span><span>Diseño adaptado</span><span>Precio según complejidad</span><span>Identidad propia</span></div></section>
 
 <section>
 <div class="cat-kicker" style="margin:0 0 16px">Colección NoeApps · 10 demos artesanales</div>
@@ -248,9 +249,19 @@ function catalogAdaptationMode(x){
  const license=String(x.license||"").trim();
  return /^(Original NoeApps|MIT(?:\b|\s|\())/i.test(license)?"adapt":"reference";
 }
+function catalogTier(x){
+ const tags=(x.style||[]).map(v=>String(v).toLowerCase());
+ const impact=Number(x.impact_score||0);
+ if(tags.some(t=>t.includes("3d")||t.includes("experimental")))return {key:"signature",label:"Signature",price:1090};
+ if(tags.includes("premium")||impact>=24)return {key:"premium",label:"Premium",price:790};
+ if(tags.includes("animado")||impact>=18)return {key:"pro",label:"Pro",price:590};
+ return {key:"esencial",label:"Esencial",price:390};
+}
+function euro(value){return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(value)}
+function sectorTier(){return {key:"premium",label:"Premium",price:790}}
 function catalogBuilderUrl(x){
  const href=libraryUrl(x.preview||x.source_url);
- const mode=catalogAdaptationMode(x);
+ const mode=catalogAdaptationMode(x),tier=catalogTier(x);
  const q=new URLSearchParams({
    catalogDesign:String(x.id||""),
    catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),
@@ -262,12 +273,15 @@ function catalogBuilderUrl(x){
    catalogSource:String(x.source_name||x.source||""),
    catalogLicense:String(x.license||""),
    catalogMode:mode,
+   catalogTier:tier.label,
+   catalogPrice:String(tier.price),
    catalogImpact:String(x.impact_score||0)
  });
  return "https://personalizar.noeapps.com/?"+q.toString();
 }
 function catalogSalesLabel(x){return catalogAdaptationMode(x)==="adapt"?"Quiero una web como esta →":"Quiero algo con este estilo →"}
 function sectorBuilderUrl(s){
+ const tier=sectorTier();
  const q=new URLSearchParams({
    catalogDesign:"noeapps-sector-"+s.slug,
    catalogName:s.name,
@@ -279,11 +293,13 @@ function sectorBuilderUrl(s){
    catalogSource:"NoeApps Original",
    catalogLicense:"Original NoeApps",
    catalogMode:"adapt",
+   catalogTier:tier.label,
+   catalogPrice:String(tier.price),
    catalogImpact:"25"
  });
  return "https://personalizar.noeapps.com/?"+q.toString();
 }
-function demoSalesCta(s){return s?'<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'">Quiero una web como esta <span>→</span></a>':""}
+function demoSalesCta(s){if(!s)return"";const tier=sectorTier();return '<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'"><span><small>Desde</small><br><b>'+euro(tier.price)+'</b></span><span>Quiero una web como esta →</span></a>'}
 function libraryFiltered(){
  const q=libraryState.query.trim().toLowerCase();
  return libraryState.items.filter(x=>{
@@ -302,7 +318,8 @@ function libraryCard(x){
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><button class="quick-view" data-quick-view="'+libraryEsc(x.id)+'" type="button">Vista rápida</button><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir demo ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
+ const tier=catalogTier(x);
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-commercial"><div><span>'+libraryEsc(tier.label)+'</span><small>precio base de personalización</small></div><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="library-actions"><a class="demo-open" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -456,7 +473,8 @@ function openCompare(){
    const impact=Math.max(0,Math.min(100,Math.round(((x.impact_score||0)/26)*100)));
    const source=libraryEsc(x.source_name||x.source||"NoeApps");
    const license=libraryEsc(x.license||"—");
-   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div class="compare-row"><span>Origen</span><strong>'+source+'</strong></div><div class="compare-row"><span>Licencia</span><strong>'+license+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><button type="button" data-quick-view="'+libraryEsc(x.id)+'">Vista rápida</button><a href="'+href+'" target="_blank" rel="noopener">Abrir demo ↗</a><a class="compare-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></section>';
+   const tier=catalogTier(x);
+   return '<section class="compare-pane"><div class="compare-pane-head"><strong>'+name+'</strong><small>'+libraryEsc(x.category||"")+'</small></div><div class="compare-shot">'+compareThumb(x)+'</div><div class="compare-details"><div class="compare-row"><span>Nivel</span><strong>'+libraryEsc(tier.label)+'</strong></div><div class="compare-row"><span>Precio base</span><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="compare-row"><span>Formato</span><strong>'+libraryEsc(x.format||"—")+'</strong></div><div><span style="display:block;color:#7f8a99;font:700 9px Inter;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px">Estilos</span><div class="compare-tags">'+styles+'</div></div><div class="compare-impact"><span style="color:#7f8a99;font:700 9px Inter;text-transform:uppercase">Impacto</span><div class="compare-impact-track"><i style="--impact:'+impact+'%"></i></div><strong style="font:800 10px Inter">'+String(x.impact_score||0)+'/26</strong></div><div class="compare-actions"><a href="'+href+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="compare-sales" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></section>';
  }).join("");
  modal.classList.add("on"); document.body.style.overflow="hidden";
 }
