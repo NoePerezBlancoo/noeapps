@@ -356,8 +356,8 @@ async function initLibrary(){
 
    if(activeSelection){
      const wanted=new Set(activeSelection.ids);
-     curated=curated.filter(x=>wanted.has(x.id));
-     const collection=document.getElementById("noeappsCollection"); if(collection)collection.hidden=true;
+     curated=allItems.filter(x=>wanted.has(x.id));
+     const collection=document.getElementById("noeappsCollection"); if(collection){collection.hidden=true;collection.style.display="none";}
      const spotlight=document.getElementById("impactSpotlight"); if(spotlight)spotlight.hidden=true;
      const controls=document.querySelector(".library-controls"); if(controls)controls.style.display="none";
      const heroTitle=document.querySelector(".cat-hero h1"); if(heroTitle)heroTitle.innerHTML='Selección para <span>'+libraryEsc(activeSelection.name)+'</span>.';
