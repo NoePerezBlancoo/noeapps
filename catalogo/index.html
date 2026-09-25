@@ -141,6 +141,9 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .impact-showcase .library-sector{background:rgba(94,69,255,.84)}
 @media(max-width:1050px){.impact-grid{grid-template-columns:repeat(2,1fr)}.impact-grid .library-card:nth-child(1),.impact-grid .library-card:nth-child(2){grid-column:span 1}.impact-grid .library-card:nth-child(1) .library-shot,.impact-grid .library-card:nth-child(2) .library-shot{aspect-ratio:16/9}}@media(max-width:650px){.impact-grid{grid-template-columns:1fr}.impact-head{align-items:flex-start;flex-direction:column}}
 
+
+/* Protected commercial previews */
+.demo-watermark-layer{position:fixed;inset:0;z-index:9998;pointer-events:none;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);align-items:center;justify-items:center;overflow:hidden}.demo-watermark-layer span{font:900 11px/1 Inter,Arial,sans-serif;letter-spacing:.15em;color:rgba(255,255,255,.30);text-shadow:0 1px 7px rgba(0,0,0,.28);transform:rotate(-23deg);white-space:nowrap}.demo-owner-badge{position:fixed;right:12px;bottom:12px;z-index:9999;pointer-events:none;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(7,8,12,.76);backdrop-filter:blur(9px);font:800 10px Inter;color:#fff;letter-spacing:.08em}.library-actions .want-web{background:#f5f7ff;color:#111;border-color:#f5f7ff}.compare-pane{position:relative}.compare-pane:after{content:"NOEAPPS · DEMO";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-24deg);z-index:5;pointer-events:none;font:900 14px Inter;letter-spacing:.18em;color:rgba(255,255,255,.42);text-shadow:0 2px 9px rgba(0,0,0,.3)}@media(max-width:700px){.demo-watermark-layer{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -159,6 +162,23 @@ const sectors=[
 {slug:"academia",n:"10",name:"Academia",tag:"Formación · Cursos",desc:"Didáctica, accesible y contemporánea.",img:"https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1200&q=84"}];
 
 function back(){return '<a class="back" href="/">← Catálogo</a>'}
+function demoSessionId(){
+ let id=sessionStorage.getItem("noeappsDemoId");
+ if(!id){id=Math.random().toString(36).slice(2,10).toUpperCase();sessionStorage.setItem("noeappsDemoId",id)}
+ return id;
+}
+function applyDemoProtection(){
+ if(document.getElementById("demoWatermarkLayer"))return;
+ const id=demoSessionId(),layer=document.createElement("div"),badge=document.createElement("div");
+ layer.id="demoWatermarkLayer";layer.className="demo-watermark-layer";layer.setAttribute("aria-hidden","true");
+ layer.innerHTML=Array.from({length:12},()=>'<span>NOEAPPS · DEMO '+id+'</span>').join("");
+ badge.className="demo-owner-badge";badge.textContent="© NOEAPPS · VISTA COMERCIAL · "+id;
+ document.body.append(layer,badge);
+}
+function showcaseDemoUrl(s){
+ const q=new URLSearchParams({src:"/demo/"+s.slug,id:"noeapps-"+s.slug,name:s.name,category:s.name});
+ return "/showcase?"+q.toString();
+}
 function catalog(){
 return `<main class="catalog"><div class="shell">
 <nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill"><b id="totalCatalogCount">10</b> diseños · catálogo vivo</span><button id="surpriseBtn" class="surprise-btn" type="button">✦ Sorpréndeme</button><button id="shareSelectionBtn" class="selection-btn" type="button">Crear selección</button></div></nav>
@@ -166,7 +186,7 @@ return `<main class="catalog"><div class="shell">
 
 <section>
 <div class="cat-kicker" style="margin:0 0 16px">Colección NoeApps · 10 demos artesanales</div>
-<div class="catalog-grid">${sectors.map(s=>`<a class="sector-card reveal" href="/demo/${s.slug}"><div class="sector-bg" style="background-image:url('${s.img}')"></div><span class="num">${s.n}</span><div class="sector-copy"><small>${s.tag}</small><h2>${s.name}</h2><p>${s.desc}</p></div><span class="sector-arrow">↗</span></a>`).join("")}</div>
+<div class="catalog-grid">${sectors.map(s=>`<a class="sector-card reveal" href="${showcaseDemoUrl(s)}"><div class="sector-bg" style="background-image:url('${s.img}')"></div><span class="num">${s.n}</span><div class="sector-copy"><small>${s.tag}</small><h2>${s.name}</h2><p>${s.desc}</p></div><span class="sector-arrow">↗</span></a>`).join("")}</div>
 </section>
 
 <section class="library" id="biblioteca">
@@ -226,6 +246,7 @@ const slug=parts[0]==="demo"?parts[1]:null;
 document.getElementById("app").innerHTML=slug&&demos[slug]?demos[slug]():catalog();
 document.title=slug&&sectors.find(s=>s.slug===slug)?sectors.find(s=>s.slug===slug).name+" — NoeApps Demo":"NoeApps — Catálogo web por sectores";
 setTimeout(()=>document.querySelectorAll(".reveal").forEach((el,i)=>setTimeout(()=>el.classList.add("on"),i*55)),40);
+if(slug&&demos[slug])applyDemoProtection();
 }
 const libraryState={items:[],visible:36,query:"",category:"",style:"",favoritesOnly:false};
 const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));
@@ -233,6 +254,16 @@ const compareIds=new Set();
 
 function libraryEsc(v=""){return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
 function libraryUrl(path=""){if(!path)return"#";if(/^https?:\/\//i.test(path))return path;return "/library/"+path.replace(/^\/+/, "")}
+function showcaseUrl(x){
+ const href=libraryUrl(x.preview||x.source_url);
+ const q=new URLSearchParams({src:href,id:String(x.id||"demo"),name:String(x.commercial_name||x.title||"Diseño NoeApps"),category:String(x.category||"")});
+ return "/showcase?"+q.toString();
+}
+function builderUrl(x){
+ const q=new URLSearchParams({catalogDesign:String(x.id||""),catalogName:String(x.commercial_name||x.title||"Diseño NoeApps"),catalogCategory:String(x.category||"")});
+ q.set("catalogPreview",location.origin+showcaseUrl(x));
+ return "https://crear.noeapps.com/?"+q.toString();
+}
 function libraryFiltered(){
  const q=libraryState.query.trim().toLowerCase();
  return libraryState.items.filter(x=>{
@@ -251,7 +282,8 @@ function libraryCard(x){
  const name=x.commercial_name||x.title||"Diseño NoeApps";
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver diseño</a><a href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Abrir ↗</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
+ const protectedHref=showcaseUrl(x),wantHref=builderUrl(x);
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span><button class="library-fav '+(fav?'on':'')+'" data-lib-fav="'+libraryEsc(x.id)+'" type="button">♥</button></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-actions"><a href="'+libraryEsc(protectedHref)+'" target="_blank" rel="noopener">Ver protegido</a><a class="want-web" href="'+libraryEsc(wantHref)+'">Quiero esta web</a><button class="compare-add '+(compareIds.has(x.id)?'on':'')+'" data-compare="'+libraryEsc(x.id)+'" type="button">Comparar</button></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -371,7 +403,7 @@ function surpriseMe(){
  const source=pool.length?pool:libraryState.items.filter(x=>x.preview);
  if(!source.length){showShareToast("No hay demos disponibles");return}
  const pick=source[Math.floor(Math.random()*source.length)];
- window.open(libraryUrl(pick.preview),"_blank","noopener");
+ window.open(showcaseUrl(pick),"_blank","noopener");
 }
 function updateCompareDock(){
  const dock=document.getElementById("compareDock"),count=document.getElementById("compareCount");
