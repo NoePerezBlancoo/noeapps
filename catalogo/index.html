@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0e">
-<title>NoeApps — Catálogo web por sectores</title>
-<meta name="description" content="Catálogo de demostraciones web profesionales por sectores de NoeApps.">
+<title>NoeApps — Webs para pequeños negocios desde 39 €</title>
+<meta name="description" content="Elige un diseño web para tu negocio, personalízalo con tu marca, textos y fotos, y revisa una preview privada antes de publicar. Desde 39 €.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -160,6 +160,40 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 .impact-showcase .library-sector{background:rgba(94,69,255,.84)}
 @media(max-width:1050px){.impact-grid{grid-template-columns:repeat(2,1fr)}.impact-grid .library-card:nth-child(1),.impact-grid .library-card:nth-child(2){grid-column:span 1}.impact-grid .library-card:nth-child(1) .library-shot,.impact-grid .library-card:nth-child(2) .library-shot{aspect-ratio:16/9}}@media(max-width:650px){.impact-grid{grid-template-columns:1fr}.impact-head{align-items:flex-start;flex-direction:column}}
 
+
+/* Commercial conversion layer */
+.cat-nav-actions{display:flex;align-items:center;gap:9px}
+.cat-help-btn{height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 15px;border-radius:999px;background:#f5f7fa;color:#0a0d12;font:850 10px Inter;letter-spacing:.01em;box-shadow:0 10px 30px rgba(77,125,255,.14);transition:.22s ease}
+.cat-help-btn:hover{transform:translateY(-1px)}
+.cat-hero{padding:58px 0 32px}
+.cat-hero p{max-width:760px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.hero-actions a{min-height:48px;padding:0 18px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font:850 11px Inter;transition:.22s ease}
+.hero-primary{background:linear-gradient(135deg,#7b61ff,#4d7dff);color:#fff;box-shadow:0 15px 42px rgba(91,77,255,.26)}
+.hero-secondary{border:1px solid #323947;background:#121720;color:#e7ecf3}
+.hero-actions a:hover{transform:translateY(-2px)}
+.hero-micro{display:flex;align-items:center;gap:8px;margin-top:14px;color:#788596;font:700 10px/1.45 Inter}
+.hero-micro i{width:7px;height:7px;border-radius:50%;background:#77f0c0;box-shadow:0 0 0 5px rgba(119,240,192,.07)}
+.price-guide{margin:0 0 38px;padding:22px;border:1px solid #292f3a;border-radius:22px;background:radial-gradient(circle at 10% 0%,rgba(123,97,255,.12),transparent 32%),#0e1218}
+.price-guide-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:15px}
+.price-guide-head h2{margin:0;font:800 clamp(25px,3.5vw,42px)/.98 Manrope;letter-spacing:-.045em}
+.price-guide-head p{max-width:500px;margin:0;color:#8e99a9;font:600 11px/1.55 Inter}
+.price-guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.price-tier{padding:15px;border:1px solid #29313c;border-radius:15px;background:#11161d}
+.price-tier small{display:block;color:#788496;font:850 8px Inter;letter-spacing:.11em;text-transform:uppercase}
+.price-tier strong{display:block;margin-top:5px;font:850 26px Manrope;letter-spacing:-.04em}
+.price-tier span{display:block;margin-top:5px;color:#9aa5b4;font:650 9px/1.4 Inter}
+.price-tier.featured-tier{border-color:#6659e8;background:linear-gradient(180deg,rgba(105,83,255,.13),#11161d)}
+.price-guide-note{margin-top:11px;color:#707c8c;font:650 9px/1.5 Inter}
+.value-banner{display:flex;align-items:center;justify-content:space-between;gap:22px;margin:4px 0 38px;padding:20px 22px;border:1px solid rgba(119,240,192,.18);border-radius:18px;background:linear-gradient(135deg,rgba(119,240,192,.08),rgba(77,125,255,.07))}
+.value-banner strong{display:block;font:800 17px Manrope}
+.value-banner span{display:block;margin-top:4px;color:#8e99a8;font:650 10px/1.5 Inter}
+.value-banner a{flex:0 0 auto;min-height:42px;padding:0 15px;border-radius:10px;display:inline-flex;align-items:center;background:#eef3f7;color:#0a0d12;font:850 10px Inter}
+.featured-card .offer-note,.library-card .offer-note{color:#909baa}
+.library-head p{max-width:590px}
+@media(max-width:900px){.price-guide-grid{grid-template-columns:repeat(2,1fr)}.price-guide-head,.value-banner{align-items:flex-start;flex-direction:column}}
+@media(max-width:650px){.cat-nav{height:72px}.cat-pill{display:none}.cat-help-btn{height:38px}.cat-hero{padding-top:34px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions a{width:100%}.price-guide{padding:16px}.price-guide-grid{grid-template-columns:1fr 1fr}.price-tier strong{font-size:22px}.value-banner a{width:100%;justify-content:center}}
+
 </style>
 </head>
 <body>
@@ -193,39 +227,64 @@ const featuredNoeApps=[
 function back(){return '<a class="back" href="/">← Catálogo</a>'}
 function featuredNoeAppsCard(x){
  const tier=catalogTier(x),href=libraryUrl(x.preview);
- return '<article class="featured-card"><div class="featured-bg" style="background-image:url(\''+libraryEsc(libraryUrl(x.thumbnail))+'\')"></div><div class="featured-top"><span class="featured-cat">'+libraryEsc(x.category)+'</span><span class="featured-price">'+libraryEsc(tier.label)+' · '+libraryEsc(euro(tier.price))+'</span></div><div class="featured-copy"><small>NoeApps Original</small><h3>'+libraryEsc(x.commercial_name)+'</h3><p>'+libraryEsc(x.desc)+'</p><div class="offer-note">Adaptación + responsive + datos + fotos + 1 revisión + preview.</div><div class="featured-actions"><a class="featured-demo" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="featured-buy" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
+ return '<article class="featured-card"><div class="featured-bg" style="background-image:url(\''+libraryEsc(libraryUrl(x.thumbnail))+'\')"></div><div class="featured-top"><span class="featured-cat">'+libraryEsc(x.category)+'</span><span class="featured-price">Desde '+libraryEsc(euro(tier.price))+'</span></div><div class="featured-copy"><small>NoeApps Original · nivel '+libraryEsc(tier.label)+'</small><h3>'+libraryEsc(x.commercial_name)+'</h3><p>'+libraryEsc(x.desc)+'</p><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada.</div><div class="featured-actions"><a class="featured-demo" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="featured-buy" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
 }
 function catalog(){
 return `<main class="catalog"><div class="shell">
-<nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill"><b id="totalCatalogCount">571</b> diseños · catálogo vivo</span></div></nav>
-<section class="cat-hero reveal"><div class="cat-kicker">Catálogo interactivo 2026</div><h1>Una web <span>distinta</span> para cada negocio.</h1><p>Empieza por nuestra selección más potente: diez diseños NoeApps de alto impacto pensados para vender. Después puedes explorar el catálogo completo con cientos de referencias adicionales.</p><div class="cat-meta"><span>Desde 39 €</span><span>Responsive</span><span>Diseño adaptado</span><span>Precio según complejidad</span><span>Identidad propia</span></div></section>
-<section class="trust-strip reveal">
-  <div><strong>Precio claro</strong><span>Desde 39 € según diseño</span></div>
-  <div><strong>Adaptada a móvil</strong><span>Responsive incluido</span></div>
-  <div><strong>Preview antes de publicar</strong><span>La revisas primero</span></div>
-  <div><strong>Entrega habitual</strong><span>3–7 días laborables</span></div>
-  <div><strong>Soporte directo</strong><span>Sin intermediarios</span></div>
+<nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill">10 recomendadas · <b id="totalCatalogCount">571</b> ideas disponibles</span><a class="cat-help-btn" href="#destacados">Ver recomendadas ↓</a></div></nav>
+
+<section class="cat-hero reveal">
+  <div class="cat-kicker">Webs para pequeños negocios · precios claros</div>
+  <h1>Que te vean.<br><span>Que te elijan.</span></h1>
+  <p>Elige un diseño que encaje con tu negocio y lo adaptamos con tu marca, textos, fotos y contacto. Tú revisas una preview privada antes de publicar.</p>
+  <div class="hero-actions"><a class="hero-primary" href="#destacados">Ver las 10 recomendadas ↓</a><a class="hero-secondary" href="#biblioteca">Explorar por sector</a></div>
+  <div class="hero-micro"><i></i><span>Sin complicarte: eliges → envías tus datos → revisas → publicamos.</span></div>
+  <div class="cat-meta"><span>Personalización desde 39 €</span><span>Móvil incluido</span><span>Preview privada</span><span>1 revisión incluida</span><span>Entrega habitual 3–7 días</span></div>
 </section>
 
-<section class="featured-noeapps">
-<div class="featured-head"><div><div class="cat-kicker">Selección NoeApps · 10 diseños destacados</div><h2>Lo mejor,<br>primero.</h2></div><p>Diez webs creadas por NoeApps para enseñar desde el primer scroll el nivel visual que podemos adaptar a un pequeño negocio.</p></div>
+<section class="trust-strip reveal">
+  <div><strong>1 · Elige</strong><span>Empieza por 10 recomendadas</span></div>
+  <div><strong>2 · Personalizamos</strong><span>Tu marca, textos, fotos y contacto</span></div>
+  <div><strong>3 · Revisas</strong><span>Preview privada antes de publicar</span></div>
+  <div><strong>4 · Ajustamos</strong><span>1 revisión incluida</span></div>
+  <div><strong>5 · Publicamos</strong><span>Cuando das el visto bueno</span></div>
+</section>
+
+<section class="price-guide reveal">
+  <div class="price-guide-head"><div><div class="cat-kicker">Cuatro niveles · sin misterio</div><h2>Pagas por complejidad visual,<br>no por humo.</h2></div><p>Todos parten de la misma idea: adaptar una web real a tu negocio. El nivel cambia según el trabajo visual y la complejidad del diseño.</p></div>
+  <div class="price-guide-grid">
+    <article class="price-tier"><small>Esencial · desde</small><strong>39 €</strong><span>Presencia limpia, clara y profesional.</span></article>
+    <article class="price-tier"><small>Pro · desde</small><strong>79 €</strong><span>Más ritmo, secciones y movimiento.</span></article>
+    <article class="price-tier featured-tier"><small>Premium · desde</small><strong>149 €</strong><span>Más impacto visual y acabado.</span></article>
+    <article class="price-tier"><small>Signature · desde</small><strong>299 €</strong><span>Experiencia visual avanzada.</span></article>
+  </div>
+  <div class="price-guide-note">Los extras opcionales, si los necesitas, se calculan de forma visible en el formulario de personalización.</div>
+</section>
+
+<section class="featured-noeapps" id="destacados">
+<div class="featured-head"><div><div class="cat-kicker">Empieza aquí · 10 diseños NoeApps</div><h2>Diez opciones.<br>Cero parálisis.</h2></div><p>No necesitas revisar cientos de webs. Estas diez están delante porque enseñan rápido distintos estilos, sectores y niveles de impacto.</p></div>
 <div class="featured-grid">${featuredNoeApps.map(featuredNoeAppsCard).join("")}</div>
+</section>
+
+<section class="value-banner reveal">
+  <div><strong>¿Ya has encontrado una que encaja?</strong><span>Pulsa “Quiero una web como esta”. Nos llegará exactamente el diseño que elegiste y podrás enviarnos los datos de tu negocio.</span></div>
+  <a href="#destacados">Volver a las 10 recomendadas ↑</a>
 </section>
 
 <section class="library" id="biblioteca">
   <div class="library-head">
     <div>
-      <div class="cat-kicker">Biblioteca completa</div>
-      <h2>Cientos de ideas.<br>Una sola página.</h2>
-      <div class="library-stats"><span id="libraryCount">Cargando diseños…</span><span id="impactCount">Impacto</span><span id="categoryCount">Sectores</span><span>Sin backend</span></div>
+      <div class="cat-kicker">¿Aún no has encontrado la tuya?</div>
+      <h2>Entonces sí:<br>explora por sector.</h2>
+      <div class="library-stats"><span id="libraryCount">Cargando ideas…</span><span id="impactCount">Selección curada</span><span id="categoryCount">Sectores</span><span>Precios visibles</span></div>
     </div>
-    <p>Busca por actividad, filtra por sector o estilo y abre cualquier diseño. Esta biblioteca se alimenta automáticamente de los repositorios que vamos incorporando.</p>
+    <p>La biblioteca está para darte opciones, no para obligarte a verlas todas. Busca tu actividad, filtra por estilo y abre solo las que te llamen la atención.</p>
   </div>
 
   <section class="impact-showcase" id="impactSpotlight" hidden>
       <div class="impact-head">
         <div><div class="cat-kicker">Colección Impacto</div><h3>Las que entran por los ojos.</h3></div>
-        <p>3D, canvas, GSAP, WebGL y scroll storytelling. Aquí solo aparecen las webs con un nivel visual claramente superior.</p>
+        <p>Más movimiento, profundidad y efecto wow. Para negocios que quieren diferenciarse desde el primer segundo.</p>
       </div>
       <div id="impactGrid" class="impact-grid"></div>
     </section>
@@ -240,7 +299,7 @@ return `<main class="catalog"><div class="shell">
   <div class="library-more"><button id="libraryMore" type="button">Ver más diseños</button></div>
 </section>
 
-<footer class="cat-footer"><span>© NoeApps — Diseño web y soluciones digitales</span><span>Catálogo en crecimiento continuo</span></footer>
+<footer class="cat-footer"><span>© NoeApps — Diseño web para pequeños negocios</span><span>Elige · personaliza · revisa · publica</span></footer>
 </div></main>`}
 
 
@@ -351,7 +410,7 @@ function libraryCard(x){
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
  const tier=catalogTier(x);
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-commercial"><div><span>'+libraryEsc(tier.label)+'</span><small>precio base de personalización</small></div><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="offer-note">Incluye adaptación, móvil, datos del negocio, hasta 4 fotos, contacto/WhatsApp, 1 revisión y preview privada.</div><div class="library-actions"><a class="demo-open" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-commercial"><div><span>'+libraryEsc(tier.label)+'</span><small>personalización desde</small></div><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada.</div><div class="library-actions"><a class="demo-open" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
@@ -390,9 +449,9 @@ function fillLibraryFilters(){
  const styles=[...new Set(libraryState.items.flatMap(x=>x.style||[]))].sort((a,b)=>a.localeCompare(b,"es"));
  document.getElementById("libraryCategory").innerHTML='<option value="">Todos los sectores</option>'+cats.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
  document.getElementById("libraryStyle").innerHTML='<option value="">Todos los estilos</option>'+styles.map(x=>'<option>'+libraryEsc(x)+'</option>').join("");
- document.getElementById("libraryCount").textContent=libraryState.items.length+" diseños de alto impacto";
+ document.getElementById("libraryCount").textContent=libraryState.items.length+" ideas disponibles";
  document.getElementById("categoryCount").textContent=cats.length+" sectores";
- document.getElementById("impactCount").textContent=libraryState.items.length+" seleccionados";
+ document.getElementById("impactCount").textContent="Selección curada";
  document.getElementById("totalCatalogCount").textContent=libraryState.items.length;
 }
 let activeSelection=null;
