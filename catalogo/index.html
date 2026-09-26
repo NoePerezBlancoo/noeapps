@@ -309,7 +309,7 @@ function catalogBuilderUrl(x){
    catalogPrice:String(tier.price),
    catalogImpact:String(x.impact_score||0)
  });
- return "https://personalizar.noeapps.com/?"+q.toString();
+ return "https://personalizar.noeapps.com/iniciar?"+q.toString();
 }
 function catalogSalesLabel(x){return catalogAdaptationMode(x)==="adapt"?"Quiero una web como esta →":"Quiero algo con este estilo →"}
 function sectorBuilderUrl(s){
@@ -329,7 +329,7 @@ function sectorBuilderUrl(s){
    catalogPrice:String(tier.price),
    catalogImpact:"25"
  });
- return "https://personalizar.noeapps.com/?"+q.toString();
+ return "https://personalizar.noeapps.com/iniciar?"+q.toString();
 }
 function demoSalesCta(s){if(!s)return"";const tier=sectorTier();return '<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'"><span><small>Desde</small><br><b>'+euro(tier.price)+'</b></span><span>Quiero una web como esta →</span></a>'}
 function libraryFiltered(){
