@@ -693,7 +693,7 @@ function normalizeSiteSlug(value){
 function validSiteSlug(value){
   return typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/.test(value)&&!value.startsWith('xn--')&&!value.startsWith('web-')&&!RESERVED_SITE_SLUGS.has(value);
 }
-function sitePublicUrl(slug){return 'https://'+slug+'.'+SITE_DOMAIN+'/';}
+function sitePublicUrl(slug){return process.env.CATALOG_ENVIRONMENT==='staging'?PUBLIC_ORIGIN+'/customer-site/'+encodeURIComponent(slug):'https://'+slug+'.'+SITE_DOMAIN+'/';}
 function safeSiteOrigin(value){
   const raw=text(value,1600);if(!raw)return'';
   try{
@@ -1260,6 +1260,14 @@ http.createServer(async(req,res)=>{
       if(!roadmap.enabled())return json(res,404,{error:'Función no habilitada.'});
       await ensureSchema();
       if(url.pathname==='/api/crm/roadmap'&&req.method==='GET')return json(res,200,await crmRoadmap.report());
+      if(url.pathname==='/api/crm/roadmap/campaign'&&req.method==='GET'){
+        const id=url.searchParams.get('id');if(!validUuid(id))return json(res,400,{error:'Campaña no válida.'});
+        const customers=(await pool.query(`SELECT a.source,a.entity_id,a.assigned_at,r.business_name,r.first_paid_amount_cents
+          FROM crm_campaign_assignments a LEFT JOIN catalog_requests r ON a.source='catalog' AND r.id=a.entity_id
+          WHERE a.campaign_id=$1 ORDER BY a.assigned_at DESC`,[id])).rows;
+        const tn=customers.some(x=>x.source==='tunegocio')?await fetchTunegocioOperations():null;
+        return json(res,200,{customers:customers.map(x=>({...x,business_name:x.business_name||tn?.projects.find(p=>p.id===x.entity_id)?.businessName||x.entity_id}))});
+      }
       if(url.pathname==='/api/crm/roadmap/incidents'&&req.method==='GET'){
         const [list,count,run]=await Promise.all([pool.query("SELECT * FROM crm_incidents ORDER BY (state='resolved'),last_seen_at DESC LIMIT 500"),pool.query("SELECT count(*)::int AS total FROM crm_incidents WHERE state<>'resolved'"),pool.query('SELECT * FROM crm_monitor_runs ORDER BY id DESC LIMIT 1')]);
         return json(res,200,{incidents:list.rows,openCount:count.rows[0].total,lastRun:run.rows[0]||null});
