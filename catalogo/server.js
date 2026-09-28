@@ -490,4 +490,7 @@ http.createServer(async(req,res)=>{
     console.error('Catalog request failed',error&&error.message?error.message:error);
     json(res,error&&error.status?error.status:500,{error:error&&error.publicMessage?error.publicMessage:(error&&error.status===413?'Solicitud demasiado grande.':'No se pudo completar la operación.')});
   }
-}).listen(port,'0.0.0.0',()=>console.log('NoeApps catalog listening on '+port));
+}).listen(port,'0.0.0.0',()=>{
+  console.log('NoeApps catalog listening on '+port);
+  migrateLegacyData().catch(()=>{});
+});
