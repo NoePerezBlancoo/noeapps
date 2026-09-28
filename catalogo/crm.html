@@ -214,19 +214,47 @@ function renderDetail(){
   if(selected.source==='tunegocio')return renderTnDetail();
   renderCatalogDetail();
 }
+function subscriptionPanel(x){
+  if(!x.subscriptionControlsEnabled||!(x.subscriptionId||x.stripe_subscription_id))return '';
+  const s=x.source==='tunegocio'?x.subscription:x.subscription_state;
+  const labels={active:'ACTIVA',trialing:'EN PRUEBA',past_due:'PAGO PENDIENTE',unpaid:'IMPAGADA',canceled:'CANCELADA',incomplete:'PAGO INCOMPLETO',incomplete_expired:'CADUCADA',paused:'PAUSADA'};
+  const scheduled=s&&(s.cancelAtPeriodEnd||s.cancelAt);
+  const label=s?(scheduled?'CANCELACIÓN PROGRAMADA':labels[s.status]||s.status):'ESTADO STRIPE SIN CONSULTAR';
+  const period=s?(s.paidUntil?'Servicio pagado hasta '+date(s.paidUntil):'Periodo pagado no disponible'):'';
+  return '<section class="summary" aria-label="Suscripción Stripe"><strong>'+esc(label)+'</strong>'+(s&&s.amountCents!=null?'<p>Cuota base: '+cents(s.amountCents)+({month:'/mes',year:'/año',week:'/semana',day:'/día'}[s.interval]||'')+'</p>':'')+'<small>'+esc(period)+(scheduled?'<br>No se volverá a cobrar la renovación.':s&&s.nextRenewalAt?'<br>Próximo cobro: '+date(s.nextRenewalAt):'')+'</small><div class="actions"><button class="btn" data-subscription="refresh">Actualizar desde Stripe</button><button class="btn" data-subscription="portal">Abrir portal Stripe ↗</button>'+(s&&s.canCancel?'<button class="btn" data-subscription="cancel">Cancelar al final del periodo</button>':'')+(s&&s.canReactivate?'<button class="btn" data-subscription="reactivate">Reactivar suscripción</button>':'')+'</div><div id="subscriptionMsg" class="msg" role="status"></div></section>';
+}
+function bindSubscriptionActions(){
+  document.querySelectorAll('[data-subscription]').forEach(button=>button.onclick=()=>subscriptionAction(button.dataset.subscription));
+}
+async function subscriptionAction(action){
+  const item=selected,source=item.source,id=item.id;
+  if(action==='cancel'&&!window.confirm('Se cancelará al finalizar el periodo. El servicio se conserva hasta la fecha pagada. ¿Continuar?'))return;
+  if(action==='reactivate'&&!window.confirm('La suscripción volverá a renovarse y Stripe podrá cobrar en la próxima fecha. ¿Continuar?'))return;
+  const msg=el('subscriptionMsg');msg.textContent='Consultando Stripe…';
+  document.querySelectorAll('[data-subscription]').forEach(button=>button.disabled=true);
+  try{
+    const route='/api/crm/'+(source==='tunegocio'?'tunegocio':'requests')+'/'+id+'/subscription';
+    const result=await api(route,{method:'POST',body:JSON.stringify({action})});
+    if(selected.id!==id||selected.source!==source)return;
+    if(source==='tunegocio')selected.subscription=result.subscription;else selected.subscription_state=result.subscription;
+    renderDetail();
+    el('subscriptionMsg').textContent=action==='cancel'?'Cancelación programada.':action==='reactivate'?'Renovación reactivada.':'Estado actualizado desde Stripe.';
+    if(result.url){const u=new URL(result.url);if(u.origin!=='https://billing.stripe.com')throw new Error('Portal no verificado.');window.location.assign(result.url);}
+  }catch(error){if(selected.id===id&&selected.source===source){el('subscriptionMsg').textContent=error.message;document.querySelectorAll('[data-subscription]').forEach(button=>button.disabled=false);}}
+}
 function renderTnDetail(){
   const x=selected,first=Number(x.firstAmountCents||0),commission=Number(x.commissionCents||0);
   el('detail').innerHTML=
     '<div class="sub"><span class="source tn">TuNegocio · IA</span> Proyecto '+esc(String(x.id).slice(0,8).toUpperCase())+'</div>'+
     '<h2>'+esc(x.businessName||x.slug)+'</h2><div class="sub">'+esc(x.category||'Web generada con IA')+' · '+esc(x.city||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(x.published?'good':'')+'">Web: '+(x.published?'publicada':'no publicada')+'</span><span class="tag '+(x.paymentStatus==='paid'?'good':'')+'">Pago: '+esc(x.paymentStatus||'none')+'</span><span class="tag '+(needsReview(x)?'warn':'good')+'">Manual: '+esc(x.manualStatus||'auto')+'</span></div>'+
-    '<div class="grid2"><div class="box"><span>Cuenta</span><p>'+esc(x.accountEmail||'—')+'</p></div><div class="box"><span>Contacto negocio</span><p>'+esc(x.businessEmail||'')+'\n'+esc(x.phone||'')+'\n'+esc(x.whatsapp||'')+'</p></div><div class="box"><span>Proyecto</span><p>'+esc(x.slug)+'\nEstilo: '+esc(x.styleId||'—')+'</p></div><div class="box"><span>Vigencia</span><p>Pagado hasta: '+date(x.paidUntil)+'\nPublicado hasta: '+date(x.publishedUntil)+'</p></div></div>'+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Cuenta</span><p>'+esc(x.accountEmail||'—')+'</p></div><div class="box"><span>Contacto negocio</span><p>'+esc(x.businessEmail||'')+'\n'+esc(x.phone||'')+'\n'+esc(x.whatsapp||'')+'</p></div><div class="box"><span>Proyecto</span><p>'+esc(x.slug)+'\nEstilo: '+esc(x.styleId||'—')+'</p></div><div class="box"><span>Vigencia</span><p>Pagado hasta: '+date(x.paidUntil)+'\nPublicado hasta: '+date(x.publishedUntil)+'</p></div></div>'+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="tnSalesperson" '+(x.firstAmountCents&&x.salespersonId?'disabled':'')+'>'+salespersonOptions(x.salespersonId)+'</select></label><label class="field"><span>Oferta</span><select id="tnOffer" '+(x.paymentStatus==='paid'?'disabled':'')+'>'+offerOptions('tunegocio',x.offerId)+'</select></label></div>'+
     '<div class="summary"><strong>'+ (first?('Primer cobro: '+cents(first)):'Primer cobro pendiente') +'</strong><small>Comisión comercial: '+(x.salespersonId&&first?cents(commission)+' ('+commissionPercent+'%)':'—')+(x.offerName?' · Oferta: '+esc(x.offerName):'')+'</small></div>'+
     '<label class="field"><span>Estado manual</span><select id="tnManual"><option value="auto" '+(x.manualStatus==='auto'?'selected':'')+'>Automático / sin intervención</option><option value="review" '+(x.manualStatus==='review'?'selected':'')+'>Revisar</option><option value="in_progress" '+(x.manualStatus==='in_progress'?'selected':'')+'>Intervención en curso</option><option value="resolved" '+(x.manualStatus==='resolved'?'selected':'')+'>Resuelto</option><option value="closed" '+(x.manualStatus==='closed'?'selected':'')+'>Cerrado</option></select></label>'+
     '<label class="field"><span>Notas internas</span><textarea id="tnNotes">'+esc(x.adminNotes||'')+'</textarea></label>'+
     '<div class="actions"><button class="btn primary" id="tnSave">Guardar gestión</button>'+(x.publicUrl?'<a target="_blank" href="'+esc(x.publicUrl)+'">Abrir web ↗</a>':'')+'</div><div id="detailMsg" class="msg"></div>';
-  document.getElementById('tnSave').onclick=saveTn;
+  document.getElementById('tnSave').onclick=saveTn;bindSubscriptionActions();
 }
 async function saveTn(){
   const m=document.getElementById('detailMsg');m.textContent='Guardando…';
@@ -249,7 +277,7 @@ function renderCatalogDetail(){
   el('detail').innerHTML=
     '<div class="sub"><span class="source catalog">Catálogo</span> Solicitud '+esc(String(x.id).slice(0,8).toUpperCase())+'</div><h2>'+esc(x.business_name)+'</h2><div class="sub">'+esc(x.design_name)+' · '+esc(x.category||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente')+'</span><span class="tag '+(x.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(x.stripe_payment_status||'sin cobrar')+'</span><span class="tag '+(['active','trialing'].includes(x.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(x.stripe_subscription_status||'—')+'</span><span class="tag '+(x.site_status==='active'?'good':'')+'">Web: '+esc(x.site_status||'draft')+'</span></div>'+
-    '<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="catSalesperson" '+(x.first_paid_amount_cents!=null&&x.salesperson_id?'disabled':'')+'>'+salespersonOptions(x.salesperson_id)+'</select></label><label class="field"><span>Oferta mensual</span><select id="catOffer" '+(x.first_paid_amount_cents!=null?'disabled':'')+'>'+offerOptions('catalog',x.offer_id)+'</select></label></div>'+
     '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+x.offer_percent_off+'% durante '+x.offer_duration_months+' mes(es)':'')+'</small></div>'+
     '<div class="grid2"><label class="field"><span>Precio creación (€)</span><input id="creationPrice" type="number" min="0" max="10000" step="1" value="'+esc(x.creation_price||0)+'"></label><label class="field"><span>Cuota mensual (€)</span><input id="monthlyPrice" type="number" min="1" max="1000" step=".01" value="'+(Number(x.monthly_price_cents||1990)/100).toFixed(2)+'"></label></div>'+
@@ -261,7 +289,7 @@ function renderCatalogDetail(){
   document.getElementById('catSave').onclick=()=>saveCatalog(true);
   document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
-  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;
+  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();
 }
 async function saveCatalog(reload=true){
   const m=document.getElementById('detailMsg');if(m)m.textContent='';
