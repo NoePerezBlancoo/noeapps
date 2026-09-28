@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-09-28T17:37:02.285Z",
+  "fixtureId": "c1da82cb-aaf9-494f-8e9b-9e673197ca6c",
+  "subscriptionId": "sub_1UKiTt4u1bh3pBtlf1zdZoye",
+  "checks": [
+    "Stripe TEST paid invoice",
+    "signed webhook and duplicate replay",
+    "webhook TEST/LIVE separation",
+    "CRM auth",
+    "same-origin",
+    "scheduled cancellation",
+    "paid access retained",
+    "subscription content cannot bypass expiry through cache",
+    "reactivation",
+    "safe portal",
+    "terminal reactivation rejected",
+    "expired synthetic entitlement denied",
+    "immutable action audit"
+  ]
+}
