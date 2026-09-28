@@ -547,7 +547,9 @@ async function handleStripeWebhook(req,res){
           stripe_payment_status=$4,
           stripe_last_event_at=now(),
           paid_at=CASE WHEN $4='paid' THEN COALESCE(paid_at,now()) ELSE paid_at END,
-          status=CASE WHEN $4='paid' AND status IN ('new','preparing','preview_ready','sent','paid') THEN 'paid' ELSE status END,
+          site_status=CASE WHEN $4='paid' THEN 'active' ELSE site_status END,
+          preview_expires_at=CASE WHEN $4='paid' THEN NULL ELSE preview_expires_at END,
+          status=CASE WHEN $4='paid' AND status IN ('new','preparing','preview_ready','sent','paid','expired') THEN 'paid' ELSE status END,
           updated_at=now()
           WHERE id=$1`,[requestId,String(obj.customer||''),String(obj.subscription||''),String(obj.payment_status||'complete')]);
       }
@@ -565,17 +567,21 @@ async function handleStripeWebhook(req,res){
       if(where){
         await client.query(`UPDATE catalog_requests SET stripe_payment_status=$1,stripe_last_invoice_id=$2,stripe_last_event_at=now(),
           paid_at=CASE WHEN $1='paid' THEN COALESCE(paid_at,now()) ELSE paid_at END,
-          status=CASE WHEN $1='paid' AND status IN ('new','preparing','preview_ready','sent','paid') THEN 'paid' ELSE status END,
+          site_status=CASE WHEN $1='paid' THEN 'active' ELSE site_status END,
+          preview_expires_at=CASE WHEN $1='paid' THEN NULL ELSE preview_expires_at END,
+          status=CASE WHEN $1='paid' AND status IN ('new','preparing','preview_ready','sent','paid','expired') THEN 'paid' ELSE status END,
           updated_at=now() WHERE `+where,values);
       }
     }else if(type==='customer.subscription.created'||type==='customer.subscription.updated'||type==='customer.subscription.deleted'){
       const requestId=obj.metadata&&obj.metadata.catalog_request_id||'';
       const subStatus=String(obj.status||(type.endsWith('.deleted')?'canceled':''));
+      const activeSub=['active','trialing','past_due'].includes(subStatus);
+      const deleted=type==='customer.subscription.deleted'||['canceled','unpaid','incomplete_expired'].includes(subStatus);
       if(validUuid(requestId)){
-        await client.query('UPDATE catalog_requests SET stripe_subscription_id=$2,stripe_customer_id=COALESCE(NULLIF($3,\'\'),stripe_customer_id),stripe_subscription_status=$4,stripe_last_event_at=now(),updated_at=now() WHERE id=$1',
-          [requestId,String(obj.id||''),String(obj.customer||''),subStatus]);
+        await client.query("UPDATE catalog_requests SET stripe_subscription_id=$2,stripe_customer_id=COALESCE(NULLIF($3,''),stripe_customer_id),stripe_subscription_status=$4,site_status=CASE WHEN $5 THEN 'active' WHEN $6 THEN 'suspended' ELSE site_status END,preview_expires_at=CASE WHEN $5 THEN NULL ELSE preview_expires_at END,stripe_last_event_at=now(),updated_at=now() WHERE id=$1",
+          [requestId,String(obj.id||''),String(obj.customer||''),subStatus,activeSub,deleted]);
       }else if(obj.id){
-        await client.query('UPDATE catalog_requests SET stripe_subscription_status=$2,stripe_last_event_at=now(),updated_at=now() WHERE stripe_subscription_id=$1',[String(obj.id),subStatus]);
+        await client.query("UPDATE catalog_requests SET stripe_subscription_status=$2,site_status=CASE WHEN $3 THEN 'active' WHEN $4 THEN 'suspended' ELSE site_status END,preview_expires_at=CASE WHEN $3 THEN NULL ELSE preview_expires_at END,stripe_last_event_at=now(),updated_at=now() WHERE stripe_subscription_id=$1",[String(obj.id),subStatus,activeSub,deleted]);
       }
     }
     await client.query('COMMIT');
@@ -595,13 +601,16 @@ async function createRequest(req,res){
   if(!designId||![39,79,149,299].includes(creationPrice))return json(res,400,{error:'No hemos podido identificar correctamente el diseño. Vuelve al catálogo.'});
   await ensureSchema();
   const id=crypto.randomUUID();
-  await pool.query(`INSERT INTO catalog_requests(id,contact_name,business_name,whatsapp,email,city,source_url,notes,design_id,design_name,category,tier,creation_price,catalog_preview_url,thumbnail_url)
-    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,[id,contactName,businessName,whatsapp,email,city,sourceUrl,notes,designId,designName,category,tier,creationPrice,catalogPreview,thumbnail]);
-  return json(res,201,{ok:true,id});
+  const siteSlug=await makeUniqueSiteSlug(businessName);
+  await pool.query(`INSERT INTO catalog_requests(id,contact_name,business_name,whatsapp,email,city,source_url,notes,design_id,design_name,category,tier,creation_price,catalog_preview_url,thumbnail_url,site_slug)
+    VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,[id,contactName,businessName,whatsapp,email,city,sourceUrl,notes,designId,designName,category,tier,creationPrice,catalogPreview,thumbnail,siteSlug]);
+  return json(res,201,{ok:true,id,siteSlug,siteUrl:sitePublicUrl(siteSlug)});
 }
 async function listRequests(res){
   await ensureSchema();
+  await expireOverduePreviews();
   const result=await pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500');
+  await ensureSiteSlugs(result.rows);
   return json(res,200,{requests:result.rows});
 }
 async function updateRequest(req,res,id){
@@ -648,6 +657,11 @@ http.createServer(async(req,res)=>{
     }
     if(url.pathname==='/api/stripe/webhook'&&req.method==='POST')return await handleStripeWebhook(req,res);
     if(url.pathname==='/api/requests'&&req.method==='POST')return await createRequest(req,res);
+    if(url.pathname==='/api/public/site-route'&&req.method==='GET')return await publicSiteRoute(res,String(url.searchParams.get('slug')||'').toLowerCase());
+    const customerSiteMatch=url.pathname.match(/^\/customer-site\/([a-z0-9-]{3,48})(\/.*)?$/i);
+    if(customerSiteMatch)return await proxyCustomerSite(req,res,customerSiteMatch[1].toLowerCase(),customerSiteMatch[2]||'/',url.search);
+    const payMatch=url.pathname.match(/^\/pagar\/([A-Za-z0-9_-]{20,80})$/);
+    if(payMatch&&req.method==='GET')return await handlePublicPayment(res,payMatch[1]);
     if(url.pathname==='/api/crm/login'&&req.method==='POST'){
       if(!CRM_PASSWORD||!SESSION_SECRET)return json(res,503,{error:'CRM no configurado.'});
       const data=await bodyJson(req,2048);
@@ -658,8 +672,15 @@ http.createServer(async(req,res)=>{
     if(url.pathname==='/api/crm/requests'&&req.method==='GET'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       await ensureSchema();
+      await expireOverduePreviews();
       const result=await pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500');
-      return json(res,200,{requests:result.rows,stripeConfigured:!!STRIPE_SECRET_KEY,taxEnabled:STRIPE_AUTOMATIC_TAX,stripeAccountId:STRIPE_ACCOUNT_ID});
+      await ensureSiteSlugs(result.rows);
+      return json(res,200,{requests:result.rows,stripeConfigured:!!STRIPE_SECRET_KEY,taxEnabled:STRIPE_AUTOMATIC_TAX,stripeAccountId:STRIPE_ACCOUNT_ID,siteDomain:SITE_DOMAIN});
+    }
+    const publishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/site\/publish$/i);
+    if(publishMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await publishSite(req,res,publishMatch[1]);
     }
     const checkoutMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/checkout$/i);
     if(checkoutMatch&&req.method==='POST'){
@@ -690,4 +711,6 @@ http.createServer(async(req,res)=>{
   console.log('NoeApps catalog listening on '+port);
   console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
   migrateLegacyData().catch(()=>{});
+  expireOverduePreviews().catch(()=>{});
+  setInterval(()=>expireOverduePreviews().catch(error=>console.error('Preview expiry sweep failed',error&&error.message?error.message:error)),60*60*1000).unref();
 });
