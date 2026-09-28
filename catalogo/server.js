@@ -1010,9 +1010,10 @@ async function listRequests(res){
 }
 async function updateRequest(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
-  const data=await bodyJson(req,16000);
+  const data=await bodyJson(req,18000);
   const status=text(data.status,30),previewUrl=safeUrl(data.previewUrl,1600),paymentUrl=safeUrl(data.paymentUrl,1600),adminNotes=text(data.adminNotes,3000);
-  const salesperson=text(data.salesperson,120),discountCode=text(data.discountCode,60).toUpperCase(),discountType=text(data.discountType,20),discountScope=text(data.discountScope,20);
+  const salespersonId=text(data.salespersonId,40),offerId=text(data.offerId,40);
+  const discountCode=text(data.discountCode,60).toUpperCase(),discountType=text(data.discountType,20),discountScope=text(data.discountScope,20);
   const requestedSiteSlug=text(data.siteSlug,80).toLowerCase();
   const siteSlug=requestedSiteSlug?normalizeSiteSlug(requestedSiteSlug):'';
   const rawSiteOrigin=text(data.siteOriginUrl,1600);
@@ -1021,6 +1022,8 @@ async function updateRequest(req,res,id){
   const monthlyPriceCents=Math.round(Number(data.monthlyPriceCents));
   let discountValue=Math.round(Number(data.discountValue)||0);
   if(!statuses.has(status))return json(res,400,{error:'Estado no válido.'});
+  if(salespersonId&&!validUuid(salespersonId))return json(res,400,{error:'Comercial no válido.'});
+  if(offerId&&!validUuid(offerId))return json(res,400,{error:'Oferta no válida.'});
   if(siteSlug&&!validSiteSlug(siteSlug))return json(res,400,{error:'El subdominio no es válido.'});
   if(rawSiteOrigin&&!siteOriginUrl)return json(res,400,{error:'La URL origen de la web debe ser HTTPS y pública.'});
   if(!discountTypes.has(discountType))return json(res,400,{error:'Tipo de descuento no válido.'});
@@ -1030,16 +1033,65 @@ async function updateRequest(req,res,id){
   if(discountType==='none')discountValue=0;
   if(discountType==='percent'&&(!Number.isSafeInteger(discountValue)||discountValue<0||discountValue>100))return json(res,400,{error:'El descuento porcentual debe estar entre 0 y 100.'});
   if(discountType==='fixed'&&(!Number.isSafeInteger(discountValue)||discountValue<0||discountValue>1000000))return json(res,400,{error:'Descuento fijo no válido.'});
+
   await ensureSchema();
+  const existing=(await pool.query("SELECT * FROM catalog_requests WHERE id=$1 LIMIT 1",[id])).rows[0];
+  if(!existing)return json(res,404,{error:'Solicitud no encontrada.'});
+
+  let salesperson=null;
+  if(salespersonId){
+    const q=await pool.query("SELECT * FROM crm_salespeople WHERE id=$1 AND active=true LIMIT 1",[salespersonId]);
+    salesperson=q.rows[0];
+    if(!salesperson)return json(res,400,{error:'El comercial no está activo.'});
+  }
+
+  let offer=null;
+  const offerChanged=String(existing.offer_id||'')!==offerId;
+  if(offerChanged&&existing.first_paid_amount_cents!=null)return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
+  if(offerId){
+    offer=await getOffer(offerId,'catalog');
+    if(!offer)return json(res,400,{error:'La oferta no está activa para Catálogo.'});
+  }
+
   if(siteSlug){
     const clash=await pool.query('SELECT id FROM catalog_requests WHERE site_slug=$1 AND id<>$2 LIMIT 1',[siteSlug,id]);
     if(clash.rows[0])return json(res,409,{error:'Ese subdominio ya está asignado a otra web.'});
   }
+
   const publicUrl=siteSlug?sitePublicUrl(siteSlug):'';
-  const result=await pool.query("UPDATE catalog_requests SET status=$2,preview_url=CASE WHEN site_status IN ('preview','active') AND $13<>'' THEN $15 ELSE $3 END,payment_url=$4,admin_notes=$5,creation_price=$6,monthly_price_cents=$7,salesperson=$8,discount_code=$9,discount_type=$10,discount_value=$11,discount_scope=$12,site_slug=CASE WHEN $13<>'' THEN $13 ELSE site_slug END,site_origin_url=CASE WHEN $14<>'' THEN $14 ELSE site_origin_url END,updated_at=now() WHERE id=$1 RETURNING *",
-    [id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents,salesperson,discountCode,discountType,discountValue,discountScope,siteSlug,siteOriginUrl,publicUrl]);
-  if(!result.rows[0])return json(res,404,{error:'Solicitud no encontrada.'});
-  return json(res,200,{ok:true,request:result.rows[0]});
+  const firstPaid=existing.first_paid_amount_cents==null?null:Number(existing.first_paid_amount_cents);
+  const commission=salesperson&&firstPaid!=null?Math.round(firstPaid*SALESPERSON_COMMISSION_PERCENT/100):null;
+  const result=await pool.query(`UPDATE catalog_requests SET
+    status=$2,
+    preview_url=CASE WHEN site_status IN ('preview','active') AND $13<>'' THEN $15 ELSE $3 END,
+    payment_url=$4,
+    admin_notes=$5,
+    creation_price=$6,
+    monthly_price_cents=$7,
+    salesperson=$8,
+    discount_code=$9,
+    discount_type=$10,
+    discount_value=$11,
+    discount_scope=$12,
+    site_slug=CASE WHEN $13<>'' THEN $13 ELSE site_slug END,
+    site_origin_url=CASE WHEN $14<>'' THEN $14 ELSE site_origin_url END,
+    salesperson_id=$16,
+    offer_id=$17,
+    offer_name=$18,
+    offer_percent_off=$19,
+    offer_duration_months=$20,
+    stripe_offer_coupon_id=CASE WHEN $21 THEN '' ELSE stripe_offer_coupon_id END,
+    stripe_offer_promotion_code_id=CASE WHEN $21 THEN '' ELSE stripe_offer_promotion_code_id END,
+    stripe_checkout_url=CASE WHEN $21 THEN '' ELSE stripe_checkout_url END,
+    stripe_checkout_session_id=CASE WHEN $21 THEN '' ELSE stripe_checkout_session_id END,
+    checkout_fingerprint=CASE WHEN $21 THEN '' ELSE checkout_fingerprint END,
+    commission_cents=$22,
+    updated_at=now()
+    WHERE id=$1 RETURNING *`,
+    [id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents,salesperson?String(salesperson.name):'',discountCode,discountType,discountValue,discountScope,
+      siteSlug,siteOriginUrl,publicUrl,salesperson?String(salesperson.id):null,offer?String(offer.id):null,offer?String(offer.name):'',
+      offer?Number(offer.percent_off):0,offer?Number(offer.duration_months):0,offerChanged,commission]);
+  return json(res,200,{ok:true,request:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
 }
 
 http.createServer(async(req,res)=>{
@@ -1079,20 +1131,44 @@ http.createServer(async(req,res)=>{
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       await ensureSchema();
       await expireOverduePreviews();
-      const [result,tunegocio]=await Promise.all([
+      const [result,tunegocio,config]=await Promise.all([
         pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500'),
-        fetchTunegocioOperations()
+        fetchTunegocioOperations(),
+        crmConfig()
       ]);
       await ensureSiteSlugs(result.rows);
+      const analytics=await combinedAnalytics(tunegocio);
       return json(res,200,{
         requests:result.rows,
         tunegocio:tunegocio.projects,
         tunegocioAvailable:tunegocio.available,
+        salespeople:config.salespeople,
+        offers:config.offers,
+        analytics,
+        commissionPercent:SALESPERSON_COMMISSION_PERCENT,
         stripeConfigured:!!STRIPE_SECRET_KEY,
         taxEnabled:STRIPE_AUTOMATIC_TAX,
         stripeAccountId:STRIPE_ACCOUNT_ID,
         siteDomain:SITE_DOMAIN
       });
+    }
+    if(url.pathname==='/api/crm/salespeople'&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await createSalesperson(req,res);
+    }
+    const salespersonMatch=url.pathname.match(/^\/api\/crm\/salespeople\/([0-9a-f-]{36})$/i);
+    if(salespersonMatch&&req.method==='PATCH'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await updateSalesperson(req,res,salespersonMatch[1]);
+    }
+    if(url.pathname==='/api/crm/offers'&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await createOffer(req,res);
+    }
+    const offerMatch=url.pathname.match(/^\/api\/crm\/offers\/([0-9a-f-]{36})$/i);
+    if(offerMatch&&req.method==='PATCH'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await updateOffer(req,res,offerMatch[1]);
     }
     const tunegocioMatch=url.pathname.match(/^\/api\/crm\/tunegocio\/([0-9a-f-]{36})$/i);
     if(tunegocioMatch&&req.method==='PATCH'){
