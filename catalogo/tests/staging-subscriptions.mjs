@@ -43,6 +43,9 @@ try{
   const active=(await request(route,{action:'refresh'})).subscription;
   assert.equal(active.status,'active');assert.equal(active.canCancel,true);assert.ok(Date.parse(active.paidUntil)>Date.now());
   assert.equal((await request('/api/public/site-route?slug='+fixture.siteSlug)).status,'active');
+  const paidSite=await fetch(origin+'/customer-site/'+fixture.siteSlug);
+  assert.equal(paidSite.status,200);
+  assert.match(paidSite.headers.get('cache-control'),/no-store/,'Cached content must not bypass entitlement expiry');
   await request(route,{action:'cancel'},403,{Origin:'https://attacker.example.invalid'});
   await request(route,{action:'cancel'},401,{Cookie:''});
   const cancelled=(await request(route,{action:'cancel'})).subscription;
@@ -68,7 +71,7 @@ try{
   assert.ok(audit.some(row=>row.action==='cancel'&&row.outcome==='succeeded'));
   assert.ok(audit.some(row=>row.action==='reactivate'&&row.outcome==='succeeded'));
   assert.ok(audit.some(row=>row.action==='reactivate'&&row.outcome==='failed'));
-  const evidence={verifiedAt:new Date().toISOString(),fixtureId:fixture.id,subscriptionId:subscription.id,checks:['Stripe TEST paid invoice','signed webhook and duplicate replay','webhook TEST/LIVE separation','CRM auth','same-origin','scheduled cancellation','paid access retained','reactivation','safe portal','terminal reactivation rejected','expired synthetic entitlement denied','immutable action audit']};
+  const evidence={verifiedAt:new Date().toISOString(),fixtureId:fixture.id,subscriptionId:subscription.id,checks:['Stripe TEST paid invoice','signed webhook and duplicate replay','webhook TEST/LIVE separation','CRM auth','same-origin','scheduled cancellation','paid access retained','subscription content cannot bypass expiry through cache','reactivation','safe portal','terminal reactivation rejected','expired synthetic entitlement denied','immutable action audit']};
   await writeFile(new URL('../../.env.phase1-evidence.json',import.meta.url),JSON.stringify(evidence,null,2));
   console.log(JSON.stringify(evidence));
 }finally{await db.end()}

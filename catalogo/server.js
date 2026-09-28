@@ -949,7 +949,7 @@ async function proxyCustomerSite(req,res,slug,pathname,search){
     }
     const responseHeaders={
       'Content-Type':upstream.headers.get('content-type')||contentType(pathname,upstream.headers.get('content-type')),
-      'Cache-Control':row.site_status==='preview'?'private, no-store, max-age=0':(upstream.headers.get('cache-control')||'public, max-age=60'),
+      'Cache-Control':row.site_status==='preview'||(subscriptions.enabled()&&row.subscription_state&&row.stripe_subscription_id)?'private, no-store, max-age=0':(upstream.headers.get('cache-control')||'public, max-age=60'),
       'X-Content-Type-Options':'nosniff'
     };
     if(row.site_status==='preview')responseHeaders['X-Robots-Tag']='noindex, nofollow, noarchive';
@@ -1338,7 +1338,7 @@ http.createServer(async(req,res)=>{
   }
 }).listen(port,'0.0.0.0',()=>{
   console.log('NoeApps catalog listening on '+port);
-  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
+  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('rkcs_test_')?'sandbox_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
   migrateLegacyData().catch(()=>{});
   expireOverduePreviews().catch(()=>{});
   fetchTunegocioOperations().then(result=>console.log('TuNegocio CRM bridge: '+(result.available?'ready ('+result.projects.length+' project(s))':'unavailable'))).catch(()=>{});
