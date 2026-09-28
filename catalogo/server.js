@@ -31,6 +31,8 @@ const STRIPE_DEFAULT_MONTHLY_PRICE_ID=(process.env.STRIPE_DEFAULT_MONTHLY_PRICE_
 const STRIPE_AUTOMATIC_TAX=/^(1|true|yes)$/i.test(process.env.STRIPE_AUTOMATIC_TAX||'');
 const PUBLIC_ORIGIN=(process.env.PUBLIC_ORIGIN||'https://catalogo.noeapps.com').replace(/\/$/,'');
 const SITE_DOMAIN=(process.env.SITE_DOMAIN||'noeapps.com').trim().toLowerCase();
+const CRM_BRIDGE_SECRET=(process.env.NOEAPPS_CRM_BRIDGE_SECRET||'').trim();
+const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace(/\/$/,'');
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
 let schemaPromise=null;
@@ -112,6 +114,17 @@ async function ensureSchema(){
       id text PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS crm_operations(
+      source text NOT NULL CHECK (source IN ('tunegocio')),
+      external_id uuid NOT NULL,
+      manual_status text NOT NULL DEFAULT 'auto' CHECK (manual_status IN ('auto','review','in_progress','resolved','closed')),
+      salesperson text NOT NULL DEFAULT '',
+      admin_notes text NOT NULL DEFAULT '',
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now(),
+      PRIMARY KEY(source,external_id)
+    );
+    CREATE INDEX IF NOT EXISTS crm_operations_updated_idx ON crm_operations(updated_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
@@ -199,6 +212,61 @@ function safeUrl(value,max=1600){
 function safeEq(a,b){
   const x=Buffer.from(String(a)),y=Buffer.from(String(b));
   return x.length===y.length&&crypto.timingSafeEqual(x,y);
+}
+function safeTunegocioOrigin(){
+  if(!TUNEGOCIO_CRM_ORIGIN)return'';
+  try{
+    const u=new URL(TUNEGOCIO_CRM_ORIGIN);
+    if(u.protocol!=='https:'||u.username||u.password||u.port||!u.hostname.endsWith('.up.railway.app'))return'';
+    return u.origin;
+  }catch{return''}
+}
+async function fetchTunegocioOperations(){
+  const origin=safeTunegocioOrigin();
+  if(!origin||CRM_BRIDGE_SECRET.length<32)return{available:false,projects:[],error:'bridge_not_configured'};
+  try{
+    const response=await fetch(origin+'/api/internal/crm-summary',{
+      method:'GET',
+      headers:{'Authorization':'Bearer '+CRM_BRIDGE_SECRET,'Accept':'application/json'},
+      cache:'no-store',
+      signal:AbortSignal.timeout(7000)
+    });
+    if(!response.ok)return{available:false,projects:[],error:'upstream_'+response.status};
+    const data=await response.json();
+    const remote=Array.isArray(data.projects)?data.projects:[];
+    await ensureSchema();
+    const local=await pool.query("SELECT external_id,manual_status,salesperson,admin_notes,updated_at FROM crm_operations WHERE source='tunegocio'");
+    const meta=new Map(local.rows.map(row=>[String(row.external_id),row]));
+    return{available:true,projects:remote.filter(item=>item&&validUuid(String(item.id||''))).map(item=>{
+      const saved=meta.get(String(item.id))||{};
+      return{
+        ...item,
+        source:'tunegocio',
+        manualStatus:String(saved.manual_status||'auto'),
+        salesperson:String(saved.salesperson||''),
+        adminNotes:String(saved.admin_notes||''),
+        manualUpdatedAt:saved.updated_at?new Date(saved.updated_at).toISOString():null
+      };
+    })};
+  }catch(error){
+    console.warn('TuNegocio CRM bridge unavailable',{message:error&&error.name?error.name:'error'});
+    return{available:false,projects:[],error:'bridge_unavailable'};
+  }
+}
+async function updateTunegocioOperation(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Proyecto no válido.'});
+  const data=await bodyJson(req,12000);
+  const manualStatus=text(data.manualStatus,30);
+  const salesperson=text(data.salesperson,120);
+  const adminNotes=text(data.adminNotes,4000);
+  const allowed=new Set(['auto','review','in_progress','resolved','closed']);
+  if(!allowed.has(manualStatus))return json(res,400,{error:'Estado manual no válido.'});
+  await ensureSchema();
+  const result=await pool.query(
+    "INSERT INTO crm_operations(source,external_id,manual_status,salesperson,admin_notes) VALUES('tunegocio',$1,$2,$3,$4) ON CONFLICT(source,external_id) DO UPDATE SET manual_status=EXCLUDED.manual_status,salesperson=EXCLUDED.salesperson,admin_notes=EXCLUDED.admin_notes,updated_at=now() RETURNING *",
+    [id,manualStatus,salesperson,adminNotes]
+  );
+  return json(res,200,{ok:true,operation:result.rows[0]});
 }
 function cookies(req){
   return Object.fromEntries((req.headers.cookie||'').split(';').map(x=>x.trim().split('=').map(decodeURIComponent)).filter(x=>x.length===2));
@@ -684,9 +752,25 @@ http.createServer(async(req,res)=>{
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       await ensureSchema();
       await expireOverduePreviews();
-      const result=await pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500');
+      const [result,tunegocio]=await Promise.all([
+        pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500'),
+        fetchTunegocioOperations()
+      ]);
       await ensureSiteSlugs(result.rows);
-      return json(res,200,{requests:result.rows,stripeConfigured:!!STRIPE_SECRET_KEY,taxEnabled:STRIPE_AUTOMATIC_TAX,stripeAccountId:STRIPE_ACCOUNT_ID,siteDomain:SITE_DOMAIN});
+      return json(res,200,{
+        requests:result.rows,
+        tunegocio:tunegocio.projects,
+        tunegocioAvailable:tunegocio.available,
+        stripeConfigured:!!STRIPE_SECRET_KEY,
+        taxEnabled:STRIPE_AUTOMATIC_TAX,
+        stripeAccountId:STRIPE_ACCOUNT_ID,
+        siteDomain:SITE_DOMAIN
+      });
+    }
+    const tunegocioMatch=url.pathname.match(/^\/api\/crm\/tunegocio\/([0-9a-f-]{36})$/i);
+    if(tunegocioMatch&&req.method==='PATCH'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await updateTunegocioOperation(req,res,tunegocioMatch[1]);
     }
     const publishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/site\/publish$/i);
     if(publishMatch&&req.method==='POST'){
