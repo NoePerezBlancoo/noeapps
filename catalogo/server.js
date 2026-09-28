@@ -459,7 +459,7 @@ async function combinedAnalytics(tunegocio){
 
 async function fetchTunegocioOperations(){
   const origin=safeTunegocioOrigin();
-  if(!origin||CRM_BRIDGE_SECRET.length<32)return{available:false,projects:[],error:'bridge_not_configured'};
+  if(!origin||CRM_BRIDGE_SECRET.length<32)return{available:false,projects:[],analytics:null,error:'bridge_not_configured'};
   try{
     const response=await fetch(origin+'/api/internal/crm-summary',{
       method:'GET',
@@ -467,42 +467,102 @@ async function fetchTunegocioOperations(){
       cache:'no-store',
       signal:AbortSignal.timeout(7000)
     });
-    if(!response.ok)return{available:false,projects:[],error:'upstream_'+response.status};
+    if(!response.ok)return{available:false,projects:[],analytics:null,error:'upstream_'+response.status};
     const data=await response.json();
     const remote=Array.isArray(data.projects)?data.projects:[];
     await ensureSchema();
-    const local=await pool.query("SELECT external_id,manual_status,salesperson,admin_notes,updated_at FROM crm_operations WHERE source='tunegocio'");
+    const local=await pool.query("SELECT o.*,s.name AS salesperson_name,s.email AS salesperson_email FROM crm_operations o LEFT JOIN crm_salespeople s ON s.id=o.salesperson_id WHERE o.source='tunegocio'");
     const meta=new Map(local.rows.map(row=>[String(row.external_id),row]));
-    return{available:true,projects:remote.filter(item=>item&&validUuid(String(item.id||''))).map(item=>{
+    const projects=[];
+    for(const item of remote.filter(item=>item&&validUuid(String(item.id||'')))){
       const saved=meta.get(String(item.id))||{};
-      return{
+      const firstAmount=Number(item.firstAmountCents||saved.first_paid_amount_cents||0);
+      const salespersonId=saved.salesperson_id?String(saved.salesperson_id):'';
+      const commissionCents=salespersonId&&firstAmount>0?Number(saved.commission_cents||Math.round(firstAmount*SALESPERSON_COMMISSION_PERCENT/100)):0;
+      if(salespersonId&&firstAmount>0&&(!saved.first_paid_amount_cents||!saved.commission_cents)){
+        await pool.query("UPDATE crm_operations SET first_paid_amount_cents=COALESCE(first_paid_amount_cents,$2),commission_cents=COALESCE(commission_cents,$3),updated_at=now() WHERE source='tunegocio' AND external_id=$1",
+          [item.id,firstAmount,commissionCents]).catch(()=>{});
+      }
+      projects.push({
         ...item,
         source:'tunegocio',
         manualStatus:String(saved.manual_status||'auto'),
-        salesperson:String(saved.salesperson||''),
+        salesperson:String(saved.salesperson_name||saved.salesperson||''),
+        salespersonId,
+        salespersonEmail:String(saved.salesperson_email||''),
         adminNotes:String(saved.admin_notes||''),
+        offerId:saved.offer_id?String(saved.offer_id):'',
+        offerName:String(saved.offer_name||item.offerName||''),
+        offerPercentOff:Number(saved.offer_percent_off||item.offerPercentOff||0),
+        offerDurationMonths:Number(saved.offer_duration_months||item.offerDurationMonths||0),
+        firstAmountCents:firstAmount||null,
+        commissionCents,
+        commissionPercent:SALESPERSON_COMMISSION_PERCENT,
         manualUpdatedAt:saved.updated_at?new Date(saved.updated_at).toISOString():null
-      };
-    })};
+      });
+    }
+    return{available:true,projects,analytics:data.analytics||null};
   }catch(error){
     console.warn('TuNegocio CRM bridge unavailable',{message:error&&error.name?error.name:'error'});
-    return{available:false,projects:[],error:'bridge_unavailable'};
+    return{available:false,projects:[],analytics:null,error:'bridge_unavailable'};
   }
 }
 async function updateTunegocioOperation(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Proyecto no válido.'});
-  const data=await bodyJson(req,12000);
-  const manualStatus=text(data.manualStatus,30);
-  const salesperson=text(data.salesperson,120);
-  const adminNotes=text(data.adminNotes,4000);
+  const data=await bodyJson(req,16000);
+  const manualStatus=text(data.manualStatus,30),adminNotes=text(data.adminNotes,4000);
+  const salespersonId=text(data.salespersonId,40),offerId=text(data.offerId,40);
   const allowed=new Set(['auto','review','in_progress','resolved','closed']);
   if(!allowed.has(manualStatus))return json(res,400,{error:'Estado manual no válido.'});
+  if(salespersonId&&!validUuid(salespersonId))return json(res,400,{error:'Comercial no válido.'});
+  if(offerId&&!validUuid(offerId))return json(res,400,{error:'Oferta no válida.'});
   await ensureSchema();
+
+  let salesperson=null;
+  if(salespersonId){
+    const q=await pool.query("SELECT * FROM crm_salespeople WHERE id=$1 AND active=true LIMIT 1",[salespersonId]);
+    salesperson=q.rows[0];
+    if(!salesperson)return json(res,400,{error:'El comercial no está activo.'});
+  }
+
+  const currentLocal=(await pool.query("SELECT * FROM crm_operations WHERE source='tunegocio' AND external_id=$1 LIMIT 1",[id])).rows[0]||{};
+  const remoteBundle=await fetchTunegocioOperations();
+  const remote=remoteBundle.projects.find(item=>String(item.id)===id);
+  if(!remote)return json(res,503,{error:'No se pudo comprobar el proyecto de TuNegocio.'});
+
+  let offer=null;
+  const offerChanged=String(currentLocal.offer_id||'')!==offerId;
+  if(offerChanged&&remote.paymentStatus==='paid')return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
+  if(offerId){
+    offer=await getOffer(offerId,'tunegocio');
+    if(!offer)return json(res,400,{error:'La oferta no está activa para TuNegocio.'});
+  }
+  if(offerChanged){
+    try{await syncTunegocioOffer(id,offer)}catch(error){return json(res,503,{error:error&&error.message?String(error.message):'No se pudo aplicar la oferta en TuNegocio.'})}
+  }
+
+  const firstAmount=Number(remote.firstAmountCents||currentLocal.first_paid_amount_cents||0);
+  const commissionCents=salesperson&&firstAmount>0?Math.round(firstAmount*SALESPERSON_COMMISSION_PERCENT/100):null;
   const result=await pool.query(
-    "INSERT INTO crm_operations(source,external_id,manual_status,salesperson,admin_notes) VALUES('tunegocio',$1,$2,$3,$4) ON CONFLICT(source,external_id) DO UPDATE SET manual_status=EXCLUDED.manual_status,salesperson=EXCLUDED.salesperson,admin_notes=EXCLUDED.admin_notes,updated_at=now() RETURNING *",
-    [id,manualStatus,salesperson,adminNotes]
+    `INSERT INTO crm_operations(source,external_id,manual_status,salesperson,admin_notes,salesperson_id,offer_id,offer_name,offer_percent_off,offer_duration_months,first_paid_amount_cents,commission_cents)
+     VALUES('tunegocio',$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+     ON CONFLICT(source,external_id) DO UPDATE SET
+       manual_status=EXCLUDED.manual_status,
+       salesperson=EXCLUDED.salesperson,
+       admin_notes=EXCLUDED.admin_notes,
+       salesperson_id=EXCLUDED.salesperson_id,
+       offer_id=EXCLUDED.offer_id,
+       offer_name=EXCLUDED.offer_name,
+       offer_percent_off=EXCLUDED.offer_percent_off,
+       offer_duration_months=EXCLUDED.offer_duration_months,
+       first_paid_amount_cents=COALESCE(crm_operations.first_paid_amount_cents,EXCLUDED.first_paid_amount_cents),
+       commission_cents=CASE WHEN EXCLUDED.salesperson_id IS NULL THEN NULL ELSE COALESCE(crm_operations.commission_cents,EXCLUDED.commission_cents) END,
+       updated_at=now()
+     RETURNING *`,
+    [id,manualStatus,salesperson?String(salesperson.name):'',adminNotes,salesperson?String(salesperson.id):null,offer?String(offer.id):null,
+      offer?String(offer.name):'',offer?Number(offer.percent_off):0,offer?Number(offer.duration_months):0,firstAmount||null,commissionCents]
   );
-  return json(res,200,{ok:true,operation:result.rows[0]});
+  return json(res,200,{ok:true,operation:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
 }
 function cookies(req){
   return Object.fromEntries((req.headers.cookie||'').split(';').map(x=>x.trim().split('=').map(decodeURIComponent)).filter(x=>x.length===2));
