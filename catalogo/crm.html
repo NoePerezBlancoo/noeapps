@@ -25,7 +25,12 @@ function renderDetail(){
   const el=document.getElementById('detail');if(!selected){el.innerHTML='<div class="empty">Selecciona una solicitud.</div>';return}
   const wa=String(selected.whatsapp||'').replace(/\D/g,'');
   const t=totals(selected);
-  const whatsappText=encodeURIComponent('Hola '+selected.contact_name+', ya tenemos preparada tu web.\n\nPreview: '+(selected.preview_url||'')+'\n\nActivación/pago: '+(selected.payment_url||''));
+  const pageUrl=selected.preview_url||selected.catalog_preview_url||'';
+  const whatsappText=encodeURIComponent(
+    'Hola '+selected.contact_name+', ya tenemos preparada tu web.\n\n'+
+    (pageUrl?'Puedes verla aquí:\n'+pageUrl+'\n\n':'')+
+    (selected.payment_url?'Cuando quieras activarla, puedes hacer el pago y la suscripción aquí:\n'+selected.payment_url:'')
+  );
   const discountValue=discountDisplayValue(selected);
   el.innerHTML=
     '<div class="sub">Solicitud '+esc(selected.id.slice(0,8).toUpperCase())+'</div>'+
