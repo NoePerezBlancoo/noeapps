@@ -1,18 +1,34 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CRM Catálogo · NoeApps</title><style>
-*{box-sizing:border-box}body{margin:0;background:#080a0e;color:#f5f7fb;font-family:Inter,Arial,sans-serif}button,input,select,textarea{font:inherit}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(420px,100%);padding:28px;border:1px solid #29313b;border-radius:20px;background:#10151c}.card span{font-size:10px;letter-spacing:.15em;color:#8290a0;font-weight:900}.card h1{font-size:42px;letter-spacing:-.06em;margin:10px 0 20px}.card input{width:100%;padding:13px;border-radius:10px;border:1px solid #303947;background:#0b0f14;color:#fff}.card button{width:100%;margin-top:12px;height:46px;border:0;border-radius:10px;background:#6f62ff;color:#fff;font-weight:900}.app{display:none}.top{display:flex;justify-content:space-between;align-items:end;padding:25px 30px;border-bottom:1px solid #202630}.top h1{margin:4px 0 0;font-size:36px}.top span{color:#7c8797;font-size:10px;letter-spacing:.14em}.top button{background:#161c24;color:#dce2e9;border:1px solid #303846;padding:9px 12px;border-radius:8px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:18px 30px}.metric{padding:15px;border:1px solid #252c36;border-radius:13px;background:#0f141b}.metric span{font-size:9px;color:#788495;text-transform:uppercase}.metric b{display:block;font-size:26px;margin-top:4px}.layout{display:grid;grid-template-columns:1fr 1.05fr;min-height:calc(100vh - 170px);border-top:1px solid #202630}.list{border-right:1px solid #202630;padding:16px;overflow:auto}.row{width:100%;display:grid;grid-template-columns:1.2fr .8fr auto;gap:12px;text-align:left;padding:14px;margin-bottom:8px;border:1px solid #252d37;border-radius:12px;background:#0d1218;color:#fff;cursor:pointer}.row.active{border-color:#7064ff;background:#121527}.row strong,.row small{display:block}.row small{margin-top:3px;color:#7d8999}.row em{font-style:normal;color:#a9b4c3;font-size:11px}.pill{align-self:center;padding:6px 8px;border-radius:999px;background:#1b222c;font-size:9px;text-transform:uppercase}.detail{padding:24px 28px;overflow:auto}.detail h2{font-size:34px;margin:5px 0 4px}.detail .sub{color:#8490a0;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.box{padding:13px;border:1px solid #252d37;border-radius:11px;background:#0e1319}.box span{display:block;color:#778394;font-size:9px;text-transform:uppercase;font-weight:800}.box p{margin:6px 0 0;white-space:pre-wrap;font-size:12px}.field{display:block;margin-top:12px}.field span{display:block;color:#8e99a8;font-size:9px;font-weight:800;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid #303947;background:#0b0f14;color:#fff;border-radius:9px;padding:10px}.field textarea{min-height:86px}.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.actions button,.actions a{padding:10px 12px;border-radius:9px;border:1px solid #303947;background:#151b23;color:#fff;text-decoration:none;font-size:10px;font-weight:800}.actions .primary{background:#6f62ff;border-color:#6f62ff}.actions button:disabled{opacity:.45;cursor:not-allowed}.summary{margin-top:14px;padding:14px;border:1px solid #343d49;border-radius:12px;background:#0b1016}.summary strong{display:block;font-size:18px}.summary small{display:block;color:#8d99a8;margin-top:5px}.stripeState{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{padding:6px 9px;border:1px solid #2d3743;border-radius:999px;background:#111821;font-size:9px;color:#b9c3cf}.tag.good{border-color:#2d684f;color:#8be0b5}.tag.warn{border-color:#765e2a;color:#ffd783}.empty{padding:50px;color:#758090;text-align:center}.msg{color:#ffb0b0;font-size:11px;margin-top:10px}@media(max-width:900px){.layout{grid-template-columns:1fr}.list{border-right:0;border-bottom:1px solid #202630}.metrics{grid-template-columns:1fr 1fr}.top{padding:20px}.metrics{padding:14px}.detail{padding:18px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}}</style></head>
+*{box-sizing:border-box}body{margin:0;background:#080a0e;color:#f5f7fb;font-family:Inter,Arial,sans-serif}button,input,select,textarea{font:inherit}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.card{width:min(420px,100%);padding:28px;border:1px solid #29313b;border-radius:20px;background:#10151c}.card span{font-size:10px;letter-spacing:.15em;color:#8290a0;font-weight:900}.card h1{font-size:42px;letter-spacing:-.06em;margin:10px 0 20px}.card input{width:100%;padding:13px;border-radius:10px;border:1px solid #303947;background:#0b0f14;color:#fff}.card button{width:100%;margin-top:12px;height:46px;border:0;border-radius:10px;background:#6f62ff;color:#fff;font-weight:900}.app{display:none}.top{display:flex;justify-content:space-between;align-items:end;padding:25px 30px;border-bottom:1px solid #202630}.top h1{margin:4px 0 0;font-size:36px}.top span{color:#7c8797;font-size:10px;letter-spacing:.14em}.top button{background:#161c24;color:#dce2e9;border:1px solid #303846;padding:9px 12px;border-radius:8px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:18px 30px}.metric{padding:15px;border:1px solid #252c36;border-radius:13px;background:#0f141b}.metric span{font-size:9px;color:#788495;text-transform:uppercase}.metric b{display:block;font-size:26px;margin-top:4px}.layout{display:grid;grid-template-columns:1fr 1.05fr;min-height:calc(100vh - 170px);border-top:1px solid #202630}.list{border-right:1px solid #202630;padding:16px;overflow:auto}.row{width:100%;display:grid;grid-template-columns:1.2fr .8fr auto;gap:12px;text-align:left;padding:14px;margin-bottom:8px;border:1px solid #252d37;border-radius:12px;background:#0d1218;color:#fff;cursor:pointer}.row.active{border-color:#7064ff;background:#121527}.row strong,.row small{display:block}.row small{margin-top:3px;color:#7d8999}.row em{font-style:normal;color:#a9b4c3;font-size:11px}.pill{align-self:center;padding:6px 8px;border-radius:999px;background:#1b222c;font-size:9px;text-transform:uppercase}.detail{padding:24px 28px;overflow:auto}.detail h2{font-size:34px;margin:5px 0 4px}.detail .sub{color:#8490a0;font-size:11px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.box{padding:13px;border:1px solid #252d37;border-radius:11px;background:#0e1319}.box span{display:block;color:#778394;font-size:9px;text-transform:uppercase;font-weight:800}.box p{margin:6px 0 0;white-space:pre-wrap;font-size:12px}.field{display:block;margin-top:12px}.field span{display:block;color:#8e99a8;font-size:9px;font-weight:800;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid #303947;background:#0b0f14;color:#fff;border-radius:9px;padding:10px}.field textarea{min-height:86px}.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.actions button,.actions a{padding:10px 12px;border-radius:9px;border:1px solid #303947;background:#151b23;color:#fff;text-decoration:none;font-size:10px;font-weight:800}.actions .primary{background:#6f62ff;border-color:#6f62ff}.actions button:disabled{opacity:.45;cursor:not-allowed}.summary{margin-top:14px;padding:14px;border:1px solid #343d49;border-radius:12px;background:#0b1016}.summary strong{display:block;font-size:18px}.summary small{display:block;color:#8d99a8;margin-top:5px}.stripeState{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{padding:6px 9px;border:1px solid #2d3743;border-radius:999px;background:#111821;font-size:9px;color:#b9c3cf}.tag.good{border-color:#2d684f;color:#8be0b5}.tag.warn{border-color:#765e2a;color:#ffd783}.sourceTag{display:inline-flex;align-items:center;padding:4px 7px;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}.sourceTag.catalog{background:#27204b;color:#c7beff}.sourceTag.tunegocio{background:#103247;color:#9ee4ff}.filters{display:flex;gap:8px;padding:0 30px 18px;flex-wrap:wrap}.filters button{border:1px solid #2c3541;background:#10161e;color:#aeb9c7;border-radius:999px;padding:8px 12px;font-size:10px;font-weight:850;cursor:pointer}.filters button.active{background:#f5f7fb;color:#0b0e12;border-color:#f5f7fb}.empty{padding:50px;color:#758090;text-align:center}.msg{color:#ffb0b0;font-size:11px;margin-top:10px}@media(max-width:900px){.layout{grid-template-columns:1fr}.list{border-right:0;border-bottom:1px solid #202630}.metrics{grid-template-columns:1fr 1fr}.top{padding:20px}.metrics{padding:14px}.detail{padding:18px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}}</style></head>
 <body>
-<section class="login" id="login"><form class="card" id="loginForm"><span>NOEAPPS · CATÁLOGO CRM</span><h1>Solicitudes.</h1><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password"><button>Entrar →</button><div id="loginMsg" class="msg"></div></form></section>
-<main class="app" id="app"><header class="top"><div><span>NOEAPPS · CATÁLOGO WEB</span><h1>CRM independiente</h1></div><div><button id="refresh">Actualizar</button> <button id="logout">Salir</button></div></header>
-<section class="metrics"><article class="metric"><span>Total</span><b id="mTotal">0</b></article><article class="metric"><span>Nuevas</span><b id="mNew">0</b></article><article class="metric"><span>En preparación</span><b id="mPrep">0</b></article><article class="metric"><span>Pagadas</span><b id="mPaid">0</b></article></section>
+<section class="login" id="login"><form class="card" id="loginForm"><span>NOEAPPS · CRM CENTRAL</span><h1>Operaciones.</h1><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password"><button>Entrar →</button><div id="loginMsg" class="msg"></div></form></section>
+<main class="app" id="app"><header class="top"><div><span>NOEAPPS · OPERACIONES WEB</span><h1>CRM central</h1></div><div><button id="refresh">Actualizar</button> <button id="logout">Salir</button></div></header>
+<section class="metrics"><article class="metric"><span>Total</span><b id="mTotal">0</b></article><article class="metric"><span>Catálogo</span><b id="mCatalog">0</b></article><article class="metric"><span>TuNegocio · IA</span><b id="mTuNegocio">0</b></article><article class="metric"><span>Revisar</span><b id="mReview">0</b></article></section><section class="filters" id="filters"><button class="active" data-filter="all">Todos</button><button data-filter="catalog">Catálogo</button><button data-filter="tunegocio">TuNegocio · IA</button><button data-filter="review">Necesita revisión</button></section>
 <div class="layout"><section class="list" id="list"></section><aside class="detail" id="detail"><div class="empty">Selecciona una solicitud.</div></aside></div></main>
 <script>
-let items=[],selected=null,stripeConfigured=false,taxEnabled=false,siteDomain='noeapps.com';
+let items=[],catalogItems=[],tunegocioItems=[],selected=null,stripeConfigured=false,taxEnabled=false,siteDomain='noeapps.com',sourceFilter='all',tunegocioAvailable=false;
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function api(url,opt={}){const r=await fetch(url,{...opt,headers:{'Content-Type':'application/json',...(opt.headers||{})}});const j=await r.json().catch(()=>({}));if(r.status===401){showLogin();throw new Error('Sesión cerrada')}if(!r.ok)throw new Error(j.error||'Error');return j}
 function showLogin(){document.getElementById('login').style.display='grid';document.getElementById('app').style.display='none'}
 function showApp(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block'}
-async function load(){try{const j=await api('/api/crm/requests');items=j.requests||[];stripeConfigured=!!j.stripeConfigured;taxEnabled=!!j.taxEnabled;siteDomain=j.siteDomain||'noeapps.com';showApp();renderList();metrics();if(selected){selected=items.find(x=>x.id===selected.id)||null;renderDetail()}}catch{}}
-function metrics(){document.getElementById('mTotal').textContent=items.length;document.getElementById('mNew').textContent=items.filter(x=>x.status==='new').length;document.getElementById('mPrep').textContent=items.filter(x=>['preparing','preview_ready','sent'].includes(x.status)).length;document.getElementById('mPaid').textContent=items.filter(x=>x.status==='paid').length}
+async function load(){try{
+  const j=await api('/api/crm/requests');
+  catalogItems=(j.requests||[]).map(x=>({...x,source:'catalog'}));
+  tunegocioItems=(j.tunegocio||[]).map(x=>({...x,source:'tunegocio'}));
+  tunegocioAvailable=!!j.tunegocioAvailable;
+  items=[...catalogItems,...tunegocioItems].sort((a,b)=>new Date(b.updatedAt||b.updated_at||b.createdAt||b.created_at||0)-new Date(a.updatedAt||a.updated_at||a.createdAt||a.created_at||0));
+  stripeConfigured=!!j.stripeConfigured;taxEnabled=!!j.taxEnabled;siteDomain=j.siteDomain||'noeapps.com';
+  showApp();renderList();metrics();
+  if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
+}catch{}}
+function tnNeedsReview(x){return ['review','in_progress'].includes(x.manualStatus)||((x.paymentStatus==='paid')&&!x.published)}
+function visibleItems(){return items.filter(x=>sourceFilter==='all'||(sourceFilter==='catalog'&&x.source==='catalog')||(sourceFilter==='tunegocio'&&x.source==='tunegocio')||(sourceFilter==='review'&&x.source==='tunegocio'&&tnNeedsReview(x)))}
+function metrics(){
+  document.getElementById('mTotal').textContent=items.length;
+  document.getElementById('mCatalog').textContent=catalogItems.length;
+  document.getElementById('mTuNegocio').textContent=tunegocioItems.length;
+  document.getElementById('mReview').textContent=tunegocioItems.filter(tnNeedsReview).length;
+}
 function money(cents){return (Number(cents||0)/100).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
 function discountDisplayValue(x){return x.discount_type==='fixed'?(Number(x.discount_value||0)/100).toFixed(2):String(Number(x.discount_value||0))}
 function totals(x){
@@ -20,9 +36,23 @@ function totals(x){
   const apply=(amount,target)=>{if(type==='none'||!value||!(scope===target||scope==='both'))return amount;if(type==='percent')return Math.max(0,Math.round(amount*(100-value)/100));if(type==='fixed')return Math.max(0,amount-value);return amount};
   const c=apply(creation,'creation'),m=apply(monthly,'monthly');return{creation:c,monthly:m,first:c+m};
 }
-function renderList(){const el=document.getElementById('list');if(!items.length){el.innerHTML='<div class="empty">Todavía no hay solicitudes.</div>';return}el.innerHTML=items.map(x=>{const m=money(x.monthly_price_cents||1990);return '<button class="row '+(selected&&selected.id===x.id?'active':'')+'" data-id="'+x.id+'"><div><strong>'+esc(x.business_name)+'</strong><small>'+esc(x.contact_name)+' · '+new Date(x.created_at).toLocaleDateString('es-ES')+'</small></div><div><em>'+esc(x.design_name)+'</em><small>'+esc(x.creation_price)+' € + '+m+'/mes'+(x.salesperson?' · '+esc(x.salesperson):'')+'</small></div><span class="pill">'+esc(x.status)+'</span></button>'}).join('');el.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{selected=items.find(x=>x.id===b.dataset.id);renderList();renderDetail()})}
+function renderList(){
+  const el=document.getElementById('list'),shown=visibleItems();
+  if(!shown.length){el.innerHTML='<div class="empty">'+(sourceFilter==='tunegocio'&&!tunegocioAvailable?'TuNegocio no está disponible temporalmente.':'No hay operaciones en este filtro.')+'</div>';return}
+  el.innerHTML=shown.map(x=>{
+    if(x.source==='tunegocio'){
+      const state=x.published?'publicada':x.paymentStatus==='paid'?'pagada / pendiente':'borrador';
+      return '<button class="row '+(selected&&selected.id===x.id&&selected.source===x.source?'active':'')+'" data-key="tunegocio:'+x.id+'"><div><strong><span class="sourceTag tunegocio">TuNegocio · IA</span>'+esc(x.businessName||x.slug)+'</strong><small>'+esc(x.accountEmail||'')+' · '+new Date(x.updatedAt).toLocaleDateString('es-ES')+'</small></div><div><em>'+esc(x.category||'Web IA')+'</em><small>'+esc(x.slug)+'.noeapps.com'+(x.salesperson?' · '+esc(x.salesperson):'')+'</small></div><span class="pill">'+esc(x.manualStatus!=='auto'?x.manualStatus:state)+'</span></button>';
+    }
+    const m=money(x.monthly_price_cents||1990);
+    return '<button class="row '+(selected&&selected.id===x.id&&selected.source===x.source?'active':'')+'" data-key="catalog:'+x.id+'"><div><strong><span class="sourceTag catalog">Catálogo</span>'+esc(x.business_name)+'</strong><small>'+esc(x.contact_name)+' · '+new Date(x.created_at).toLocaleDateString('es-ES')+'</small></div><div><em>'+esc(x.design_name)+'</em><small>'+esc(x.creation_price)+' € + '+m+'/mes'+(x.salesperson?' · '+esc(x.salesperson):'')+'</small></div><span class="pill">'+esc(x.status)+'</span></button>';
+  }).join('');
+  el.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{const [source,id]=b.dataset.key.split(':');selected=items.find(x=>x.id===id&&x.source===source)||null;renderList();renderDetail()})
+}
 function renderDetail(){
-  const el=document.getElementById('detail');if(!selected){el.innerHTML='<div class="empty">Selecciona una solicitud.</div>';return}
+  const el=document.getElementById('detail');if(!selected){el.innerHTML='<div class="empty">Selecciona una operación.</div>';return}
+  if(selected.source==='tunegocio')return renderTunegocioDetail();
+
   const wa=String(selected.whatsapp||'').replace(/\D/g,'');
   const t=totals(selected);
   const publicUrl=selected.site_slug?'https://'+selected.site_slug+'.'+siteDomain+'/':'';
@@ -68,6 +98,45 @@ function renderDetail(){
   document.getElementById('stripeCheckout').onclick=createCheckout;
   if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;
   ['creationPrice','monthlyPrice','discountType','discountValue','discountScope'].forEach(id=>{const n=document.getElementById(id);if(n)n.oninput=refreshSummary});
+}
+function renderTunegocioDetail(){
+  const el=document.getElementById('detail'),x=selected;
+  const publicUrl=x.publicUrl||'';
+  const paidUntil=x.paidUntil?new Date(x.paidUntil).toLocaleString('es-ES'):'—';
+  const publishedUntil=x.publishedUntil?new Date(x.publishedUntil).toLocaleString('es-ES'):'—';
+  el.innerHTML=
+    '<div class="sub"><span class="sourceTag tunegocio">TuNegocio · IA</span> Proyecto '+esc(String(x.id).slice(0,8).toUpperCase())+'</div>'+
+    '<h2>'+esc(x.businessName||x.slug)+'</h2>'+
+    '<div class="sub">'+esc(x.category||'Web generada con IA')+' · '+esc(x.city||'')+'</div>'+
+    '<div class="stripeState">'+
+      '<span class="tag '+(x.published?'good':'')+'">Web: '+(x.published?'publicada':'no publicada')+'</span>'+
+      '<span class="tag '+(x.paymentStatus==='paid'?'good':'')+'">Pago: '+esc(x.paymentStatus||'none')+'</span>'+
+      '<span class="tag '+(x.subscriptionId?'good':'')+'">Suscripción: '+(x.subscriptionId?'activa/registrada':'—')+'</span>'+
+      '<span class="tag '+(tnNeedsReview(x)?'warn':'good')+'">Manual: '+esc(x.manualStatus||'auto')+'</span>'+
+    '</div>'+
+    '<div class="grid"><div class="box"><span>Cuenta TuNegocio</span><p>'+esc(x.accountEmail||'—')+'</p></div><div class="box"><span>Contacto del negocio</span><p>'+esc(x.businessEmail||'')+'\n'+esc(x.phone||'')+'\n'+esc(x.whatsapp||'')+'</p></div><div class="box"><span>Proyecto</span><p>'+esc(x.slug)+'\nEstilo: '+esc(x.styleId||'—')+'</p></div><div class="box"><span>Pago / publicación</span><p>Plan: '+esc(x.planId||'—')+'\nPagado hasta: '+esc(paidUntil)+'\nPublicado hasta: '+esc(publishedUntil)+'</p></div></div>'+
+    '<label class="field"><span>Estado manual</span><select id="tnManualStatus">'+
+      [['auto','Automático / sin intervención'],['review','Revisar'],['in_progress','Intervención en curso'],['resolved','Resuelto'],['closed','Cerrado']].map(([v,l])=>'<option value="'+v+'" '+(x.manualStatus===v?'selected':'')+'>'+l+'</option>').join('')+
+    '</select></label>'+
+    '<label class="field"><span>Asignado a</span><input id="tnSalesperson" value="'+esc(x.salesperson||'')+'" placeholder="Noé, soporte, comercial..."></label>'+
+    '<label class="field"><span>Notas internas</span><textarea id="tnAdminNotes">'+esc(x.adminNotes||'')+'</textarea></label>'+
+    '<div class="actions"><button class="primary" id="tnSave">Guardar gestión manual</button>'+
+      (publicUrl?'<a target="_blank" href="'+esc(publicUrl)+'">Abrir web ↗</a>':'')+
+    '</div><div id="detailMsg" class="msg"></div>';
+  document.getElementById('tnSave').onclick=saveTunegocio;
+}
+async function saveTunegocio(){
+  const m=document.getElementById('detailMsg');m.textContent='Guardando…';
+  try{
+    const j=await api('/api/crm/tunegocio/'+selected.id,{method:'PATCH',body:JSON.stringify({
+      manualStatus:document.getElementById('tnManualStatus').value,
+      salesperson:document.getElementById('tnSalesperson').value,
+      adminNotes:document.getElementById('tnAdminNotes').value
+    })});
+    selected={...selected,manualStatus:j.operation.manual_status,salesperson:j.operation.salesperson,adminNotes:j.operation.admin_notes};
+    m.textContent='Gestión manual guardada.';
+    await load();
+  }catch(e){m.textContent=e.message}
 }
 function refreshSummary(){
   if(!selected)return;
@@ -128,5 +197,12 @@ async function openPortal(){
   try{const j=await api('/api/crm/requests/'+selected.id+'/portal',{method:'POST',body:'{}'});window.open(j.url,'_blank','noopener');m.textContent='Portal abierto.'}catch(e){m.textContent=e.message}
 }
 document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('loginMsg');m.textContent='';try{await api('/api/crm/login',{method:'POST',body:JSON.stringify({password:document.getElementById('password').value})});document.getElementById('password').value='';await load()}catch(e){m.textContent=e.message}};
-document.getElementById('refresh').onclick=load;document.getElementById('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};load();
+document.getElementById('refresh').onclick=load;
+document.getElementById('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};
+document.querySelectorAll('#filters [data-filter]').forEach(btn=>btn.onclick=()=>{
+  sourceFilter=btn.dataset.filter;
+  document.querySelectorAll('#filters [data-filter]').forEach(b=>b.classList.toggle('active',b===btn));
+  selected=null;renderList();renderDetail();
+});
+load();
 </script></body></html>
