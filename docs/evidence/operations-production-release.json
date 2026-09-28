@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-28",
+  "authorization": "SUBE A PRODUCCIÓN Y PRUEBA",
+  "catalog": {
+    "commit": "ef520ab92b425a8dd2a3bfb4e6c77451b5823180",
+    "applicationCommit": "a69fec436d6993dcf32f74983e20bbb096727a64",
+    "deploymentId": "39a4392c-13b4-4b2d-b151-a42f4371d68d",
+    "status": "SUCCESS",
+    "migration": "003_crm_operations.sql",
+    "priorMigrationChecksumsMatch": true,
+    "ci": "https://github.com/NoePerezBlancoo/noeapps/actions/runs/36478392379",
+    "ciConclusion": "success",
+    "rollbackDeploymentId": "adf75ddf-07ed-4bcc-b468-2e5008d1cd00"
+  },
+  "tunegocio": {
+    "commit": "9522d800617d95988d8cd0b4bc4272a2314aeb00",
+    "deploymentId": "5d220eaa-f2de-4afb-b7b8-467c34bb8413",
+    "status": "SUCCESS",
+    "migrationsApplied": ["024_subscription_management.sql", "025_crm_roadmap.sql"],
+    "stripeLiveReadOnlyPreflight": "passed",
+    "ci": "https://github.com/NoePerezBlancoo/TuNegocio/actions/runs/36477536634",
+    "ciConclusion": "success",
+    "rollbackDeploymentId": "d3cf34bc-4d03-4962-a0af-5812a0f65e7d"
+  },
+  "configuration": {
+    "CRM_ROADMAP_V2": "true on both production services",
+    "subscriptionMutationControls": "not enabled",
+    "expandedSourceImport": "not enabled",
+    "productionDatabaseSyntheticChecks": "removed from predeploy; retained in staging",
+    "productionPredeploy": "npm run db:migrate && npx tsx scripts/check-publication-stripe.ts --mode=live"
+  },
+  "livePaymentsCreatedForTesting": 0,
+  "liveCampaignsCreatedForTesting": 0,
+  "customerMessagesSent": 0,
+  "dnsChanges": 0,
+  "productionSchemaRollbackRequired": false
+}

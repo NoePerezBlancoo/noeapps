@@ -1,0 +1,23 @@
+{
+  "date": "2026-09-28",
+  "origins": ["https://catalogo.noeapps.com", "https://tunegocio-beta-production.up.railway.app"],
+  "crm": {
+    "login": "passed",
+    "analyticsMetricCards": 22,
+    "analyticsLoadError": false,
+    "campaignResultsVisible": true,
+    "campaignCustomerSelectorVisible": true,
+    "expenseProfitabilityVisible": true,
+    "editableWhatsappTemplates": 6,
+    "monitorCompleted": true,
+    "openIncidents": 0,
+    "mobileViewportWidth": 390,
+    "mobileDocumentWidth": 390
+  },
+  "publicCatalog": {"search":"COCHES","matches":8,"recommendedDemos":3},
+  "tunegocioCreator": {"pageAvailable":true,"existingSevenStepFlowPreserved":true},
+  "businessMutationRequests": 0,
+  "paymentsCreated": 0,
+  "messagesSent": 0,
+  "customerDetailsIncluded": false
+}

@@ -1,0 +1,24 @@
+{
+  "at": "2026-09-28T20:21:38.901Z",
+  "origin": "https://catalogo.noeapps.com",
+  "checks": [
+    "Public health endpoints 200; private reports reject anonymous access",
+    "Authenticated production bridge and analytics reconcile",
+    "Six WhatsApp templates available; no message prepared or sent",
+    "Automatic production monitor completed successfully",
+    "Existing offers, campaign customer view and expense listing respond"
+  ],
+  "stripeWrites": 0,
+  "businessMutationRequests": 0,
+  "messagesSent": 0,
+  "products": {
+    "catalogOperations": 1,
+    "tunegocioOperations": 3
+  },
+  "monitor": {
+    "outcome": "succeeded",
+    "openCount": 0
+  },
+  "offerCount": 1,
+  "expenseCount": 0
+}
