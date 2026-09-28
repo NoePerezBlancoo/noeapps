@@ -1,0 +1,45 @@
+{
+  "at": "2026-09-28T19:36:15.167Z",
+  "product": "tunegocio",
+  "campaignId": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+  "invoices": [
+    {
+      "month": 1,
+      "invoiceId": "in_1UKkLVJXCvRIbAjBMhFnSkiC",
+      "paidCents": 995,
+      "discountCents": 995
+    },
+    {
+      "month": 2,
+      "invoiceId": "in_1UKkLeJXCvRIbAjBhucuC2Vv",
+      "paidCents": 995,
+      "discountCents": 995
+    },
+    {
+      "month": 3,
+      "invoiceId": "in_1UKkLpJXCvRIbAjBzU4Xw6uS",
+      "paidCents": 995,
+      "discountCents": 995
+    },
+    {
+      "month": 4,
+      "invoiceId": "in_1UKkM1JXCvRIbAjBZbrh1MMn",
+      "paidCents": 995,
+      "discountCents": 995
+    },
+    {
+      "month": 5,
+      "invoiceId": "in_1UKkMJJXCvRIbAjBOYOXKgIR",
+      "paidCents": 1990,
+      "discountCents": 0
+    }
+  ],
+  "checks": [
+    "Real TEST checkout quote 995 cents",
+    "Four monthly paid invoices at 50%",
+    "Fifth paid invoice at regular 1990 cents",
+    "Project campaign snapshot preserved"
+  ],
+  "clockId": "clock_1UKkLTJXCvRIbAjBkATcQWXe",
+  "subscriptionId": "sub_1UKkLUJXCvRIbAjBVewJkitV"
+}

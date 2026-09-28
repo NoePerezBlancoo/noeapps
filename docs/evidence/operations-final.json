@@ -1,0 +1,55 @@
+{
+  "at": "2026-09-28T19:55:21.789Z",
+  "origin": "https://catalogo-staging-v2-production.up.railway.app",
+  "bridgeAvailable": true,
+  "mode": "test",
+  "campaign": {
+    "id": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+    "customers": 2,
+    "sales": 2,
+    "revenue": 1990,
+    "discount": 1990,
+    "unknown_discounts": 0,
+    "conversion": 1
+  },
+  "combined": {
+    "revenue": {
+      "today": 15920,
+      "month": 15920,
+      "year": 15920,
+      "total": 15920
+    },
+    "operations": 10,
+    "paid": 9,
+    "firstRevenue": 15920,
+    "activeCustomers": 9,
+    "newCustomers": 9,
+    "mrr": 7960,
+    "commissions": 0,
+    "monthCommissions": 0,
+    "operatingResult": 13452
+  },
+  "costs": {
+    "month": "2026-09",
+    "operatingExpensesCents": 2468,
+    "recordedCommissionPaymentsCents": 0,
+    "byCategory": {
+      "hosting": 2468
+    }
+  },
+  "monitor": {
+    "outcome": "succeeded",
+    "checkedCount": 10,
+    "openCount": 4
+  },
+  "checks": [
+    "Private analytics reject anonymous access",
+    "Both isolated TEST products respond",
+    "Aggregate revenue and operating result reconcile",
+    "Customer cohorts and published counts available",
+    "Campaign has two actual sales and 1990 cents discount",
+    "Campaign customer list includes both products",
+    "Six editable WhatsApp templates available",
+    "Monitor succeeds and flags the paid synthetic fixture without a publication origin"
+  ]
+}
