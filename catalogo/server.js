@@ -30,6 +30,7 @@ const STRIPE_MAINTENANCE_PRODUCT_ID=(process.env.STRIPE_MAINTENANCE_PRODUCT_ID||
 const STRIPE_DEFAULT_MONTHLY_PRICE_ID=(process.env.STRIPE_DEFAULT_MONTHLY_PRICE_ID||'').trim();
 const STRIPE_AUTOMATIC_TAX=/^(1|true|yes)$/i.test(process.env.STRIPE_AUTOMATIC_TAX||'');
 const PUBLIC_ORIGIN=(process.env.PUBLIC_ORIGIN||'https://catalogo.noeapps.com').replace(/\/$/,'');
+const SITE_DOMAIN=(process.env.SITE_DOMAIN||'noeapps.com').trim().toLowerCase();
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
 let schemaPromise=null;
@@ -70,6 +71,14 @@ async function ensureSchema(){
       stripe_last_event_at timestamptz,
       paid_at timestamptz,
       checkout_fingerprint text NOT NULL DEFAULT '',
+      payment_token text NOT NULL DEFAULT '',
+      stripe_checkout_url text NOT NULL DEFAULT '',
+      stripe_checkout_expires_at timestamptz,
+      site_slug text NOT NULL DEFAULT '',
+      site_origin_url text NOT NULL DEFAULT '',
+      site_status text NOT NULL DEFAULT 'draft',
+      preview_published_at timestamptz,
+      preview_expires_at timestamptz,
       catalog_preview_url text NOT NULL DEFAULT '',
       thumbnail_url text NOT NULL DEFAULT '',
       preview_url text NOT NULL DEFAULT '',
@@ -91,12 +100,22 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_last_event_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS paid_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS checkout_fingerprint text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS payment_token text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_checkout_url text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_checkout_expires_at timestamptz;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS site_slug text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS site_origin_url text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS site_status text NOT NULL DEFAULT 'draft';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS preview_published_at timestamptz;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS preview_expires_at timestamptz;
     CREATE TABLE IF NOT EXISTS stripe_events(
       id text PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
+    CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
+    CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_payment_token_uidx ON catalog_requests(payment_token) WHERE payment_token <> '';
   `).catch(error=>{schemaPromise=null;throw error});
   return schemaPromise;
 }
@@ -203,9 +222,74 @@ function sessionCookie(token){
 }
 function clearCookie(){return 'catalog_crm=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0'}
 function validUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)}
-const statuses=new Set(['new','preparing','preview_ready','sent','paid','published','closed']);
+const statuses=new Set(['new','preparing','preview_ready','sent','paid','published','expired','closed']);
 const discountTypes=new Set(['none','percent','fixed']);
 const discountScopes=new Set(['creation','monthly','both']);
+const RESERVED_SITE_SLUGS=new Set(['www','app','admin','administrator','api','auth','login','logout','signup','register','account','accounts','cuenta','billing','checkout','payments','pagos','publish','publicar','preview','estilos','sites','assets','static','images','fonts','media','uploads','examples','art','mail','email','smtp','imap','pop','pop3','webmail','mx','status','support','help','docs','dashboard','panel','manage','management','settings','security','privacy','legal','terms','contact','contacto','abuse','postmaster','hostmaster','webmaster','root','ftp','sftp','ssh','cdn','proxy','origin','ns1','ns2','dns','dev','test','testing','staging','sandbox','demo','beta','production','prod','localhost','noeapps','tunegocio','crear','personalizar','stripe','webhook','webhooks','health','healthz','metrics','internal','autodiscover','autoconfig','bbdd','rsend','send','tutest','adt','cisneros','catalogo']);
+
+function normalizeSiteSlug(value){
+  let slug=String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'').slice(0,48).replace(/-+$/g,'');
+  if(slug.length<3)slug=(slug||'web')+'-web';
+  if(RESERVED_SITE_SLUGS.has(slug))slug=('web-'+slug).slice(0,48);
+  return slug;
+}
+function validSiteSlug(value){
+  return typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/.test(value)&&!value.startsWith('xn--')&&!value.startsWith('web-')&&!RESERVED_SITE_SLUGS.has(value);
+}
+function sitePublicUrl(slug){return 'https://'+slug+'.'+SITE_DOMAIN+'/';}
+function safeSiteOrigin(value){
+  const raw=text(value,1600);if(!raw)return'';
+  try{
+    const u=new URL(raw);const h=u.hostname.toLowerCase();
+    if(u.protocol!=='https:'||u.username||u.password||u.port)return'';
+    if(h==='localhost'||h.endsWith('.local')||h.endsWith('.internal')||h.endsWith('.'+SITE_DOMAIN))return'';
+    if(/^\d{1,3}(?:\.\d{1,3}){3}$/.test(h)||h==='0.0.0.0'||h==='127.0.0.1'||h==='::1')return'';
+    u.hash='';return u.toString().replace(/\/$/,'');
+  }catch{return''}
+}
+function siteIsPaid(row){
+  return !!(row&&(
+    row.paid_at||
+    String(row.stripe_payment_status||'').toLowerCase()==='paid'||
+    ['active','trialing','past_due'].includes(String(row.stripe_subscription_status||'').toLowerCase())
+  ));
+}
+async function makeUniqueSiteSlug(name,excludeId=''){
+  let base=normalizeSiteSlug(name);
+  for(let i=0;i<20;i++){
+    const candidate=i===0?base:(base.slice(0,43)+'-'+crypto.randomBytes(2).toString('hex')).replace(/-+$/,'');
+    const q=await pool.query('SELECT 1 FROM catalog_requests WHERE site_slug=$1 AND ($2::uuid IS NULL OR id<>$2::uuid) LIMIT 1',[candidate,excludeId||null]);
+    if(!q.rows[0])return candidate;
+  }
+  return ('web-'+crypto.randomBytes(8).toString('hex')).slice(0,48);
+}
+async function ensureSiteSlugs(rows){
+  for(const row of rows){
+    if(row.site_slug)continue;
+    const slug=await makeUniqueSiteSlug(row.business_name,row.id);
+    const u=await pool.query('UPDATE catalog_requests SET site_slug=$2,updated_at=now() WHERE id=$1 RETURNING *',[row.id,slug]);
+    if(u.rows[0])Object.assign(row,u.rows[0]);
+  }
+  return rows;
+}
+async function refreshSiteState(row){
+  if(!row)return row;
+  if(siteIsPaid(row)&&row.site_status!=='active'){
+    const r=await pool.query("UPDATE catalog_requests SET site_status='active',preview_expires_at=NULL,status=CASE WHEN status='published' THEN status ELSE 'paid' END,updated_at=now() WHERE id=$1 RETURNING *",[row.id]);
+    return r.rows[0]||row;
+  }
+  if(row.site_status==='preview'&&row.preview_expires_at&&new Date(row.preview_expires_at).getTime()<=Date.now()){
+    const r=await pool.query("UPDATE catalog_requests SET site_status='expired',status=CASE WHEN status IN ('new','preparing','preview_ready','sent') THEN 'expired' ELSE status END,updated_at=now() WHERE id=$1 RETURNING *",[row.id]);
+    return r.rows[0]||row;
+  }
+  return row;
+}
+async function expireOverduePreviews(){
+  if(!pool)return;
+  await ensureSchema();
+  await pool.query("UPDATE catalog_requests SET site_status='expired',status=CASE WHEN status IN ('new','preparing','preview_ready','sent') THEN 'expired' ELSE status END,updated_at=now() WHERE site_status='preview' AND preview_expires_at IS NOT NULL AND preview_expires_at<=now() AND paid_at IS NULL AND stripe_payment_status<>'paid' AND stripe_subscription_status NOT IN ('active','trialing','past_due')");
+}
 
 async function rawBody(req,max=1024*1024){
   let size=0,chunks=[];
