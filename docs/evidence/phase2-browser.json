@@ -1,0 +1,25 @@
+{
+  "environment": "catalogo-staging-v2",
+  "date": "2026-09-28",
+  "deployment": "c1c44c50-14c6-42f7-bbd2-c4acf1ef893d",
+  "deploymentStatus": "SUCCESS",
+  "healthStatus": 200,
+  "unauthenticatedPrivateStatsStatus": 401,
+  "recommendations": [
+    {"query": "peluquería elegante", "matches": 10, "recommended": 3},
+    {"query": "restaurante moderno", "matches": 11, "recommended": 3},
+    {"query": "abogado serio", "matches": 2, "recommended": 2},
+    {"query": "taller industrial", "matches": 8, "recommended": 3},
+    {"query": "inmobiliaria premium", "matches": 2, "recommended": 2},
+    {"query": "astronauta inexistente", "matches": 0, "recommended": 0}
+  ],
+  "combinedFilterMatches": 5,
+  "invalidPriceRangeShowsErrorAndNoMatches": true,
+  "desktopHorizontalOverflow": false,
+  "mobileViewportWidth": 390,
+  "mobileHorizontalOverflow": false,
+  "crmExample": {"design": "noeapps-beauty-velvet", "requests": 1, "sales": 1, "conversion": 1, "grossRevenueCents": 1990, "stripeMode": "test"},
+  "baselineDesigns": 571,
+  "baselineKnownAdditionDates": 0,
+  "migrationChecksumsVerified": ["001_subscription_management.sql", "002_catalog_discovery.sql"]
+}
