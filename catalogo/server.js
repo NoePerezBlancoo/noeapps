@@ -618,10 +618,16 @@ async function updateRequest(req,res,id){
   const data=await bodyJson(req,16000);
   const status=text(data.status,30),previewUrl=safeUrl(data.previewUrl,1600),paymentUrl=safeUrl(data.paymentUrl,1600),adminNotes=text(data.adminNotes,3000);
   const salesperson=text(data.salesperson,120),discountCode=text(data.discountCode,60).toUpperCase(),discountType=text(data.discountType,20),discountScope=text(data.discountScope,20);
+  const requestedSiteSlug=text(data.siteSlug,80).toLowerCase();
+  const siteSlug=requestedSiteSlug?normalizeSiteSlug(requestedSiteSlug):'';
+  const rawSiteOrigin=text(data.siteOriginUrl,1600);
+  const siteOriginUrl=rawSiteOrigin?safeSiteOrigin(rawSiteOrigin):'';
   const creationPrice=Math.round(Number(data.creationPrice));
   const monthlyPriceCents=Math.round(Number(data.monthlyPriceCents));
   let discountValue=Math.round(Number(data.discountValue)||0);
   if(!statuses.has(status))return json(res,400,{error:'Estado no válido.'});
+  if(siteSlug&&!validSiteSlug(siteSlug))return json(res,400,{error:'El subdominio no es válido.'});
+  if(rawSiteOrigin&&!siteOriginUrl)return json(res,400,{error:'La URL origen de la web debe ser HTTPS y pública.'});
   if(!discountTypes.has(discountType))return json(res,400,{error:'Tipo de descuento no válido.'});
   if(!discountScopes.has(discountScope))return json(res,400,{error:'Ámbito de descuento no válido.'});
   if(!Number.isSafeInteger(creationPrice)||creationPrice<0||creationPrice>10000)return json(res,400,{error:'Precio de creación no válido.'});
@@ -630,8 +636,13 @@ async function updateRequest(req,res,id){
   if(discountType==='percent'&&(!Number.isSafeInteger(discountValue)||discountValue<0||discountValue>100))return json(res,400,{error:'El descuento porcentual debe estar entre 0 y 100.'});
   if(discountType==='fixed'&&(!Number.isSafeInteger(discountValue)||discountValue<0||discountValue>1000000))return json(res,400,{error:'Descuento fijo no válido.'});
   await ensureSchema();
-  const result=await pool.query('UPDATE catalog_requests SET status=$2,preview_url=$3,payment_url=$4,admin_notes=$5,creation_price=$6,monthly_price_cents=$7,salesperson=$8,discount_code=$9,discount_type=$10,discount_value=$11,discount_scope=$12,updated_at=now() WHERE id=$1 RETURNING *',
-    [id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents,salesperson,discountCode,discountType,discountValue,discountScope]);
+  if(siteSlug){
+    const clash=await pool.query('SELECT id FROM catalog_requests WHERE site_slug=$1 AND id<>$2 LIMIT 1',[siteSlug,id]);
+    if(clash.rows[0])return json(res,409,{error:'Ese subdominio ya está asignado a otra web.'});
+  }
+  const publicUrl=siteSlug?sitePublicUrl(siteSlug):'';
+  const result=await pool.query("UPDATE catalog_requests SET status=$2,preview_url=CASE WHEN site_status IN ('preview','active') AND $13<>'' THEN $15 ELSE $3 END,payment_url=$4,admin_notes=$5,creation_price=$6,monthly_price_cents=$7,salesperson=$8,discount_code=$9,discount_type=$10,discount_value=$11,discount_scope=$12,site_slug=CASE WHEN $13<>'' THEN $13 ELSE site_slug END,site_origin_url=CASE WHEN $14<>'' THEN $14 ELSE site_origin_url END,updated_at=now() WHERE id=$1 RETURNING *",
+    [id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents,salesperson,discountCode,discountType,discountValue,discountScope,siteSlug,siteOriginUrl,publicUrl]);
   if(!result.rows[0])return json(res,404,{error:'Solicitud no encontrada.'});
   return json(res,200,{ok:true,request:result.rows[0]});
 }
