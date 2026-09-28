@@ -160,6 +160,18 @@ async function ensureSchema(){
       kind text NOT NULL CHECK (kind IN ('initial','renewal')),
       paid_at timestamptz NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS crm_expenses(
+      id uuid PRIMARY KEY,
+      name text NOT NULL,
+      category text NOT NULL DEFAULT 'other',
+      amount_cents integer NOT NULL CHECK (amount_cents >= 0),
+      cadence text NOT NULL CHECK (cadence IN ('one_time','monthly')),
+      expense_date date NOT NULL DEFAULT current_date,
+      active boolean NOT NULL DEFAULT true,
+      notes text NOT NULL DEFAULT '',
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    );
     CREATE INDEX IF NOT EXISTS catalog_revenue_events_paid_idx ON catalog_revenue_events(paid_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_revenue_events_request_idx ON catalog_revenue_events(request_id, paid_at DESC);
     CREATE TABLE IF NOT EXISTS crm_operations(
@@ -299,6 +311,46 @@ async function crmConfig(){
   ]);
   return{salespeople:salespeople.rows,offers:offers.rows};
 }
+async function expenseConfig(){
+  await ensureSchema();
+  const q=await pool.query("SELECT * FROM crm_expenses ORDER BY active DESC,expense_date DESC,created_at DESC");
+  return q.rows;
+}
+async function createExpense(req,res){
+  const data=await bodyJson(req,10000);
+  const name=text(data.name,160),category=text(data.category,40)||'other',cadence=text(data.cadence,20);
+  const amountCents=Math.round(Number(data.amountCents)),notes=text(data.notes,1200);
+  const expenseDate=data.expenseDate?new Date(String(data.expenseDate)+'T00:00:00Z'):new Date();
+  if(!name||!['hosting','ai','software','ads','commission','tax','other'].includes(category)||!['one_time','monthly'].includes(cadence)
+    ||!Number.isSafeInteger(amountCents)||amountCents<0||amountCents>100000000||!Number.isFinite(expenseDate.getTime())){
+    return json(res,400,{error:'Gasto no válido.'});
+  }
+  await ensureSchema();
+  const result=await pool.query("INSERT INTO crm_expenses(id,name,category,amount_cents,cadence,expense_date,notes) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+    [crypto.randomUUID(),name,category,amountCents,cadence,expenseDate.toISOString().slice(0,10),notes]);
+  return json(res,201,{ok:true,expense:result.rows[0]});
+}
+async function updateExpense(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Gasto no válido.'});
+  const data=await bodyJson(req,8000);
+  const active=data.active!==false;
+  await ensureSchema();
+  const result=await pool.query("UPDATE crm_expenses SET active=$2,updated_at=now() WHERE id=$1 RETURNING *",[id,active]);
+  if(!result.rows[0])return json(res,404,{error:'Gasto no encontrado.'});
+  return json(res,200,{ok:true,expense:result.rows[0]});
+}
+async function expenseAnalytics(){
+  await ensureSchema();
+  const q=await pool.query(`SELECT
+    coalesce(sum(amount_cents) FILTER (WHERE active=true AND cadence='monthly'),0)::bigint AS recurring_monthly_cents,
+    coalesce(sum(amount_cents) FILTER (WHERE active=true AND cadence='one_time' AND expense_date>=date_trunc('month',current_date)::date),0)::bigint AS one_time_month_cents,
+    count(*) FILTER (WHERE active=true)::integer AS active_count
+    FROM crm_expenses`);
+  const row=q.rows[0]||{};
+  const recurring=Number(row.recurring_monthly_cents||0),oneTime=Number(row.one_time_month_cents||0);
+  return{recurringMonthlyCents:recurring,oneTimeMonthCents:oneTime,monthExpensesCents:recurring+oneTime,activeCount:Number(row.active_count||0)};
+}
+
 async function createSalesperson(req,res){
   const data=await bodyJson(req,8000);
   const name=text(data.name,120),email=text(data.email,180).toLowerCase();
@@ -424,7 +476,7 @@ async function catalogAnalytics(){
   };
 }
 async function combinedAnalytics(tunegocio){
-  const catalog=await catalogAnalytics();
+  const [catalog,expenses]=await Promise.all([catalogAnalytics(),expenseAnalytics()]);
   const tnCommercial=tunegocio&&tunegocio.analytics&&tunegocio.analytics.commercial?tunegocio.analytics.commercial:null;
   const tnAi=tunegocio&&tunegocio.analytics&&tunegocio.analytics.aiUsage?tunegocio.analytics.aiUsage:null;
   const tnProjects=Array.isArray(tunegocio?.projects)?tunegocio.projects:[];
@@ -452,8 +504,12 @@ async function combinedAnalytics(tunegocio){
       monthRevenueCents:catalog.monthRevenueCents+Number(tnCommercial?.monthRevenueCents||0),
       mrrCents:catalog.mrrCents+tnMrrCents,
       commissionsCents:totalCommissionsCents,
-      averageFirstTicketCents:totalPaid?Math.round((catalog.topDesigns.reduce((s,x)=>s+Number(x.first_revenue_cents||0),0)+tnProjects.filter(x=>x.paymentStatus==='paid').reduce((s,x)=>s+Number(x.firstAmountCents||0),0))/totalPaid):0
-    }
+      averageFirstTicketCents:totalPaid?Math.round((catalog.topDesigns.reduce((s,x)=>s+Number(x.first_revenue_cents||0),0)+tnProjects.filter(x=>x.paymentStatus==='paid').reduce((s,x)=>s+Number(x.firstAmountCents||0),0))/totalPaid):0,
+      monthExpensesCents:expenses.monthExpensesCents,
+      recurringExpensesCents:expenses.recurringMonthlyCents,
+      monthOperatingResultCents:catalog.monthRevenueCents+Number(tnCommercial?.monthRevenueCents||0)-expenses.monthExpensesCents
+    },
+    expenses
   };
 }
 
@@ -1131,10 +1187,11 @@ http.createServer(async(req,res)=>{
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       await ensureSchema();
       await expireOverduePreviews();
-      const [result,tunegocio,config]=await Promise.all([
+      const [result,tunegocio,config,expenses]=await Promise.all([
         pool.query('SELECT * FROM catalog_requests ORDER BY created_at DESC LIMIT 500'),
         fetchTunegocioOperations(),
-        crmConfig()
+        crmConfig(),
+        expenseConfig()
       ]);
       await ensureSiteSlugs(result.rows);
       const analytics=await combinedAnalytics(tunegocio);
@@ -1144,6 +1201,7 @@ http.createServer(async(req,res)=>{
         tunegocioAvailable:tunegocio.available,
         salespeople:config.salespeople,
         offers:config.offers,
+        expenses,
         analytics,
         commissionPercent:SALESPERSON_COMMISSION_PERCENT,
         stripeConfigured:!!STRIPE_SECRET_KEY,
@@ -1151,6 +1209,15 @@ http.createServer(async(req,res)=>{
         stripeAccountId:STRIPE_ACCOUNT_ID,
         siteDomain:SITE_DOMAIN
       });
+    }
+    if(url.pathname==='/api/crm/expenses'&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await createExpense(req,res);
+    }
+    const expenseMatch=url.pathname.match(/^\/api\/crm\/expenses\/([0-9a-f-]{36})$/i);
+    if(expenseMatch&&req.method==='PATCH'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await updateExpense(req,res,expenseMatch[1]);
     }
     if(url.pathname==='/api/crm/salespeople'&&req.method==='POST'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
