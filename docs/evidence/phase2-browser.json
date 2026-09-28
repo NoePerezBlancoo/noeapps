@@ -1,7 +1,9 @@
 {
   "environment": "catalogo-staging-v2",
   "date": "2026-09-28",
-  "deployment": "c1c44c50-14c6-42f7-bbd2-c4acf1ef893d",
+  "deployment": "1ec347d6-1965-47b6-8611-fbf1e20b3084",
+  "controlsPrecedeEditorialHighlights": true,
+  "editorialHighlightsHiddenDuringSearch": true,
   "deploymentStatus": "SUCCESS",
   "healthStatus": 200,
   "unauthenticatedPrivateStatsStatus": 401,

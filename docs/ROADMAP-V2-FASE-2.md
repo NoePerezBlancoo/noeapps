@@ -1,12 +1,14 @@
 # Fase 2 — búsqueda comercial del Catálogo
 
-Revisión del 28/09/2026. Rama: `agent/catalog-roadmap-v2-safe`. Código: `c2371a3`, ajuste de legibilidad `926e684`.
+Revisión del 28/09/2026. Rama: `agent/catalog-roadmap-v2-safe`. Código: `c2371a3`, ajustes de legibilidad y posición de filtros `926e684` y `916090f`.
 
 ## Cambios
 
 La biblioteca permite combinar texto, categoría, sector, tipo de negocio, estilo visual y rango de precio de creación. Normaliza acentos, mayúsculas y equivalencias: peluquería/barbería, abogado/bufete, taller/automoción, elegante/premium y serio/sobrio, entre otras. El tipo de negocio agrupa afinidades editoriales a partir de la categoría existente; no representa una clasificación nueva basada en inspeccionar cada demo.
 
 Ordena por adecuación, solicitudes, ventas, conversión, incorporación registrada y precio ascendente/descendente. El botón de recomendación devuelve hasta tres coincidencias respetando todos los filtros. Si solo hay dos, explica que no existen tres. Las consultas sin coincidencias no se rellenan con resultados inventados. Conserva los criterios existentes de selección de demos y los enlaces a demo y solicitud.
+
+Los filtros aparecen antes de la selección destacada de la biblioteca. Al buscar o filtrar se oculta esa selección editorial, de forma que las coincidencias aparecen inmediatamente debajo de los controles; al limpiar los filtros vuelve a mostrarse.
 
 Las estadísticas públicas solo contienen agregados de solicitudes, ventas y conversión. La facturación por diseño se consulta con sesión administrativa en CRM → Analítica → Rendimiento por diseño. Hay buscador, ordenación y paginación visual de la tabla.
 
@@ -60,8 +62,7 @@ Servicio: `catalogo-staging-v2`, ID `2b7b78ca-0cb9-43ae-b6cc-4ee77b1015a1`, proy
 
 - [Búsqueda de staging](https://catalogo-staging-v2-production.up.railway.app/#biblioteca).
 - [CRM de staging](https://catalogo-staging-v2-production.up.railway.app/crm), con su contraseña propia en Railway (`CATALOG_CRM_PASSWORD`).
-- Despliegue funcional revisado `65e2a708-af77-49e9-8069-2707b2227e13`: SUCCESS, healthcheck aprobado, Stripe `sandbox_test`, bridge listo.
-- Último despliegue `c1c44c50-14c6-42f7-bbd2-c4acf1ef893d`: SUCCESS. Health HTTP 200, 571 diseños registrados, endpoint privado HTTP 401 sin sesión y logs de arranque sin errores. El CRM muestra el porcentaje y su denominador en líneas separadas.
+- Último despliegue `1ec347d6-1965-47b6-8611-fbf1e20b3084`: SUCCESS. Healthcheck aprobado, 571 diseños registrados, endpoint privado HTTP 401 sin sesión y logs de arranque sin errores, Stripe `sandbox_test` y bridge listo. El CRM muestra el porcentaje y su denominador en líneas separadas. En un navegador nuevo se comprobó que los filtros preceden a los destacados y que estos se ocultan al mostrar tres recomendaciones.
 - Checksums de `001_subscription_management.sql` y `002_catalog_discovery.sql` contrastados contra la base de staging: PASS. Inventario inicial: 571 diseños y 0 fechas históricas inventadas.
 
 Las pruebas utilizaron exclusivamente la base separada, clientes sintéticos y Stripe TEST. TuNegocio y sus cancelaciones no han requerido cambios en esta fase. El checkout original de NoeApps sigue limpio en main.
