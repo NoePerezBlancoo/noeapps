@@ -31,6 +31,7 @@ const STRIPE_DEFAULT_MONTHLY_PRICE_ID=(process.env.STRIPE_DEFAULT_MONTHLY_PRICE_
 const STRIPE_AUTOMATIC_TAX=/^(1|true|yes)$/i.test(process.env.STRIPE_AUTOMATIC_TAX||'');
 const PUBLIC_ORIGIN=(process.env.PUBLIC_ORIGIN||'https://catalogo.noeapps.com').replace(/\/$/,'');
 const SITE_DOMAIN=(process.env.SITE_DOMAIN||'noeapps.com').trim().toLowerCase();
+const SALESPERSON_COMMISSION_PERCENT=30;
 const CRM_BRIDGE_SECRET=(process.env.NOEAPPS_CRM_BRIDGE_SECRET||'').trim();
 const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace(/\/$/,'');
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
@@ -85,7 +86,16 @@ async function ensureSchema(){
       thumbnail_url text NOT NULL DEFAULT '',
       preview_url text NOT NULL DEFAULT '',
       payment_url text NOT NULL DEFAULT '',
-      admin_notes text NOT NULL DEFAULT ''
+      admin_notes text NOT NULL DEFAULT '',
+      salesperson_id uuid,
+      offer_id uuid,
+      offer_name text NOT NULL DEFAULT '',
+      offer_percent_off integer NOT NULL DEFAULT 0,
+      offer_duration_months integer NOT NULL DEFAULT 0,
+      stripe_offer_coupon_id text NOT NULL DEFAULT '',
+      stripe_offer_promotion_code_id text NOT NULL DEFAULT '',
+      first_paid_amount_cents integer,
+      commission_cents integer
     );
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS monthly_price_cents integer NOT NULL DEFAULT 1990;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS salesperson text NOT NULL DEFAULT '';
@@ -110,21 +120,73 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS site_status text NOT NULL DEFAULT 'draft';
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS preview_published_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS preview_expires_at timestamptz;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS salesperson_id uuid;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS offer_id uuid;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS offer_name text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS offer_percent_off integer NOT NULL DEFAULT 0;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS offer_duration_months integer NOT NULL DEFAULT 0;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_offer_coupon_id text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_offer_promotion_code_id text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS first_paid_amount_cents integer;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS commission_cents integer;
     CREATE TABLE IF NOT EXISTS stripe_events(
       id text PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS crm_salespeople(
+      id uuid PRIMARY KEY,
+      name text NOT NULL,
+      email text NOT NULL DEFAULT '',
+      active boolean NOT NULL DEFAULT true,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE IF NOT EXISTS crm_offers(
+      id uuid PRIMARY KEY,
+      name text NOT NULL,
+      source text NOT NULL CHECK (source IN ('catalog','tunegocio','both')),
+      percent_off integer NOT NULL CHECK (percent_off BETWEEN 1 AND 100),
+      duration_months integer NOT NULL CHECK (duration_months BETWEEN 1 AND 24),
+      active boolean NOT NULL DEFAULT true,
+      starts_at timestamptz,
+      ends_at timestamptz,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE IF NOT EXISTS catalog_revenue_events(
+      event_id text PRIMARY KEY,
+      request_id uuid NOT NULL REFERENCES catalog_requests(id) ON DELETE CASCADE,
+      amount_paid_cents integer NOT NULL CHECK (amount_paid_cents >= 0),
+      kind text NOT NULL CHECK (kind IN ('initial','renewal')),
+      paid_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS catalog_revenue_events_paid_idx ON catalog_revenue_events(paid_at DESC);
+    CREATE INDEX IF NOT EXISTS catalog_revenue_events_request_idx ON catalog_revenue_events(request_id, paid_at DESC);
     CREATE TABLE IF NOT EXISTS crm_operations(
       source text NOT NULL CHECK (source IN ('tunegocio')),
       external_id uuid NOT NULL,
       manual_status text NOT NULL DEFAULT 'auto' CHECK (manual_status IN ('auto','review','in_progress','resolved','closed')),
       salesperson text NOT NULL DEFAULT '',
       admin_notes text NOT NULL DEFAULT '',
+      salesperson_id uuid,
+      offer_id uuid,
+      offer_name text NOT NULL DEFAULT '',
+      offer_percent_off integer NOT NULL DEFAULT 0,
+      offer_duration_months integer NOT NULL DEFAULT 0,
+      first_paid_amount_cents integer,
+      commission_cents integer,
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now(),
       PRIMARY KEY(source,external_id)
     );
     CREATE INDEX IF NOT EXISTS crm_operations_updated_idx ON crm_operations(updated_at DESC);
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS salesperson_id uuid;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS offer_id uuid;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS offer_name text NOT NULL DEFAULT '';
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS offer_percent_off integer NOT NULL DEFAULT 0;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS offer_duration_months integer NOT NULL DEFAULT 0;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS first_paid_amount_cents integer;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS commission_cents integer;
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
