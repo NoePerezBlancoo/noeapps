@@ -1,0 +1,147 @@
+{
+  "asset": "https://catalogo-staging-v2-production.up.railway.app/assets/catalog-search.js?v=2-plurals",
+  "contradictoryFilterCount": 0,
+  "deployment": "519f6df4-a3d7-412e-8242-0afe5a44eba0",
+  "environment": "catalogo-staging-v2",
+  "recommended": 3,
+  "results": [
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "coche",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "COCHES",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "vehículos",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "automóviles",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "autos",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "concesionarios",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 8,
+      "ids": [
+        "noeapps-automotive-nightshift",
+        "noeapps-automotive-velocity",
+        "impact-car-exhibition",
+        "fourtwenty-advanced-two-index-html",
+        "fourtwenty-advanced-four-index-html",
+        "fourtwenty-advanced-one-index-html",
+        "mcarbonell-landings-818001087-html",
+        "impact-ferrari"
+      ],
+      "query": "coches modernos",
+      "summary": "8 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 2,
+      "ids": [
+        "noeapps-legal-civic",
+        "noeapps-legal-veritas"
+      ],
+      "query": "bufetes sobrios",
+      "summary": "2 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 11,
+      "ids": [
+        "noeapps-restaurant-ember",
+        "noeapps-hosteleria-savor",
+        "codrops-grid-preview",
+        "formwork-roastery",
+        "formwork-meridian",
+        "formwork-revolver",
+        "impact-vandora",
+        "mcarbonell-landings-610170284-html",
+        "mcarbonell-landings-594326597-html",
+        "mcarbonell-landings-641509652-html",
+        "mcarbonell-landings-323521033-html"
+      ],
+      "query": "cafeterías modernas",
+      "summary": "11 diseños coinciden con tu búsqueda."
+    },
+    {
+      "count": 0,
+      "ids": [],
+      "query": "astronauta inexistente",
+      "summary": "0 diseños coinciden con tu búsqueda."
+    }
+  ]
+}

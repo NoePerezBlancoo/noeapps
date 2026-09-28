@@ -1,11 +1,20 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.CatalogSearch=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  // Expand the curated vocabulary, without stripping endings from arbitrary queries.
+  function withPlurals(aliases){
+    return [...new Set(aliases.flatMap(alias=>{
+      const word=normalize(alias);
+      if(word.length<3||/[sx0-9]$/.test(word))return [word];
+      const plural=word.endsWith('z')?word.slice(0,-1)+'ces':word+(/[aeiou]$/.test(word)?'s':'es');
+      return [word,plural];
+    }))];
+  }
   const businesses=[
     ['peluqueria','Peluquería y barbería','Belleza','Belleza y moda','peluqueria peluquerias barberia barberias barber hair salon belleza estetica'],
     ['restaurante','Restaurante y cafetería','Hostelería','Hostelería y turismo','restaurante restaurantes restaurant gastronomia cafeteria cafe bar cocina food'],
     ['abogado','Abogacía y asesoría','Legal','Servicios profesionales','abogado abogados abogada abogacia despacho bufete legal law lawyer asesor juridico'],
-    ['taller','Taller y automoción','Automoción','Industria y movilidad','taller talleres coche mecanica mecanico garage automotive motor automocion'],
+    ['taller','Taller y automoción','Automoción','Industria y movilidad','taller talleres coche vehiculo automovil auto concesionario mecanica mecanico garage automotive motor automocion'],
     ['industria','Empresa industrial','Industria','Industria y movilidad','fabrica manufactura maquinaria industria industrial ingenieria'],
     ['inmobiliaria','Inmobiliaria','Inmobiliaria','Vivienda y construcción','inmobiliaria inmobiliarias vivienda viviendas realestate estate propiedades property'],
     ['construccion','Construcción y reformas','Construcción','Vivienda y construcción','construccion constructora reforma reformas arquitectura obra'],
@@ -20,17 +29,17 @@
     ['moda','Moda','Moda','Belleza y moda','moda fashion ropa boutique'],
     ['servicios','Servicios profesionales','Servicios','Servicios profesionales','servicios profesional profesionales consultoria mantenimiento limpieza'],
     ['empresas','Empresa','Empresas','Servicios profesionales','empresa empresas corporativo corporate negocio business']
-  ].map(([id,label,category,sector,aliases])=>({id,label,category,sector,aliases:aliases.split(' ')}));
+  ].map(([id,label,category,sector,aliases])=>({id,label,category,sector,aliases:withPlurals(aliases.split(' '))}));
   const styles=[
-    {aliases:'elegante elegantes elegancia premium lujo lujoso sofisticado exclusiva exclusivo refinado'.split(' '),values:['premium','clasico','minimalista']},
-    {aliases:'moderno moderna modernos modernas contemporaneo actual innovador'.split(' '),values:['moderno','animado','experimental']},
+    {aliases:'elegante elegantes elegancia premium lujo lujoso lujosa sofisticado sofisticada exclusiva exclusivo refinado refinada'.split(' '),values:['premium','clasico','minimalista']},
+    {aliases:'moderno moderna modernos modernas contemporaneo contemporanea actual innovador innovadora'.split(' '),values:['moderno','animado','experimental']},
     {aliases:'serio seria sobrio sobria formal confianza tradicional clasico clasica'.split(' '),values:['clasico','minimalista'],categories:['Legal','Empresas','Servicios']},
-    {aliases:'industrial tecnico tecnica robusto mecanico'.split(' '),values:['oscuro'],categories:['Industria','Automoción','Construcción']},
+    {aliases:'industrial tecnico tecnica robusto robusta mecanico'.split(' '),values:['oscuro'],categories:['Industria','Automoción','Construcción']},
     {aliases:'minimal minimalista limpio limpia sencillo sencilla simple'.split(' '),values:['minimalista']},
     {aliases:'oscuro oscura dark negro negra'.split(' '),values:['oscuro']},
     {aliases:'animado animada dinamico dinamica movimiento'.split(' '),values:['animado']},
     {aliases:['3d','inmersivo','inmersiva'],values:['3d']}
-  ];
+  ].map(style=>({...style,aliases:withPlurals(style.aliases)}));
   const stopWords=new Set('una un de del el la los las para con y web webs pagina paginas quiero necesito como'.split(' '));
   function tier(item){
     const tags=(item.style||[]).map(normalize),impact=Number(item.impact_score||0);

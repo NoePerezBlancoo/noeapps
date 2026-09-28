@@ -22,6 +22,20 @@ test('all filters intersect; invalid price ranges never broaden results',()=>{
   for(const options of [{minPrice:300,maxPrice:100},{minPrice:-1},{maxPrice:'oops'}])assert.deepEqual(engine.search(items,options),[]);
   assert.deepEqual(engine.search(items,{sort:'price-desc'}).map(x=>engine.tier(x.item).price),[299,149,149,79,39,39]);
 });
+test('everyday automotive terms and their plurals find automotive designs',()=>{
+  for(const query of ['coche','COCHES','vehículo','vehículos','automóvil','automóviles','auto','autos','concesionario','concesionarios','taller','talleres']){
+    assert.deepEqual(engine.search(items,{query}).map(x=>x.item.id),['garage'],query);
+  }
+  assert.deepEqual(engine.search(items,{query:'coches',category:'Legal'}),[]);
+  assert.deepEqual(engine.search(items,{query:'coches',minPrice:100}),[]);
+  assert.deepEqual(engine.search(items,{query:'coches modernos'}),[]);
+  assert.deepEqual(engine.search(items,{query:'coches oscuros'}).map(x=>x.item.id),['garage']);
+});
+test('business and style plurals retain all search terms and accent normalization',()=>{
+  for(const [query,id] of Object.entries({'bufetes sobrios':'law','abogadas serias':'law','cafeterías modernas':'food','barberías elegantes':'hair','inmobiliarias sofisticadas':'estate'}))assert.deepEqual(engine.search(items,{query}).map(x=>x.item.id),[id],query);
+  assert.deepEqual(engine.search(items,{query:'coches astronautas'}),[]);
+  assert.deepEqual(engine.search(items,{query:'automóviles abogados'}),[]);
+});
 test('ranking uses observed metrics and date information; zero and unknown differ',()=>{
   const stats={law:{requests:10,sales:2,conversion:.2},hair:{requests:2,sales:1,conversion:.5},tech:{requests:0,sales:0,conversion:null}};
   assert.equal(engine.search(items,{sort:'popular',stats})[0].item.id,'law');
