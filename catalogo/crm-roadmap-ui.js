@@ -1,6 +1,6 @@
 /* Enhancements activate only after the authenticated API advertises the staging flag. */
 (()=>{
-  let active=false,templates={},report=null;
+  let active=false,templates={},report=null,scanning=null;
   const labels={preview:'Enviar preview',payment:'Enlace de pago',reminder:'Recordatorio',published:'Web publicada',followup:'Seguimiento',cancellation:'Cancelación'};
   const num=v=>v==null?'No disponible':Number(v).toLocaleString('es-ES');
   const money=v=>v==null?'No disponible':cents(v);
@@ -15,18 +15,24 @@
       const button=node('nav-'+key,el('nav'),'button');button.dataset.view=key;button.textContent=title;button.onclick=()=>switchView(key);
       const view=node('view-'+key,el('app'),'section');view.className='page hidden';
     }
-    const root=el('view-incidents');root.innerHTML='<div class="sectionHead"><div><h2>Necesita revisión <span id="incidentCount"></span></h2><p>Comprobación automática cada cinco minutos. Marcar revisada conserva la incidencia hasta que desaparezca su causa.</p></div><button class="btn primary" id="scanIncidents">Comprobar ahora</button></div><p id="monitorStatus" role="status"></p><div id="incidentList"></div>';
-    el('scanIncidents').onclick=async()=>{el('scanIncidents').disabled=true;el('monitorStatus').textContent='Comprobando…';try{await api('/api/crm/roadmap/scan',{method:'POST',body:'{}'});await loadIncidents()}catch(e){el('monitorStatus').textContent=e.message}finally{el('scanIncidents').disabled=false}};
+    const root=el('view-incidents');root.innerHTML='<div class="sectionHead"><div><h2>Necesita revisión <span id="incidentCount"></span></h2><p>Se comprueba al entrar en el CRM, al pulsar Actualizar o Comprobar ahora. No hay comprobaciones periódicas. Marcar revisada conserva la incidencia hasta que desaparezca su causa.</p></div><button class="btn primary" id="scanIncidents">Comprobar ahora</button></div><p id="monitorStatus" role="status"></p><div id="incidentList"></div>';
+    el('scanIncidents').onclick=()=>scanIncidents().catch(e=>{el('monitorStatus').textContent=e.message;});
     const messages=el('view-whatsapp');messages.innerHTML='<div class="sectionHead"><div><h2>WhatsApp</h2><p>Prepara y revisa el mensaje desde la ficha de una operación. Abrir WhatsApp no envía el mensaje.</p></div></div><article class="panel"><h3>Plantillas editables</h3><label class="field"><span>Tipo de mensaje</span><select id="templateKind">'+Object.entries(labels).map(([key,title])=>'<option value="'+key+'">'+title+'</option>').join('')+'</select></label><label class="field"><span>Texto</span><textarea id="templateBody" maxlength="1600" rows="6"></textarea></label><p class="note">Campos: {cliente}, {negocio}, {preview}, {pago}, {web}, {fin}. No se generan enlaces si falta un dato requerido.</p><button class="btn primary" id="saveTemplate">Guardar plantilla</button><p id="templateStatus" role="status"></p></article>';
     el('templateKind').onchange=()=>{el('templateBody').value=templates[val('templateKind')]||'';};
     el('saveTemplate').onclick=async()=>{try{await api('/api/crm/roadmap/templates',{method:'PUT',body:JSON.stringify({kind:val('templateKind'),body:val('templateBody')})});templates[val('templateKind')]=val('templateBody');el('templateStatus').textContent='Plantilla guardada.'}catch(e){el('templateStatus').textContent=e.message}};
     const offerNote=node('campaignNote',el('view-offers'),'p');offerNote.className='note';offerNote.textContent='Las campañas se aplican a la cuota mensual. El precio de creación del Catálogo se mantiene. Una campaña caducada no admite nuevos checkouts; los ya reservados conservan sus condiciones. TuNegocio requiere un primer cobro superior a cero (descuentos del 1 al 99%).';
     const expenseNote=node('expenseAccountingNote',el('view-expenses'),'p');expenseNote.className='note';expenseNote.textContent='La fecha indica cuándo empieza el gasto. Detener un gasto mensual conserva su historial. Categoría Comisiones: registra pagos de comisiones ya devengadas; no se descuentan dos veces del resultado. Los costes IA en USD no se convierten automáticamente a euros.';
   }
+  function scanIncidents(){
+    if(scanning)return scanning;
+    el('scanIncidents').disabled=true;el('monitorStatus').textContent='Comprobando…';
+    scanning=api('/api/crm/roadmap/scan',{method:'POST',body:'{}'}).then(loadIncidents).finally(()=>{scanning=null;el('scanIncidents').disabled=false;});
+    return scanning;
+  }
   async function loadIncidents(){
     const data=await api('/api/crm/roadmap/incidents');window.crmOpenIncidents=data.incidents;
     el('incidentCount').textContent='('+data.openCount+')';el('nav-incidents').textContent='Incidencias · '+data.openCount;el('mReview').textContent=data.openCount;
-    const run=data.lastRun;el('monitorStatus').textContent=run?'Última comprobación: '+new Date(run.started_at).toLocaleString('es-ES')+' · '+({succeeded:'Completada',partial:'Parcial: TuNegocio no disponible',failed:'Fallida: revisar conexión',running:'En curso'}[run.outcome]||run.outcome):'Pendiente de la primera comprobación automática.';
+    const run=data.lastRun;el('monitorStatus').textContent=run?'Última comprobación: '+new Date(run.started_at).toLocaleString('es-ES')+' · '+({succeeded:'Completada',partial:'Parcial: TuNegocio no disponible',failed:'Fallida: revisar conexión',running:'En curso'}[run.outcome]||run.outcome):'Pendiente de comprobación. Pulsa Comprobar ahora.';
     el('incidentList').innerHTML=data.incidents.length?data.incidents.map(i=>'<article class="panel" style="margin-bottom:12px"><div class="statusline"><span class="tag '+(i.state==='resolved'?'good':'warn')+'">'+esc({open:'Abierta',acknowledged:'Revisada · sigue pendiente',resolved:'Resuelta automáticamente'}[i.state])+'</span><span>'+esc(i.source)+'</span></div><h3>'+esc(i.title)+'</h3><p>'+esc(i.business_name||i.entity_id)+'</p><p>'+esc(i.recommendation)+'</p><p class="note">Detectada: '+date(i.first_seen_at)+' · Última vez: '+date(i.last_seen_at)+'</p>'+(i.note?'<p>Nota: '+esc(i.note)+'</p>':'')+(i.state!=='resolved'?'<label class="field"><span>Nota de revisión</span><input maxlength="2000" data-incident-note="'+esc(i.key)+'"></label><button class="btn" data-ack="'+esc(i.key)+'">Marcar revisada</button>':'')+'</article>').join(''):'<div class="empty">No se han detectado incidencias.</div>';
     document.querySelectorAll('[data-ack]').forEach(button=>button.onclick=async()=>{try{const input=[...document.querySelectorAll('[data-incident-note]')].find(x=>x.dataset.incidentNote===button.dataset.ack);await api('/api/crm/roadmap/incident',{method:'PATCH',body:JSON.stringify({key:button.dataset.ack,note:input.value})});await loadIncidents();renderList()}catch(e){el('monitorStatus').textContent=e.message}});
     renderList();
@@ -65,10 +71,18 @@
     el('prepareMessage').onclick=async()=>{try{const msg=await api('/api/crm/roadmap/message',{method:'POST',body:JSON.stringify({source:selected.source,id:selected.id,kind:val('messageKind'),body:val('messageBody'),phone:val('messagePhone'),previewUrl:val('messagePreview'),paymentUrl:val('messagePayment')})});el('messageResult').innerHTML='<p style="white-space:pre-wrap">'+esc(msg.message)+'</p><a class="btn" href="'+esc(msg.url)+'" target="_blank" rel="noopener noreferrer">Abrir WhatsApp y revisar</a><p class="note">El mensaje no se ha enviado.</p>'}catch(e){el('messageResult').textContent=e.message}};
   }
   window.addEventListener('crm:detail',composer);
-  window.addEventListener('crm:loaded',async event=>{
-    if(!event.detail.roadmapEnabled)return;
+  window.refreshCRMExtras=async(data,{checkIncidents=false}={})=>{
+    if(!data.roadmapEnabled)return;
     if(!active){active=true;setup();}
-    try{templates=(await api('/api/crm/roadmap/templates')).templates;el('templateKind').onchange();await Promise.all([api('/api/crm/roadmap').then(renderReport),loadIncidents()]);composer();}
-    catch(e){const p=node('roadmapError',el('view-operations'),'p');p.className='msg';p.textContent='No se pudo actualizar el panel: '+e.message;}
-  });
+    try{
+      const results=await Promise.allSettled([
+        api('/api/crm/roadmap/templates').then(data=>{templates=data.templates;el('templateKind').onchange();}),
+        api('/api/crm/roadmap').then(renderReport),
+        checkIncidents?scanIncidents():loadIncidents()
+      ]);
+      const failed=results.find(x=>x.status==='rejected');if(failed)throw failed.reason;
+      if(el('roadmapError'))el('roadmapError').remove();composer();
+    }
+    catch(e){const p=node('roadmapError',el('view-operations'),'p');p.className='msg';p.textContent='No se pudo actualizar el panel: '+e.message;throw e;}
+  };
 })();

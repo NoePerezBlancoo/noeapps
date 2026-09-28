@@ -32,6 +32,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
   <div class="brand"><span class="eyebrow">NOEAPPS · CONTROL</span><h1>CRM central</h1></div>
   <div class="topActions"><button class="btn" id="refresh">Actualizar</button><button class="btn" id="logout">Salir</button></div>
 </header>
+<p id="refreshStatus" role="status" style="font-size:12px;margin:10px 28px">Actualización al entrar o manual</p>
 <nav class="nav" id="nav">
   <button class="active" data-view="operations">Operaciones</button>
   <button data-view="analytics">Analítica</button>
@@ -160,7 +161,7 @@ async function loadDesignStats(){
     if(!designReport.metricsAvailable)throw new Error('Estadísticas no disponibles. No se muestran ceros como si fueran datos confirmados.');
     document.getElementById('designStatsNote').textContent=(designReport.mode==='test'?'DATOS DE PRUEBA · ':'')+'Ventas: solicitudes con algún cobro positivo confirmado. Las renovaciones suman cobros, no ventas. Conversión: ventas / solicitudes. Facturación: cobros brutos registrados, antes de devoluciones. Sin estimaciones ni reconstrucción del historial anterior al ledger. Actualizado: '+new Date(designReport.generatedAt).toLocaleString('es-ES')+'.';
     renderDesignStats();
-  }catch(error){panel.classList.remove('hidden');document.getElementById('designStatsNote').textContent=error.message;document.getElementById('designStatsTable').innerHTML='';document.getElementById('designStatsMore').hidden=true;}
+  }catch(error){panel.classList.remove('hidden');document.getElementById('designStatsNote').textContent=error.message;document.getElementById('designStatsTable').innerHTML='';document.getElementById('designStatsMore').hidden=true;throw error;}
 }
 function renderDesignStats(){
   if(!designReport?.metricsAvailable)return;
@@ -189,7 +190,14 @@ async function api(url,opt={}){
 function showLogin(){document.getElementById('login').style.display='grid';document.getElementById('app').style.display='none'}
 function showApp(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block'}
 
-async function load(){
+let loading=null;
+function load({checkIncidents=false}={}){
+  if(loading)return loading;
+  el('refresh').disabled=true;el('refreshStatus').textContent='Actualizando…';
+  loading=loadData(checkIncidents).finally(()=>{loading=null;el('refresh').disabled=false;});
+  return loading;
+}
+async function loadData(checkIncidents){
   try{
     const j=await api('/api/crm/requests');
     catalogItems=(j.requests||[]).map(x=>({...x,source:'catalog'}));
@@ -198,10 +206,12 @@ async function load(){
     salespeople=j.salespeople||[];offers=j.offers||[];expenses=j.expenses||[];analytics=j.analytics||null;
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
-    void loadDesignStats();
-    window.dispatchEvent(new CustomEvent('crm:loaded',{detail:j}));
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
-  }catch{}
+    if(j.roadmapEnabled&&!window.refreshCRMExtras)throw new Error('No se ha cargado el panel avanzado. Recarga la página');
+    const results=await Promise.allSettled([loadDesignStats(),window.refreshCRMExtras?.(j,{checkIncidents})]);
+    const failed=results.find(x=>x.status==='rejected');if(failed)throw failed.reason;
+    el('refreshStatus').textContent='Última actualización: '+new Date().toLocaleString('es-ES')+' · Sin actualización periódica';
+  }catch(error){el('refreshStatus').textContent='Actualización incompleta: '+error.message+'. Pulsa Actualizar para reintentar.';}
 }
 function needsReview(x){return (window.crmOpenIncidents||[]).some(i=>i.source===x.source&&i.entity_id===x.id&&i.state!=='resolved')||x.source==='tunegocio'&&(['review','in_progress'].includes(x.manualStatus)||(x.paymentStatus==='paid'&&!x.published))}
 function paid(x){return x.source==='catalog'?x.first_paid_amount_cents!=null||x.stripe_payment_status==='paid':x.paymentStatus==='paid'}
@@ -376,8 +386,8 @@ function renderExpenses(){
 }
 
 function el(id){return document.getElementById(id)}function val(id){return el(id)?.value||''}
-document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=el('loginMsg');m.textContent='';try{await api('/api/crm/login',{method:'POST',body:JSON.stringify({password:val('password')})});el('password').value='';await load()}catch(err){m.textContent=err.message}};
-el('refresh').onclick=load;el('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};
+document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=el('loginMsg');m.textContent='';try{await api('/api/crm/login',{method:'POST',body:JSON.stringify({password:val('password')})});el('password').value='';await load({checkIncidents:true})}catch(err){m.textContent=err.message}};
+el('refresh').onclick=()=>load({checkIncidents:true});el('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};
 document.querySelectorAll('#nav [data-view]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav [data-view]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));el('view-'+b.dataset.view).classList.remove('hidden')});
 document.getElementById('designStatsQuery').oninput=()=>{designStatsVisible=50;renderDesignStats()};
 document.getElementById('designStatsSort').onchange=()=>{designStatsVisible=50;renderDesignStats()};
@@ -387,8 +397,8 @@ el('search').oninput=e=>{searchTerm=e.target.value;renderList()};
 el('salesForm').onsubmit=async e=>{e.preventDefault();const m=el('salesMsg');m.textContent='';try{await api('/api/crm/salespeople',{method:'POST',body:JSON.stringify({name:val('salesName'),email:val('salesEmail')})});e.target.reset();m.className='msg ok';m.textContent='Comercial añadido.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
 el('offerForm').onsubmit=async e=>{e.preventDefault();const m=el('offerMsg');m.textContent='';try{await api('/api/crm/offers',{method:'POST',body:JSON.stringify({name:val('offerName'),source:val('offerSource'),percentOff:Number(val('offerPercent')),durationMonths:Number(val('offerMonths')),startsAt:val('offerStart')||null,endsAt:val('offerEnd')||null})});e.target.reset();el('offerPercent').value='50';el('offerMonths').value='4';m.className='msg ok';m.textContent='Oferta creada.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
 el('expenseForm').onsubmit=async e=>{e.preventDefault();const m=el('expenseMsg');m.textContent='';try{await api('/api/crm/expenses',{method:'POST',body:JSON.stringify({name:val('expenseName'),category:val('expenseCategory'),amountCents:Math.round(Number(val('expenseAmount'))*100),cadence:val('expenseCadence'),expenseDate:val('expenseDate')||null,notes:val('expenseNotes')})});e.target.reset();m.className='msg ok';m.textContent='Gasto registrado.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
-load();
 </script>
 <script src="/assets/crm-roadmap.js"></script>
+<script>load({checkIncidents:true});</script>
 </body>
 </html>
