@@ -1,0 +1,11 @@
+{
+  "at": "2026-09-28T20:40:59.921Z",
+  "origin": "https://catalogo.noeapps.com",
+  "healthBothProducts": true,
+  "anonymousCrmRejected": true,
+  "bridgeAvailable": true,
+  "productionAnalyticsReconcile": true,
+  "stripeMutationRequests": 0,
+  "customerMutationRequests": 0,
+  "messagesSent": 0
+}

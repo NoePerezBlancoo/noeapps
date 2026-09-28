@@ -1,0 +1,14 @@
+{
+  "at": "2026-09-28T20:42:05.688Z",
+  "deployment": "2a874ef6-be83-48d8-b581-37a8cb6c0257",
+  "duplicateRefreshCoalesced": true,
+  "entryRefresh": true,
+  "idleRequests": 0,
+  "idleSeconds": 94,
+  "manualRefresh": true,
+  "mobileDocumentWidth": 390,
+  "mobileViewport": 390,
+  "monitorSucceeded": true,
+  "monitorUnchangedDuringIdle": true,
+  "origin": "https://catalogo.noeapps.com"
+}

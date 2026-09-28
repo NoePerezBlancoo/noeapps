@@ -1,6 +1,6 @@
 # CRM: actualización al entrar y manual
 
-Cambio preparado en `agent/catalog-roadmap-v2-safe`. Producción pendiente de la autorización específica del propietario: `SUBE A PRODUCCIÓN`.
+Cambio desarrollado en `agent/catalog-roadmap-v2-safe` y publicado tras la autorización específica del propietario: `SUBE A PRODUCCIÓN`.
 
 ## Comportamiento
 
@@ -37,4 +37,17 @@ Las cifras y las incidencias pueden quedar desactualizadas hasta la siguiente en
 
 Rollback: volver al código anterior (`6a412ab`) y redesplegar el servicio afectado. No requiere restaurar ni transformar datos. Ese rollback recuperaría las comprobaciones periódicas anteriores.
 
-Se detiene el flujo en staging/revisión. No se ha desplegado esta mejora en producción ni modificado su configuración, Stripe LIVE o DNS.
+El desarrollo se detuvo inicialmente en staging/revisión. Tras la autorización posterior se publicó la mejora según se detalla a continuación.
+
+## Publicación autorizada
+
+- PR: https://github.com/NoePerezBlancoo/noeapps/pull/7, fusionada después de superar las comprobaciones de GitHub y staging.
+- Commit de producción: `ce6fc5683c3ebb5d0fa53ff3c79f8fef6ee751b1`.
+- Railway: despliegue `2a874ef6-be83-48d8-b581-37a8cb6c0257`, estado SUCCESS.
+- Servicio: `3b94ba57-4e1e-4715-8aef-d53d696b0b87`, proyecto `7bce8c48-c5af-4682-add2-8402a959373e`, entorno `4abf1d82-e865-4aaf-a250-0280e0ac3c05`.
+- URL verificada: https://catalogo.noeapps.com/crm.
+- Navegador en producción: entrada autenticada, actualización manual, cargas simultáneas sin duplicaciones, detector completado y vista móvil de 390 px sin desbordamiento. Sin errores JavaScript observados.
+- Comprobaciones HTTP: ambos productos saludables, CRM privado rechaza acceso anónimo, bridge disponible y sumas de analítica conciliadas. Evidencia: `docs/evidence/crm-on-demand-production-smoke.json` y `docs/evidence/crm-on-demand-production-browser.json`.
+- Las únicas operaciones de escritura de la comprobación fueron la sesión y las comprobaciones normales del detector/auditoría. No se crearon pagos, campañas, gastos, clientes ni mensajes de prueba en producción.
+- Sin cambios de variables, migraciones nuevas, DNS ni configuración de Stripe LIVE. TuNegocio no se redesplegó.
+- Rollback de producción: restaurar el despliegue anterior `39a4392c-13b4-4b2d-b151-a42f4371d68d`, commit `ef520ab92b425a8dd2a3bfb4e6c77451b5823180`. No requiere revertir datos; recuperaría el temporizador anterior.
