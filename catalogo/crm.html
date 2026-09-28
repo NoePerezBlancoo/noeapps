@@ -6,12 +6,12 @@
 <section class="metrics"><article class="metric"><span>Total</span><b id="mTotal">0</b></article><article class="metric"><span>Nuevas</span><b id="mNew">0</b></article><article class="metric"><span>En preparación</span><b id="mPrep">0</b></article><article class="metric"><span>Pagadas</span><b id="mPaid">0</b></article></section>
 <div class="layout"><section class="list" id="list"></section><aside class="detail" id="detail"><div class="empty">Selecciona una solicitud.</div></aside></div></main>
 <script>
-let items=[],selected=null,stripeConfigured=false,taxEnabled=false;
+let items=[],selected=null,stripeConfigured=false,taxEnabled=false,siteDomain='noeapps.com';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function api(url,opt={}){const r=await fetch(url,{...opt,headers:{'Content-Type':'application/json',...(opt.headers||{})}});const j=await r.json().catch(()=>({}));if(r.status===401){showLogin();throw new Error('Sesión cerrada')}if(!r.ok)throw new Error(j.error||'Error');return j}
 function showLogin(){document.getElementById('login').style.display='grid';document.getElementById('app').style.display='none'}
 function showApp(){document.getElementById('login').style.display='none';document.getElementById('app').style.display='block'}
-async function load(){try{const j=await api('/api/crm/requests');items=j.requests||[];stripeConfigured=!!j.stripeConfigured;taxEnabled=!!j.taxEnabled;showApp();renderList();metrics();if(selected){selected=items.find(x=>x.id===selected.id)||null;renderDetail()}}catch{}}
+async function load(){try{const j=await api('/api/crm/requests');items=j.requests||[];stripeConfigured=!!j.stripeConfigured;taxEnabled=!!j.taxEnabled;siteDomain=j.siteDomain||'noeapps.com';showApp();renderList();metrics();if(selected){selected=items.find(x=>x.id===selected.id)||null;renderDetail()}}catch{}}
 function metrics(){document.getElementById('mTotal').textContent=items.length;document.getElementById('mNew').textContent=items.filter(x=>x.status==='new').length;document.getElementById('mPrep').textContent=items.filter(x=>['preparing','preview_ready','sent'].includes(x.status)).length;document.getElementById('mPaid').textContent=items.filter(x=>x.status==='paid').length}
 function money(cents){return (Number(cents||0)/100).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
 function discountDisplayValue(x){return x.discount_type==='fixed'?(Number(x.discount_value||0)/100).toFixed(2):String(Number(x.discount_value||0))}
@@ -25,7 +25,9 @@ function renderDetail(){
   const el=document.getElementById('detail');if(!selected){el.innerHTML='<div class="empty">Selecciona una solicitud.</div>';return}
   const wa=String(selected.whatsapp||'').replace(/\D/g,'');
   const t=totals(selected);
-  const pageUrl=selected.preview_url||selected.catalog_preview_url||'';
+  const publicUrl=selected.site_slug?'https://'+selected.site_slug+'.'+siteDomain+'/':'';
+  const pageUrl=selected.preview_url||publicUrl||selected.catalog_preview_url||'';
+  const expiry=selected.preview_expires_at?new Date(selected.preview_expires_at).toLocaleString('es-ES'):'';
   const whatsappText=encodeURIComponent(
     'Hola '+selected.contact_name+', ya tenemos preparada tu web.\n\n'+
     (pageUrl?'Puedes verla aquí:\n'+pageUrl+'\n\n':'')+
@@ -40,6 +42,7 @@ function renderDetail(){
       '<span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente de clave')+'</span>'+
       '<span class="tag '+(selected.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(selected.stripe_payment_status||'sin cobrar')+'</span>'+
       '<span class="tag '+(['active','trialing'].includes(selected.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(selected.stripe_subscription_status||'—')+'</span>'+
+      '<span class="tag '+(['active','preview'].includes(selected.site_status)?'good':(selected.site_status==='expired'?'warn':''))+'">Web: '+esc(selected.site_status||'draft')+'</span>'+
       '<span class="tag good">Precio final</span>'+
     '</div>'+
     '<div class="grid"><div class="box"><span>Contacto</span><p>'+esc(selected.contact_name)+'\n'+esc(selected.whatsapp)+'\n'+esc(selected.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(selected.city||'')+'\n'+esc(selected.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(selected.category||'')+' · '+esc(selected.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(selected.notes||'—')+'</p></div></div>'+
@@ -47,17 +50,21 @@ function renderDetail(){
     '<label class="field"><span>Comercial asignado</span><input id="salesperson" value="'+esc(selected.salesperson||'')+'" placeholder="Ej. Noé, Marta, comercial 1..."></label>'+
     '<div class="grid"><label class="field"><span>Código de descuento</span><input id="discountCode" value="'+esc(selected.discount_code||'')+'" placeholder="Ej. LANZAMIENTO20"></label><label class="field"><span>Tipo de descuento</span><select id="discountType"><option value="none" '+(selected.discount_type==='none'?'selected':'')+'>Sin descuento</option><option value="percent" '+(selected.discount_type==='percent'?'selected':'')+'>Porcentaje (%)</option><option value="fixed" '+(selected.discount_type==='fixed'?'selected':'')+'>Importe fijo (€)</option></select></label></div>'+
     '<div class="grid"><label class="field"><span>Valor descuento</span><input id="discountValue" type="number" min="0" step="0.01" value="'+esc(discountValue)+'"></label><label class="field"><span>Aplicar a</span><select id="discountScope"><option value="creation" '+(selected.discount_scope==='creation'?'selected':'')+'>Solo creación</option><option value="monthly" '+(selected.discount_scope==='monthly'?'selected':'')+'>Cuota mensual</option><option value="both" '+(selected.discount_scope==='both'?'selected':'')+'>Creación y mensual</option></select></label></div>'+
-    '<div class="summary"><strong>Primer cobro: '+money(t.first)+'</strong><small>'+money(t.creation)+' creación + '+money(t.monthly)+'/mes después. '+(selected.discount_code?'Descuento '+esc(selected.discount_code)+' aplicado. ':'')+'Precio final configurado. IVA automático no activado.'+'</small></div>'+
-    '<label class="field"><span>Estado</span><select id="status">'+['new','preparing','preview_ready','sent','paid','published','closed'].map(s=>'<option '+(selected.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label>'+
-    '<label class="field"><span>Enlace preview</span><input id="previewUrl" value="'+esc(selected.preview_url||'')+'" placeholder="https://..."></label>'+
-    '<label class="field"><span>Enlace de pago Stripe</span><input id="paymentUrl" value="'+esc(selected.payment_url||'')+'" placeholder="Se genera desde el botón Stripe"></label>'+
+    '<div class="summary"><strong>Primer cobro: '+money(t.first)+'</strong><small>'+money(t.creation)+' creación + '+money(t.monthly)+'/mes después. '+(selected.discount_code?'Descuento '+esc(selected.discount_code)+' aplicado. ':'')+'Precio final configurado. IVA automático no activado.</small></div>'+
+    '<div class="summary"><strong>URL definitiva</strong><small>'+(publicUrl?'<a style="color:#fff" target="_blank" href="'+esc(publicUrl)+'">'+esc(publicUrl)+'</a>':'Se reservará al publicar')+(expiry&&selected.site_status==='preview'?'<br>Preview disponible hasta: '+esc(expiry):'')+'</small></div>'+
+    '<div class="grid"><label class="field"><span>Subdominio definitivo</span><input id="siteSlug" value="'+esc(selected.site_slug||'')+'" placeholder="mi-negocio"></label><label class="field"><span>Origen privado de la web</span><input id="siteOriginUrl" value="'+esc(selected.site_origin_url||'')+'" placeholder="https://...up.railway.app"></label></div>'+
+    '<label class="field"><span>Estado</span><select id="status">'+['new','preparing','preview_ready','sent','paid','published','expired','closed'].map(s=>'<option '+(selected.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label>'+
+    '<label class="field"><span>Enlace público de la web</span><input id="previewUrl" readonly value="'+esc(selected.preview_url||publicUrl||'')+'" placeholder="Se genera al publicar"></label>'+
+    '<label class="field"><span>Enlace de pago</span><input id="paymentUrl" readonly value="'+esc(selected.payment_url||'')+'" placeholder="Se genera desde el botón Stripe"></label>'+
     '<label class="field"><span>Notas internas</span><textarea id="adminNotes">'+esc(selected.admin_notes||'')+'</textarea></label>'+
-    '<div class="actions"><button class="primary" id="save">Guardar cambios</button><button id="stripeCheckout" '+(!stripeConfigured?'disabled':'')+'>Crear enlace Stripe</button>'+
+    '<div class="actions"><button class="primary" id="save">Guardar cambios</button><button id="publishSite">Publicar preview 10 días</button><button id="stripeCheckout" '+(!stripeConfigured?'disabled':'')+'>Crear enlace Stripe</button>'+
       (selected.stripe_customer_id?'<button id="portal">Portal cliente</button>':'')+
-      (selected.catalog_preview_url?'<a target="_blank" href="'+esc(selected.catalog_preview_url)+'">Ver diseño ↗</a>':'')+
-      (wa&&selected.payment_url?'<a target="_blank" href="https://wa.me/'+wa+'?text='+whatsappText+'">Enviar por WhatsApp ↗</a>':'')+
+      (selected.preview_url?'<a target="_blank" href="'+esc(selected.preview_url)+'">Abrir web ↗</a>':'')+
+      (selected.catalog_preview_url?'<a target="_blank" href="'+esc(selected.catalog_preview_url)+'">Ver diseño original ↗</a>':'')+
+      (wa&&selected.payment_url&&pageUrl?'<a target="_blank" href="https://wa.me/'+wa+'?text='+whatsappText+'">Enviar por WhatsApp ↗</a>':'')+
     '</div><div id="detailMsg" class="msg"></div>';
   document.getElementById('save').onclick=()=>save(true);
+  document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
   if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;
   ['creationPrice','monthlyPrice','discountType','discountValue','discountScope'].forEach(id=>{const n=document.getElementById(id);if(n)n.oninput=refreshSummary});
@@ -85,21 +92,34 @@ async function save(reload=true){
       discountCode:document.getElementById('discountCode').value,
       discountType:type,
       discountValue,
-      discountScope:document.getElementById('discountScope').value
+      discountScope:document.getElementById('discountScope').value,
+      siteSlug:document.getElementById('siteSlug').value,
+      siteOriginUrl:document.getElementById('siteOriginUrl').value
     })});
     selected=j.request;
     if(reload)await load();
     return selected;
   }catch(e){if(m)m.textContent=e.message;throw e}
 }
+async function publishSite(){
+  const m=document.getElementById('detailMsg');m.textContent='Publicando en la URL definitiva…';
+  try{
+    await save(false);
+    const j=await api('/api/crm/requests/'+selected.id+'/site/publish',{method:'POST',body:JSON.stringify({siteSlug:document.getElementById('siteSlug').value,siteOriginUrl:document.getElementById('siteOriginUrl').value})});
+    selected=j.request;
+    if(navigator.clipboard&&j.publicUrl)await navigator.clipboard.writeText(j.publicUrl).catch(()=>{});
+    m.textContent='Preview publicada 10 días en '+j.publicUrl;
+    await load();
+  }catch(e){m.textContent=e.message}
+}
 async function createCheckout(){
-  const m=document.getElementById('detailMsg');m.textContent='Guardando y creando Checkout de Stripe…';
+  const m=document.getElementById('detailMsg');m.textContent='Guardando y creando enlace de pago…';
   try{
     await save(false);
     const j=await api('/api/crm/requests/'+selected.id+'/checkout',{method:'POST',body:'{}'});
     selected=j.request;
     if(navigator.clipboard&&j.url)await navigator.clipboard.writeText(j.url).catch(()=>{});
-    m.textContent=j.reused?'Enlace Stripe existente copiado.':'Enlace Stripe creado y copiado.';
+    m.textContent=j.reused?'Enlace de pago existente copiado.':'Enlace de pago creado y copiado.';
     await load();
   }catch(e){m.textContent=e.message}
 }
