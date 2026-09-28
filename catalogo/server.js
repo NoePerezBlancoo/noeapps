@@ -589,6 +589,7 @@ async function updateTunegocioOperation(req,res,id){
   let offer=null;
   const offerChanged=String(currentLocal.offer_id||'')!==offerId;
   if(offerChanged&&remote.paymentStatus==='paid')return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
+  if(offerChanged&&remote.paymentStatus==='pending')return json(res,409,{error:'Esta web ya tiene un pago pendiente. No cambies la oferta hasta que ese checkout expire o se cierre.'});
   if(offerId){
     offer=await getOffer(offerId,'tunegocio');
     if(!offer)return json(res,400,{error:'La oferta no está activa para TuNegocio.'});
@@ -1103,7 +1104,9 @@ async function updateRequest(req,res,id){
 
   let offer=null;
   const offerChanged=String(existing.offer_id||'')!==offerId;
+  const hasOpenCheckout=!!existing.stripe_checkout_session_id&&!['paid','complete','failed','expired'].includes(String(existing.stripe_payment_status||'').toLowerCase());
   if(offerChanged&&existing.first_paid_amount_cents!=null)return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
+  if(offerChanged&&hasOpenCheckout)return json(res,409,{error:'Esta web ya tiene un enlace de pago pendiente. No cambies la oferta hasta que ese checkout caduque o se cierre.'});
   if(offerId){
     offer=await getOffer(offerId,'catalog');
     if(!offer)return json(res,400,{error:'La oferta no está activa para Catálogo.'});
