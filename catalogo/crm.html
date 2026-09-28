@@ -281,7 +281,7 @@ async function createCheckout(){const m=el('detailMsg');m.textContent='Creando e
 async function openPortal(){const m=el('detailMsg');m.textContent='Abriendo portal…';try{const j=await api('/api/crm/requests/'+selected.id+'/portal',{method:'POST',body:'{}'});window.open(j.url,'_blank','noopener');m.textContent='Portal abierto.'}catch(e){m.textContent=e.message}}
 
 function renderAnalytics(){
-  const a=analytics||{},t=a.totals||{},cat=a.catalog||{},tn=a.tunegocio||{},ai=tn.aiUsage||{},com=tn.commercial||{};
+  const a=analytics||{},t=a.totals||{},cat=a.catalog||{},tn=a.tunegocio||{},ai=tn.aiUsage||null,com=tn.commercial||{};
   el('aRevenue').textContent=cents(t.revenueCents);el('aMonth').textContent=cents(t.monthRevenueCents);el('aMrr').textContent=cents(t.mrrCents);el('aResult').textContent=cents(t.monthOperatingResultCents);
   el('aResult').className=Number(t.monthOperatingResultCents||0)>=0?'goodText':'warnText';
   el('aConversion').textContent=Number(t.conversionPct||0).toLocaleString('es-ES')+'%';el('aTicket').textContent=cents(t.averageFirstTicketCents);el('aCommissions').textContent=cents(t.commissionsCents);el('aExpenses').textContent=cents(t.monthExpensesCents);
