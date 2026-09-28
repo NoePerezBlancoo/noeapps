@@ -10,6 +10,7 @@
   function panel(id,parent,title){const e=node(id,parent,'article');e.className='panel';e.style.marginTop='16px';e.innerHTML='<h3>'+esc(title)+'</h3>';return e;}
   function switchView(name){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('hidden',x.id!=='view-'+name));document.querySelectorAll('#nav [data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===name));}
   function setup(){
+    node('roadmapStyles',document.head,'style').textContent='#expenseList,#offerList{max-width:100%;overflow-x:auto}.panel,.field{min-width:0}#whatsappComposer p{overflow-wrap:anywhere}@media(max-width:600px){.sectionHead{flex-wrap:wrap}.metric b{overflow-wrap:anywhere}.formRow{grid-template-columns:repeat(2,minmax(0,1fr))}.field input,.field select{min-width:0}}';
     for(const [key,title] of [['incidents','Incidencias'],['whatsapp','WhatsApp']]){
       const button=node('nav-'+key,el('nav'),'button');button.dataset.view=key;button.textContent=title;button.onclick=()=>switchView(key);
       const view=node('view-'+key,el('app'),'section');view.className='page hidden';
