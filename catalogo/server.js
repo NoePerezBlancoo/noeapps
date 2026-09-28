@@ -231,7 +231,7 @@ function normalizeSiteSlug(value){
   let slug=String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
     .replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'').slice(0,48).replace(/-+$/g,'');
   if(slug.length<3)slug=(slug||'web')+'-web';
-  if(RESERVED_SITE_SLUGS.has(slug))slug=('web-'+slug).slice(0,48);
+  if(RESERVED_SITE_SLUGS.has(slug))slug=('cliente-'+slug).slice(0,48);
   return slug;
 }
 function validSiteSlug(value){
