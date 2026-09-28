@@ -492,5 +492,6 @@ http.createServer(async(req,res)=>{
   }
 }).listen(port,'0.0.0.0',()=>{
   console.log('NoeApps catalog listening on '+port);
+  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'test':'unknown'));
   migrateLegacyData().catch(()=>{});
 });
