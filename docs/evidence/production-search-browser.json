@@ -1,0 +1,49 @@
+{
+  "deployment": "adf75ddf-07ed-4bcc-b468-2e5008d1cd00",
+  "environment": "production",
+  "filteredCount": 0,
+  "horizontalOverflow": false,
+  "links": [
+    {
+      "href": "https://catalogo.noeapps.com/library/templates/noeapps-automotive-nightshift/index.html",
+      "label": "Ver demo ↗"
+    },
+    {
+      "href": "https://catalogo.noeapps.com/solicitar?catalogDesign=noeapps-automotive-nightshift&catalogName=Nightshift+Garage&catalogCategory=Automoci%C3%B3n&catalogPreview=https%3A%2F%2Fcatalogo.noeapps.com%2Flibrary%2Ftemplates%2Fnoeapps-automotive-nightshift%2Findex.html&catalogThumb=https%3A%2F%2Fcatalogo.noeapps.com%2Flibrary%2Fthumbnails%2Fnoeapps-automotive-nightshift.jpg&catalogStyles=Impacto%2CPremium%2CAnimado&catalogFormat=One+Page&catalogSource=NoeApps+Original&catalogLicense=Original+NoeApps&catalogMode=adapt&catalogTier=Premium&catalogPrice=149&catalogImpact=25",
+      "label": "Quiero una web como esta →"
+    }
+  ],
+  "origin": "https://catalogo.noeapps.com",
+  "recommended": 3,
+  "results": [
+    {
+      "count": 8,
+      "query": "COCHES"
+    },
+    {
+      "count": 8,
+      "query": "vehículos"
+    },
+    {
+      "count": 8,
+      "query": "automóviles"
+    },
+    {
+      "count": 8,
+      "query": "coches modernos"
+    },
+    {
+      "count": 2,
+      "query": "bufetes sobrios"
+    },
+    {
+      "count": 11,
+      "query": "cafeterías modernas"
+    },
+    {
+      "count": 0,
+      "query": "astronauta inexistente"
+    }
+  ],
+  "summary": "8 diseños coinciden con tu búsqueda.\nPrecio de creación. Mantenimiento al activar: 19,90 €/mes. Popularidad = solicitudes; conversión = ventas con cobro / solicitudes."
+}
