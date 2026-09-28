@@ -44,12 +44,14 @@ async function ensureSchema(){
       category text NOT NULL DEFAULT '',
       tier text NOT NULL DEFAULT '',
       creation_price integer NOT NULL,
+      monthly_price_cents integer NOT NULL DEFAULT 1990,
       catalog_preview_url text NOT NULL DEFAULT '',
       thumbnail_url text NOT NULL DEFAULT '',
       preview_url text NOT NULL DEFAULT '',
       payment_url text NOT NULL DEFAULT '',
       admin_notes text NOT NULL DEFAULT ''
     );
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS monthly_price_cents integer NOT NULL DEFAULT 1990;
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
   `).catch(error=>{schemaPromise=null;throw error});
@@ -142,9 +144,13 @@ async function updateRequest(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   const data=await bodyJson(req,12000);
   const status=text(data.status,30),previewUrl=safeUrl(data.previewUrl,1600),paymentUrl=safeUrl(data.paymentUrl,1600),adminNotes=text(data.adminNotes,3000);
+  const creationPrice=Math.round(Number(data.creationPrice));
+  const monthlyPriceCents=Math.round(Number(data.monthlyPriceCents));
   if(!statuses.has(status))return json(res,400,{error:'Estado no válido.'});
+  if(!Number.isSafeInteger(creationPrice)||creationPrice<0||creationPrice>10000)return json(res,400,{error:'Precio de creación no válido.'});
+  if(!Number.isSafeInteger(monthlyPriceCents)||monthlyPriceCents<100||monthlyPriceCents>100000)return json(res,400,{error:'Cuota mensual no válida.'});
   await ensureSchema();
-  const result=await pool.query('UPDATE catalog_requests SET status=$2,preview_url=$3,payment_url=$4,admin_notes=$5,updated_at=now() WHERE id=$1 RETURNING *',[id,status,previewUrl,paymentUrl,adminNotes]);
+  const result=await pool.query('UPDATE catalog_requests SET status=$2,preview_url=$3,payment_url=$4,admin_notes=$5,creation_price=$6,monthly_price_cents=$7,updated_at=now() WHERE id=$1 RETURNING *',[id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents]);
   if(!result.rows[0])return json(res,404,{error:'Solicitud no encontrada.'});
   return json(res,200,{ok:true,request:result.rows[0]});
 }
