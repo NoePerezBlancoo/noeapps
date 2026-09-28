@@ -227,7 +227,7 @@ const featuredNoeApps=[
 function back(){return '<a class="back" href="/">← Catálogo</a>'}
 function featuredNoeAppsCard(x){
  const tier=catalogTier(x),href=libraryUrl(x.preview);
- return '<article class="featured-card"><div class="featured-bg" style="background-image:url(\''+libraryEsc(libraryUrl(x.thumbnail))+'\')"></div><div class="featured-top"><span class="featured-cat">'+libraryEsc(x.category)+'</span><span class="featured-price">Desde '+libraryEsc(euro(tier.price))+'</span></div><div class="featured-copy"><small>NoeApps Original · nivel '+libraryEsc(tier.label)+'</small><h3>'+libraryEsc(x.commercial_name)+'</h3><p>'+libraryEsc(x.desc)+'</p><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada.</div><div class="featured-actions"><a class="featured-demo" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="featured-buy" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
+ return '<article class="featured-card"><div class="featured-bg" style="background-image:url(\''+libraryEsc(libraryUrl(x.thumbnail))+'\')"></div><div class="featured-top"><span class="featured-cat">'+libraryEsc(x.category)+'</span><span class="featured-price">Creación '+libraryEsc(euro(tier.price))+'</span></div><div class="featured-copy"><small>NoeApps Original · nivel '+libraryEsc(tier.label)+'</small><h3>'+libraryEsc(x.commercial_name)+'</h3><p>'+libraryEsc(x.desc)+'</p><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada. Al activar: 19,90 €/mes.</div><div class="featured-actions"><a class="featured-demo" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="featured-buy" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
 }
 function catalog(){
 return `<main class="catalog"><div class="shell">
@@ -239,7 +239,7 @@ return `<main class="catalog"><div class="shell">
   <p>Elige un diseño que encaje con tu negocio y lo adaptamos con tu marca, textos, fotos y contacto. Tú revisas una preview privada antes de publicar.</p>
   <div class="hero-actions"><a class="hero-primary" href="#destacados">Ver las 10 recomendadas ↓</a><a class="hero-secondary" href="#biblioteca">Explorar por sector</a></div>
   <div class="hero-micro"><i></i><span>Sin complicarte: eliges → envías tus datos → revisas → publicamos.</span></div>
-  <div class="cat-meta"><span>Personalización desde 39 €</span><span>Móvil incluido</span><span>Preview privada</span><span>1 revisión incluida</span><span>Entrega habitual 3–7 días</span></div>
+  <div class="cat-meta"><span>Creación desde 39 €</span><span>19,90 €/mes al activar</span><span>Móvil incluido</span><span>Preview privada</span><span>1 revisión incluida</span><span>Entrega habitual 3–7 días</span></div>
 </section>
 
 <section class="trust-strip reveal">
@@ -251,14 +251,14 @@ return `<main class="catalog"><div class="shell">
 </section>
 
 <section class="price-guide reveal">
-  <div class="price-guide-head"><div><div class="cat-kicker">Cuatro niveles · sin misterio</div><h2>Pagas por complejidad visual,<br>no por humo.</h2></div><p>Todos parten de la misma idea: adaptar una web real a tu negocio. El nivel cambia según el trabajo visual y la complejidad del diseño.</p></div>
+  <div class="price-guide-head"><div><div class="cat-kicker">Cuatro precios de creación · sin misterio</div><h2>Eliges la web.<br>Sabes lo que cuesta.</h2></div><p>El precio que ves en cada diseño corresponde a crear y adaptar esa web a tu negocio. Cuando decidas activarla, el servicio es el mismo para todas: 19,90 €/mes.</p></div>
   <div class="price-guide-grid">
     <article class="price-tier"><small>Esencial · desde</small><strong>39 €</strong><span>Presencia limpia, clara y profesional.</span></article>
     <article class="price-tier"><small>Pro · desde</small><strong>79 €</strong><span>Más ritmo, secciones y movimiento.</span></article>
     <article class="price-tier featured-tier"><small>Premium · desde</small><strong>149 €</strong><span>Más impacto visual y acabado.</span></article>
     <article class="price-tier"><small>Signature · desde</small><strong>299 €</strong><span>Experiencia visual avanzada.</span></article>
   </div>
-  <div class="price-guide-note">Los extras opcionales, si los necesitas, se calculan de forma visible en el formulario de personalización.</div>
+  <div class="price-guide-note">Solicitud sin pago. Primero recibes tu preview terminada; si te convence, te enviamos el enlace de activación. Servicio: 19,90 €/mes.</div>
 </section>
 
 <section class="featured-noeapps" id="destacados">
@@ -267,7 +267,7 @@ return `<main class="catalog"><div class="shell">
 </section>
 
 <section class="value-banner reveal">
-  <div><strong>¿Ya has encontrado una que encaja?</strong><span>Pulsa “Quiero una web como esta”. Nos llegará exactamente el diseño que elegiste y podrás enviarnos los datos de tu negocio.</span></div>
+  <div><strong>¿Ya has encontrado una que encaja?</strong><span>Pulsa “Quiero una web como esta”. Envías tus datos sin pagar; preparamos la preview y te contactamos por WhatsApp con la web terminada y el enlace de activación.</span></div>
   <a href="#destacados">Volver a las 10 recomendadas ↑</a>
 </section>
 
@@ -368,7 +368,7 @@ function catalogBuilderUrl(x){
    catalogPrice:String(tier.price),
    catalogImpact:String(x.impact_score||0)
  });
- return "https://personalizar.noeapps.com/?"+q.toString();
+ return "https://personalizar.noeapps.com/catalogo?"+q.toString();
 }
 function catalogSalesLabel(x){return catalogAdaptationMode(x)==="adapt"?"Quiero una web como esta →":"Quiero algo con este estilo →"}
 function sectorBuilderUrl(s){
@@ -388,9 +388,9 @@ function sectorBuilderUrl(s){
    catalogPrice:String(tier.price),
    catalogImpact:"25"
  });
- return "https://personalizar.noeapps.com/?"+q.toString();
+ return "https://personalizar.noeapps.com/catalogo?"+q.toString();
 }
-function demoSalesCta(s){if(!s)return"";const tier=sectorTier();return '<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'"><span><small>Desde</small><br><b>'+euro(tier.price)+'</b></span><span>Quiero una web como esta →</span></a>'}
+function demoSalesCta(s){if(!s)return"";const tier=sectorTier();return '<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'"><span><small>Creación</small><br><b>'+euro(tier.price)+'</b></span><span>Quiero una web como esta →</span></a>'}
 function libraryFiltered(){
  const q=libraryState.query.trim().toLowerCase();
  return libraryState.items.filter(x=>{
@@ -410,7 +410,7 @@ function libraryCard(x){
  const live=Boolean(x.preview&&((x.style||[]).includes("Impacto")||(x.impact_score||0)>=12));
  const wow=(x.impact_score||0)>=17;
  const tier=catalogTier(x);
- return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-commercial"><div><span>'+libraryEsc(tier.label)+'</span><small>personalización desde</small></div><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada.</div><div class="library-actions"><a class="demo-open" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
+ return '<article class="library-card '+(live?'has-live':'')+'" data-template-id="'+libraryEsc(x.id)+'" '+(live?'data-live-preview="'+libraryEsc(href)+'"':'')+'><div class="library-shot">'+thumb+(wow?'<span class="wow-pill">WOW</span>':'')+'<span class="library-sector">'+libraryEsc(x.category||"Otros")+'</span></div><div class="library-body"><h3>'+libraryEsc(name)+'</h3><div class="library-tags">'+tags.map(t=>'<span>'+libraryEsc(t)+'</span>').join("")+'</div><div class="library-commercial"><div><span>'+libraryEsc(tier.label)+'</span><small>precio de creación</small></div><strong>'+libraryEsc(euro(tier.price))+'</strong></div><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada. Al activar: 19,90 €/mes.</div><div class="library-actions"><a class="demo-open" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="catalog-sales-cta" href="'+libraryEsc(catalogBuilderUrl(x))+'">'+libraryEsc(catalogSalesLabel(x))+'</a></div></div></article>';
 }
 function renderLibrary(reset=false){
  if(reset)libraryState.visible=36;
