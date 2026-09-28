@@ -20,7 +20,7 @@ for(const period of ['today','month','year','total'])assert.equal(report.combine
 assert.equal(report.combined.operatingResult,report.combined.revenue.month-report.costs.operatingExpensesCents-report.combined.monthCommissions);
 for(const product of [report.catalog,report.tunegocio]){
   assert.ok(Number.isInteger(product.totals.new_customers));assert.ok(Number.isInteger(product.totals.published));
-  assert.ok(product.totals.active_customers<=product.totals.published);
+  assert.ok(product.totals.active_customers<=product.totals.operations);assert.ok(product.totals.published<=product.totals.operations);
 }
 const campaign=report.campaigns.find(x=>x.id===fixture.campaignId);
 assert.equal(campaign.customers,2);assert.equal(campaign.sales,2);assert.equal(campaign.revenue,1990);assert.equal(campaign.discount,1990);
@@ -31,10 +31,12 @@ const templates=(await api('/api/crm/roadmap/templates')).templates;
 assert.equal(Object.keys(templates).length,6);
 const scan=await api('/api/crm/roadmap/scan',{});assert.equal(scan.bridgeAvailable,true);
 const incidents=await api('/api/crm/roadmap/incidents');assert.equal(incidents.lastRun.outcome,'succeeded');
-assert.ok(incidents.incidents.some(x=>x.key==='catalog:'+fixture.requestId+':publication_error'&&x.state==='resolved')||incidents.incidents.some(x=>x.entity_id===fixture.requestId&&x.kind==='publication_error'&&x.state==='resolved'));
+// The earlier recovery test precedes payment. Paying this synthetic fixture activates
+// its entitlement, so the deliberately missing site origin must reopen the incident.
+assert.ok(incidents.incidents.some(x=>x.entity_id===fixture.requestId&&x.kind==='publication_error'&&x.state!=='resolved'&&x.title==='Web activa sin origen configurado'));
 assert.ok(!incidents.incidents.some(x=>x.key==='system:bridge'&&x.state!=='resolved'));
 const evidence={at:new Date().toISOString(),origin,bridgeAvailable:true,mode:report.mode,campaign,
   combined:report.combined,costs:report.costs,monitor:{outcome:incidents.lastRun.outcome,checkedCount:incidents.lastRun.checked_count,openCount:incidents.openCount},
-  checks:['Private analytics reject anonymous access','Both isolated TEST products respond','Aggregate revenue and operating result reconcile','Customer cohorts and published counts available','Campaign has two actual sales and 1990 cents discount','Campaign customer list includes both products','Six editable WhatsApp templates available','Monitor succeeds and previous injected publication error is resolved']};
+  checks:['Private analytics reject anonymous access','Both isolated TEST products respond','Aggregate revenue and operating result reconcile','Customer cohorts and published counts available','Campaign has two actual sales and 1990 cents discount','Campaign customer list includes both products','Six editable WhatsApp templates available','Monitor succeeds and flags the paid synthetic fixture without a publication origin']};
 await writeFile(new URL('.env.roadmap-final-evidence.json',root),JSON.stringify(evidence,null,2));
 console.log(JSON.stringify(evidence,null,2));
