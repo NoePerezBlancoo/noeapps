@@ -898,6 +898,24 @@ async function createCustomerPortal(res,id){
   const session=await stripePost('/billing_portal/sessions',{customer:row.stripe_customer_id,return_url:PUBLIC_ORIGIN+'/crm'});
   return json(res,200,{ok:true,url:session.url});
 }
+async function recordCatalogRevenue(client,requestId,invoice){
+  if(!validUuid(requestId))return;
+  const amount=Math.max(0,Math.round(Number(invoice&&invoice.amount_paid)||0));
+  if(!Number.isSafeInteger(amount))return;
+  const current=await client.query("SELECT first_paid_amount_cents,salesperson_id FROM catalog_requests WHERE id=$1 FOR UPDATE",[requestId]);
+  const row=current.rows[0];if(!row)return;
+  const initial=row.first_paid_amount_cents==null;
+  const eventId='invoice:'+String(invoice.id||'');
+  const inserted=await client.query("INSERT INTO catalog_revenue_events(event_id,request_id,amount_paid_cents,kind,paid_at) VALUES($1,$2,$3,$4,to_timestamp($5)) ON CONFLICT(event_id) DO NOTHING RETURNING event_id",
+    [eventId,requestId,amount,initial?'initial':'renewal',Number(invoice.status_transitions&&invoice.status_transitions.paid_at||invoice.created||Math.floor(Date.now()/1000))]);
+  if(!inserted.rows[0])return;
+  if(initial){
+    const commission=row.salesperson_id?Math.round(amount*SALESPERSON_COMMISSION_PERCENT/100):null;
+    await client.query("UPDATE catalog_requests SET first_paid_amount_cents=$2,commission_cents=$3,updated_at=now() WHERE id=$1",
+      [requestId,amount,commission]);
+  }
+}
+
 async function handleStripeWebhook(req,res){
   const payload=await rawBody(req);
   if(!verifyStripeSignature(payload,req.headers['stripe-signature']))return json(res,400,{error:'Firma Stripe no válida.'});
@@ -943,6 +961,11 @@ async function handleStripeWebhook(req,res){
           preview_expires_at=CASE WHEN $1='paid' THEN NULL ELSE preview_expires_at END,
           status=CASE WHEN $1='paid' AND status IN ('new','preparing','preview_ready','sent','paid','expired') THEN 'paid' ELSE status END,
           updated_at=now() WHERE `+where,values);
+        if(type==='invoice.paid'&&validUuid(requestId))await recordCatalogRevenue(client,requestId,obj);
+        else if(type==='invoice.paid'&&subscriptionId){
+          const mapped=await client.query("SELECT id FROM catalog_requests WHERE stripe_subscription_id=$1 LIMIT 1",[subscriptionId]);
+          if(mapped.rows[0])await recordCatalogRevenue(client,String(mapped.rows[0].id),obj);
+        }
       }
     }else if(type==='customer.subscription.created'||type==='customer.subscription.updated'||type==='customer.subscription.deleted'){
       const requestId=obj.metadata&&obj.metadata.catalog_request_id||'';
