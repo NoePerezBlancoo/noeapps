@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-28T19:30:32.896Z",
+  "origin": "https://catalogo-staging-v2-production.up.railway.app",
+  "checks": [
+    "Checkout TEST 9,95 EUR; concurrent retries share one session; pending terms frozen; inactive campaign does not break notes",
+    "Expense dates validated; future costs excluded; monthly history preserved after stopping",
+    "Editable templates and encoded WhatsApp draft verified; no message sent; missing publication rejected",
+    "Publication failure detected, acknowledgement retained while failing, automatic recovery recorded",
+    "Stripe TEST initial payment and signed canonical invoice webhook verified; claimable Catalog sandbox lacks test-clock permission, duration tested independently in TuNegocio TEST",
+    "Administrative requests and WhatsApp preparation audited"
+  ],
+  "fixtures": {
+    "campaignId": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+    "requestId": "800501c7-c263-48e3-90f7-420dfe26b2ad",
+    "subscriptionId": "sub_1UKkG14u1bh3pBtl100OylYq",
+    "clockId": null
+  },
+  "invoices": [
+    {
+      "month": 1,
+      "id": "in_1UKkG14u1bh3pBtlZ3NjsqNT",
+      "paidCents": 995,
+      "discountCents": 995
+    }
+  ],
+  "testClockAvailable": false,
+  "bridgeAvailable": false,
+  "campaign": {
+    "id": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+    "customers": 1,
+    "sales": 1,
+    "revenue": 995,
+    "discount": 995,
+    "unknown_discounts": 0,
+    "conversion": 1
+  },
+  "auditCount": 17
+}

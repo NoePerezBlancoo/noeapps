@@ -5,6 +5,7 @@ const crypto=require('crypto');
 const {Pool}=require('pg');
 const subscriptions=require('./subscriptions');
 const discovery=require('./catalog-discovery');
+const roadmap=require('./crm-roadmap');
 subscriptions.assertStaging();
 
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
@@ -40,6 +41,7 @@ const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
 const catalogDiscovery=discovery.createDiscovery(pool,LIBRARY_ORIGIN);
+const crmRoadmap=roadmap.createRoadmap({pool,ensureSchema,bridgeOrigin:TUNEGOCIO_CRM_ORIGIN,bridgeSecret:CRM_BRIDGE_SECRET,publicOrigin:PUBLIC_ORIGIN});
 let schemaPromise=null;
 let legacyMigrationPromise=null;
 
@@ -207,7 +209,7 @@ async function ensureSchema(){
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_payment_token_uidx ON catalog_requests(payment_token) WHERE payment_token <> '';
-  `).then(async()=>{if(subscriptions.enabled()||discovery.enabled())await subscriptions.migrate(pool)}).catch(error=>{schemaPromise=null;throw error});
+  `).then(async()=>{if(subscriptions.enabled()||discovery.enabled()||roadmap.enabled())await subscriptions.migrate(pool)}).catch(error=>{schemaPromise=null;throw error});
   return schemaPromise;
 }
 
@@ -325,6 +327,7 @@ async function createExpense(req,res){
   const name=text(data.name,160),category=text(data.category,40)||'other',cadence=text(data.cadence,20);
   const amountCents=Math.round(Number(data.amountCents)),notes=text(data.notes,1200);
   const expenseDate=data.expenseDate?new Date(String(data.expenseDate)+'T00:00:00Z'):new Date();
+  if(roadmap.enabled()&&data.expenseDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(data.expenseDate)||!Number.isFinite(expenseDate.getTime())||expenseDate.toISOString().slice(0,10)!==data.expenseDate))return json(res,400,{error:'Fecha de gasto no válida.'});
   if(!name||!['hosting','ai','software','ads','commission','tax','other'].includes(category)||!['one_time','monthly'].includes(cadence)
     ||!Number.isSafeInteger(amountCents)||amountCents<0||amountCents>100000000||!Number.isFinite(expenseDate.getTime())){
     return json(res,400,{error:'Gasto no válido.'});
@@ -339,7 +342,11 @@ async function updateExpense(req,res,id){
   const data=await bodyJson(req,8000);
   const active=data.active!==false;
   await ensureSchema();
-  const result=await pool.query("UPDATE crm_expenses SET active=$2,updated_at=now() WHERE id=$1 RETURNING *",[id,active]);
+  if(roadmap.enabled()&&active){
+    const old=(await pool.query('SELECT * FROM crm_expenses WHERE id=$1',[id])).rows[0];
+    if(old?.cadence==='monthly'&&old.ended_on)return json(res,409,{error:'Crea un nuevo gasto mensual para reanudarlo; el historial del anterior se conserva.'});
+  }
+  const result=await pool.query(roadmap.enabled()?"UPDATE crm_expenses SET active=$2,ended_on=CASE WHEN $2 THEN NULL ELSE (now() AT TIME ZONE 'Europe/Madrid')::date END,updated_at=now() WHERE id=$1 RETURNING *":"UPDATE crm_expenses SET active=$2,updated_at=now() WHERE id=$1 RETURNING *",[id,active]);
   if(!result.rows[0])return json(res,404,{error:'Gasto no encontrado.'});
   return json(res,200,{ok:true,expense:result.rows[0]});
 }
@@ -379,10 +386,11 @@ async function updateSalesperson(req,res,id){
 async function createOffer(req,res){
   const data=await bodyJson(req,10000);
   const name=text(data.name,120),source=text(data.source,20);
-  const percentOff=Math.round(Number(data.percentOff)),durationMonths=Math.round(Number(data.durationMonths));
+  const percentOff=roadmap.enabled()?Number(data.percentOff):Math.round(Number(data.percentOff)),durationMonths=roadmap.enabled()?Number(data.durationMonths):Math.round(Number(data.durationMonths));
   const startsAt=data.startsAt?new Date(String(data.startsAt)):null,endsAt=data.endsAt?new Date(String(data.endsAt)):null;
   if(!name||!['catalog','tunegocio','both'].includes(source))return json(res,400,{error:'Oferta no válida.'});
   if(!Number.isInteger(percentOff)||percentOff<1||percentOff>100)return json(res,400,{error:'El descuento debe estar entre 1% y 100%.'});
+  if(roadmap.enabled()&&source!=='catalog'&&percentOff===100)return json(res,400,{error:'TuNegocio necesita un primer cobro superior a cero. Usa del 1 al 99%.'});
   if(!Number.isInteger(durationMonths)||durationMonths<1||durationMonths>24)return json(res,400,{error:'La duración debe estar entre 1 y 24 meses.'});
   if((startsAt&&!Number.isFinite(startsAt.getTime()))||(endsAt&&!Number.isFinite(endsAt.getTime()))||(startsAt&&endsAt&&endsAt<=startsAt))return json(res,400,{error:'Revisa las fechas de la oferta.'});
   await ensureSchema();
@@ -412,7 +420,7 @@ async function syncTunegocioOffer(projectId,offer){
   const response=await fetch(origin+'/api/internal/crm-offer',{
     method:offer?'POST':'DELETE',
     headers:{'Authorization':'Bearer '+CRM_BRIDGE_SECRET,'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify(offer?{projectId,name:offer.name,percentOff:Number(offer.percent_off),durationMonths:Number(offer.duration_months)}:{projectId}),
+    body:JSON.stringify(offer?{projectId,name:offer.name,percentOff:Number(offer.percent_off),durationMonths:Number(offer.duration_months),...(roadmap.enabled()?{campaignId:offer.id,expiresAt:offer.ends_at}: {})}:{projectId}),
     signal:AbortSignal.timeout(12000)
   });
   const data=await response.json().catch(()=>({}));
@@ -421,6 +429,11 @@ async function syncTunegocioOffer(projectId,offer){
 }
 async function ensureCatalogOfferPromotion(row){
   if(!row||!Number(row.offer_percent_off)||!Number(row.offer_duration_months))return row;
+  let campaign=null;
+  if(roadmap.enabled()){
+    campaign=await getOffer(row.offer_id,'catalog');
+    if(!campaign)throw roadmap.problem(409,'La campaña no está vigente. Revisa la oferta antes de crear un checkout.');
+  }
   if(row.stripe_offer_coupon_id&&row.stripe_offer_promotion_code_id)return row;
   if(!STRIPE_MAINTENANCE_PRODUCT_ID)throw Object.assign(new Error('offer_product_missing'),{status:503,publicMessage:'Falta configurar el producto mensual de Stripe.'});
   const months=Number(row.offer_duration_months),percent=Number(row.offer_percent_off);
@@ -434,6 +447,7 @@ async function ensureCatalogOfferPromotion(row){
   },'catalog-offer-coupon-'+row.id+'-'+String(row.offer_id||'custom'));
   const promotion=await stripePost('/promotion_codes',{
     active:true,
+    ...(campaign?.ends_at?{expires_at:Math.floor(new Date(campaign.ends_at).getTime()/1000)}:{}),
     promotion:{type:'coupon',coupon:coupon.id},
     metadata:{application:'noeapps-catalog',request_id:row.id,offer_id:row.offer_id||''}
   },'catalog-offer-promo-'+row.id+'-'+String(row.offer_id||'custom'));
@@ -574,6 +588,9 @@ async function fetchTunegocioOperations(){
   }
 }
 async function updateTunegocioOperation(req,res,id){
+  return roadmap.withRequestLock(pool,'tn-'+id,()=>updateTunegocioOperationUnlocked(req,res,id));
+}
+async function updateTunegocioOperationUnlocked(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Proyecto no válido.'});
   const data=await bodyJson(req,16000);
   const manualStatus=text(data.manualStatus,30),adminNotes=text(data.adminNotes,4000);
@@ -605,7 +622,9 @@ async function updateTunegocioOperation(req,res,id){
   const offerChanged=String(currentLocal.offer_id||'')!==offerId;
   if(offerChanged&&remote.paymentStatus==='paid')return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
   if(offerChanged&&remote.paymentStatus==='pending')return json(res,409,{error:'Esta web ya tiene un pago pendiente. No cambies la oferta hasta que ese checkout expire o se cierre.'});
-  if(offerId){
+  if(offerId&&!offerChanged&&roadmap.enabled()){
+    offer={id:currentLocal.offer_id,name:currentLocal.offer_name,percent_off:currentLocal.offer_percent_off,duration_months:currentLocal.offer_duration_months};
+  }else if(offerId){
     offer=await getOffer(offerId,'tunegocio');
     if(!offer)return json(res,400,{error:'La oferta no está activa para TuNegocio.'});
   }
@@ -634,6 +653,7 @@ async function updateTunegocioOperation(req,res,id){
     [id,manualStatus,salesperson?String(salesperson.name):'',adminNotes,salesperson?String(salesperson.id):null,offer?String(offer.id):null,
       offer?String(offer.name):'',offer?Number(offer.percent_off):0,offer?Number(offer.duration_months):0,firstAmount||null,commissionCents]
   );
+  if(roadmap.enabled()&&offerChanged&&offer)await pool.query("INSERT INTO crm_campaign_assignments(campaign_id,source,entity_id) VALUES($1,'tunegocio',$2) ON CONFLICT DO NOTHING",[offer.id,id]);
   return json(res,200,{ok:true,operation:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
 }
 function cookies(req){
@@ -673,7 +693,7 @@ function normalizeSiteSlug(value){
 function validSiteSlug(value){
   return typeof value==='string'&&/^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/.test(value)&&!value.startsWith('xn--')&&!value.startsWith('web-')&&!RESERVED_SITE_SLUGS.has(value);
 }
-function sitePublicUrl(slug){return 'https://'+slug+'.'+SITE_DOMAIN+'/';}
+function sitePublicUrl(slug){return process.env.CATALOG_ENVIRONMENT==='staging'?PUBLIC_ORIGIN+'/customer-site/'+encodeURIComponent(slug):'https://'+slug+'.'+SITE_DOMAIN+'/';}
 function safeSiteOrigin(value){
   const raw=text(value,1600);if(!raw)return'';
   try{
@@ -811,6 +831,17 @@ async function ensurePaymentToken(row){
   throw new Error('payment_token_generation_failed');
 }
 async function createStripeSessionForRow(row){
+  return roadmap.withRequestLock(pool,row.id,async()=>{
+    if(roadmap.enabled()){
+      row=(await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[row.id])).rows[0];
+      if(row.first_paid_amount_cents!=null||row.stripe_payment_status==='paid')throw roadmap.problem(409,'Esta solicitud ya tiene un pago. Gestiona su suscripción existente.');
+      const expiry=row.stripe_checkout_expires_at?new Date(row.stripe_checkout_expires_at).getTime():0;
+      if(row.stripe_checkout_url&&expiry>Date.now()+60000&&!['paid','complete','failed','expired'].includes(row.stripe_payment_status))return {row,url:row.stripe_checkout_url,reused:true};
+    }
+    return createStripeSessionForRowUnlocked(row);
+  });
+}
+async function createStripeSessionForRowUnlocked(row){
   const hasOffer=Number(row.offer_percent_off)>0&&Number(row.offer_duration_months)>0;
   if(hasOffer)row=await ensureCatalogOfferPromotion(row);
   const creationBase=Math.max(0,Math.round(Number(row.creation_price)*100));
@@ -987,6 +1018,8 @@ async function recordCatalogRevenue(client,requestId,invoice){
   const inserted=await client.query("INSERT INTO catalog_revenue_events(event_id,request_id,amount_paid_cents,kind,paid_at) VALUES($1,$2,$3,$4,to_timestamp($5)) ON CONFLICT(event_id) DO NOTHING RETURNING event_id",
     [eventId,requestId,amount,initial?'initial':'renewal',Number(invoice.status_transitions&&invoice.status_transitions.paid_at||invoice.created||Math.floor(Date.now()/1000))]);
   if(!inserted.rows[0])return;
+  if(roadmap.enabled())await client.query('UPDATE catalog_revenue_events SET campaign_id=(SELECT offer_id FROM catalog_requests WHERE id=$2),discount_cents=$3 WHERE event_id=$1',
+    [eventId,requestId,Array.isArray(invoice.total_discount_amounts)?invoice.total_discount_amounts.reduce((sum,item)=>sum+Number(item.amount||0),0):null]);
   if(initial){
     const commission=row.salesperson_id?Math.round(amount*SALESPERSON_COMMISSION_PERCENT/100):null;
     await client.query("UPDATE catalog_requests SET first_paid_amount_cents=$2,commission_cents=$3,updated_at=now() WHERE id=$1",
@@ -998,7 +1031,7 @@ async function handleStripeWebhook(req,res){
   const payload=await rawBody(req);
   if(!verifyStripeSignature(payload,req.headers['stripe-signature']))return json(res,400,{error:'Firma Stripe no válida.'});
   let event;try{event=JSON.parse(payload.toString('utf8'))}catch{return json(res,400,{error:'Evento Stripe no válido.'})}
-  if(subscriptions.enabled()&&event.livemode!==/^(sk|rk)_live_/.test(STRIPE_SECRET_KEY))return json(res,400,{error:'Entorno Stripe no válido.'});
+  if((subscriptions.enabled()||roadmap.enabled())&&event.livemode!==/^(sk|rk)_live_/.test(STRIPE_SECRET_KEY))return json(res,400,{error:'Entorno Stripe no válido.'});
   await ensureSchema();
   const client=await pool.connect();
   try{
@@ -1008,7 +1041,7 @@ async function handleStripeWebhook(req,res){
     let obj=event.data&&event.data.object?event.data.object:{};
     const type=event.type||'';
     let subscriptionRequestId='';
-    const stripeV2=subscriptions.enabled()?subscriptions.stripeClient(STRIPE_SECRET_KEY):null;
+    const stripeV2=(subscriptions.enabled()||roadmap.enabled())?subscriptions.stripeClient(STRIPE_SECRET_KEY):null;
     if(stripeV2&&/^(checkout\.session\.|invoice\.|customer\.subscription\.)/.test(type)){
       const sid=type.startsWith('customer.subscription.')?obj.id:invoiceSubscriptionId(obj);
       const metadataId=invoiceRequestId(obj)||obj.client_reference_id||'';
@@ -1022,6 +1055,7 @@ async function handleStripeWebhook(req,res){
         if(canonicalId&&canonicalId!==subscriptionRequestId)throw new Error('Stripe request binding mismatch');
       }
     }
+    if(roadmap.enabled()&&type==='invoice.paid'&&(obj.currency!=='eur'||obj.status!=='paid'||obj.paid_out_of_band||obj.livemode!==stripeV2.live))throw roadmap.problem(400,'Factura no válida para el registro de cobros.');
     if(type==='checkout.session.completed'||type==='checkout.session.async_payment_succeeded'){
       const requestId=(obj.metadata&&obj.metadata.catalog_request_id)||obj.client_reference_id||'';
       if(validUuid(requestId)){
@@ -1108,6 +1142,9 @@ async function listRequests(res){
   return json(res,200,{requests:result.rows});
 }
 async function updateRequest(req,res,id){
+  return roadmap.withRequestLock(pool,id,()=>updateRequestUnlocked(req,res,id));
+}
+async function updateRequestUnlocked(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   const data=await bodyJson(req,18000);
   const status=text(data.status,30),previewUrl=safeUrl(data.previewUrl,1600),paymentUrl=safeUrl(data.paymentUrl,1600),adminNotes=text(data.adminNotes,3000);
@@ -1151,9 +1188,12 @@ async function updateRequest(req,res,id){
   let offer=null;
   const offerChanged=String(existing.offer_id||'')!==offerId;
   const hasOpenCheckout=!!existing.stripe_checkout_session_id&&!['paid','complete','failed','expired'].includes(String(existing.stripe_payment_status||'').toLowerCase());
+  if(roadmap.enabled()&&hasOpenCheckout&&(creationPrice!==existing.creation_price||monthlyPriceCents!==existing.monthly_price_cents||discountType!==existing.discount_type||discountValue!==existing.discount_value||discountScope!==existing.discount_scope))return json(res,409,{error:'Las condiciones quedan bloqueadas mientras haya un checkout pendiente.'});
   if(offerChanged&&existing.first_paid_amount_cents!=null)return json(res,409,{error:'La oferta no se puede cambiar después del primer pago.'});
   if(offerChanged&&hasOpenCheckout)return json(res,409,{error:'Esta web ya tiene un enlace de pago pendiente. No cambies la oferta hasta que ese checkout caduque o se cierre.'});
-  if(offerId){
+  if(offerId&&!offerChanged&&roadmap.enabled()){
+    offer={id:existing.offer_id,name:existing.offer_name,percent_off:existing.offer_percent_off,duration_months:existing.offer_duration_months};
+  }else if(offerId){
     offer=await getOffer(offerId,'catalog');
     if(!offer)return json(res,400,{error:'La oferta no está activa para Catálogo.'});
   }
@@ -1165,7 +1205,7 @@ async function updateRequest(req,res,id){
 
   const publicUrl=siteSlug?sitePublicUrl(siteSlug):'';
   const firstPaid=existing.first_paid_amount_cents==null?null:Number(existing.first_paid_amount_cents);
-  const commission=salesperson&&firstPaid!=null?Math.round(firstPaid*SALESPERSON_COMMISSION_PERCENT/100):null;
+  const commission=existing.commission_cents??(salesperson&&firstPaid!=null?Math.round(firstPaid*SALESPERSON_COMMISSION_PERCENT/100):null);
   const result=await pool.query(`UPDATE catalog_requests SET
     status=$2,
     preview_url=CASE WHEN site_status IN ('preview','active') AND $13<>'' THEN $15 ELSE $3 END,
@@ -1196,12 +1236,80 @@ async function updateRequest(req,res,id){
     [id,status,previewUrl,paymentUrl,adminNotes,creationPrice,monthlyPriceCents,salesperson?String(salesperson.name):'',discountCode,discountType,discountValue,discountScope,
       siteSlug,siteOriginUrl,publicUrl,salesperson?String(salesperson.id):null,offer?String(offer.id):null,offer?String(offer.name):'',
       offer?Number(offer.percent_off):0,offer?Number(offer.duration_months):0,offerChanged,commission]);
+  if(roadmap.enabled()&&offerChanged&&offer)await pool.query("INSERT INTO crm_campaign_assignments(campaign_id,source,entity_id) VALUES($1,'catalog',$2) ON CONFLICT DO NOTHING",[offer.id,id]);
   return json(res,200,{ok:true,request:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
 }
 
 http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,'http://localhost');
+    if(roadmap.enabled()&&url.pathname.startsWith('/api/crm/')&&!['GET','HEAD'].includes(req.method)){
+      if(req.headers.origin!==PUBLIC_ORIGIN||!/^application\/json(?:;|$)/i.test(req.headers['content-type']||'')||!['same-origin','none',undefined].includes(req.headers['sec-fetch-site']))return json(res,403,{error:'Abre esta acción desde el CRM.'});
+      if(!['/api/crm/login','/api/crm/logout'].includes(url.pathname)){
+        if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+        await ensureSchema();await crmRoadmap.audit('requested:'+req.method,'crm',url.pathname);
+        res.once('finish',()=>{crmRoadmap.audit('completed:'+req.method,'crm',url.pathname,{status:res.statusCode}).catch(()=>console.error('CRM audit completion unavailable'));});
+      }
+    }
+    if(url.pathname==='/assets/crm-roadmap.js'&&req.method==='GET'){
+      res.writeHead(200,{'Content-Type':'application/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+      return res.end(fs.readFileSync(path.join(__dirname,'crm-roadmap-ui.js')));
+    }
+    if(url.pathname.startsWith('/api/crm/roadmap')){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      if(!roadmap.enabled())return json(res,404,{error:'Función no habilitada.'});
+      await ensureSchema();
+      if(url.pathname==='/api/crm/roadmap'&&req.method==='GET')return json(res,200,await crmRoadmap.report());
+      if(url.pathname==='/api/crm/roadmap/campaign'&&req.method==='GET'){
+        const id=url.searchParams.get('id');if(!validUuid(id))return json(res,400,{error:'Campaña no válida.'});
+        const customers=(await pool.query(`SELECT a.source,a.entity_id,a.assigned_at,r.business_name,r.first_paid_amount_cents
+          FROM crm_campaign_assignments a LEFT JOIN catalog_requests r ON a.source='catalog' AND r.id=a.entity_id
+          WHERE a.campaign_id=$1 ORDER BY a.assigned_at DESC`,[id])).rows;
+        const tn=customers.some(x=>x.source==='tunegocio')?await fetchTunegocioOperations():null;
+        return json(res,200,{customers:customers.map(x=>({...x,business_name:x.business_name||tn?.projects.find(p=>p.id===x.entity_id)?.businessName||x.entity_id}))});
+      }
+      if(url.pathname==='/api/crm/roadmap/incidents'&&req.method==='GET'){
+        const [list,count,run]=await Promise.all([pool.query("SELECT * FROM crm_incidents ORDER BY (state='resolved'),last_seen_at DESC LIMIT 500"),pool.query("SELECT count(*)::int AS total FROM crm_incidents WHERE state<>'resolved'"),pool.query('SELECT * FROM crm_monitor_runs ORDER BY id DESC LIMIT 1')]);
+        return json(res,200,{incidents:list.rows,openCount:count.rows[0].total,lastRun:run.rows[0]||null});
+      }
+      if(url.pathname==='/api/crm/roadmap/scan'&&req.method==='POST')return json(res,200,await crmRoadmap.scan());
+      if(url.pathname==='/api/crm/roadmap/incident'&&req.method==='PATCH'){
+        const data=await bodyJson(req,4000);
+        if(typeof data.key!=='string'||data.key.length>250||typeof data.note!=='string'||data.note.length>2000)return json(res,400,{error:'Incidencia no válida.'});
+        const result=await pool.query("UPDATE crm_incidents SET state='acknowledged',acknowledged_at=now(),note=$2 WHERE key=$1 AND state<>'resolved' RETURNING *",[data.key,data.note]);
+        return json(res,result.rows.length?200:404,{incident:result.rows[0]||null});
+      }
+      if(url.pathname==='/api/crm/roadmap/templates'&&req.method==='GET'){
+        const saved=(await pool.query('SELECT * FROM crm_whatsapp_templates')).rows;
+        return json(res,200,{templates:{...roadmap.defaultTemplates,...Object.fromEntries(saved.map(x=>[x.kind,x.body]))}});
+      }
+      if(url.pathname==='/api/crm/roadmap/templates'&&req.method==='PUT'){
+        const data=await bodyJson(req,6000);
+        if(!roadmap.validTemplate(data.kind,data.body))return json(res,400,{error:'Plantilla o campos no válidos.'});
+        await pool.query('INSERT INTO crm_whatsapp_templates(kind,body) VALUES($1,$2) ON CONFLICT(kind) DO UPDATE SET body=EXCLUDED.body,updated_at=now()',[data.kind,data.body.trim()]);
+        return json(res,200,{ok:true});
+      }
+      if(url.pathname==='/api/crm/roadmap/message'&&req.method==='POST'){
+        const data=await bodyJson(req,10000);
+        if(!validUuid(data.id)||!['catalog','tunegocio'].includes(data.source)||!(data.kind in roadmap.defaultTemplates))return json(res,400,{error:'Mensaje no válido.'});
+        let item;
+        if(data.source==='catalog'){
+          item=(await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[data.id])).rows[0];
+          if(item)item={...item,publicUrl:item.site_slug?sitePublicUrl(item.site_slug):'',published:item.site_status==='active'&&subscriptions.hasPaidAccess(item),subscription:item.subscription_state};
+        }else{item=(await fetchTunegocioOperations()).projects.find(x=>x.id===data.id);}
+        if(!item)return json(res,404,{error:'Operación no disponible.'});
+        // Explicit owner-provided links support protected TuNegocio previews without inventing public URLs.
+        if(data.previewUrl)item.previewUrl=safeUrl(data.previewUrl,1600);
+        if(data.paymentUrl)item.paymentUrl=safeUrl(data.paymentUrl,1600);
+        if(data.phone)item.whatsapp=text(data.phone,40);
+        const saved=(await pool.query('SELECT body FROM crm_whatsapp_templates WHERE kind=$1',[data.kind])).rows[0];
+        const template=data.body||saved?.body||roadmap.defaultTemplates[data.kind];
+        const message=roadmap.whatsappDraft(data.kind,template,item);
+        await crmRoadmap.audit('whatsapp_prepared',data.source,data.id,{kind:data.kind});
+        return json(res,200,message);
+      }
+      return json(res,404,{error:'Ruta no encontrada.'});
+    }
     if(url.pathname==='/health'){
       try{await ensureSchema();res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok')}catch{res.writeHead(503,{'Content-Type':'text/plain'});return res.end('database unavailable')}
     }
@@ -1262,6 +1370,7 @@ http.createServer(async(req,res)=>{
         requests:result.rows.map(row=>({...row,subscriptionControlsEnabled:subscriptions.enabled()})),
         tunegocio:tunegocio.projects,
         tunegocioAvailable:tunegocio.available,
+        roadmapEnabled:roadmap.enabled(),
         salespeople:config.salespeople,
         offers:config.offers,
         expenses,
@@ -1359,4 +1468,8 @@ http.createServer(async(req,res)=>{
   expireOverduePreviews().catch(()=>{});
   fetchTunegocioOperations().then(result=>console.log('TuNegocio CRM bridge: '+(result.available?'ready ('+result.projects.length+' project(s))':'unavailable'))).catch(()=>{});
   setInterval(()=>expireOverduePreviews().catch(error=>console.error('Preview expiry sweep failed',error&&error.message?error.message:error)),60*60*1000).unref();
+  if(roadmap.enabled()){
+    setTimeout(()=>crmRoadmap.scan().catch(()=>console.error('CRM monitor failed; inspect monitor runs')),10000).unref();
+    setInterval(()=>crmRoadmap.scan().catch(()=>console.error('CRM monitor failed; inspect monitor runs')),5*60*1000).unref();
+  }
 });

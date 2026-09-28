@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-28T19:50:47.013Z",
+  "projectId": "c11d3540-a031-46d3-810e-816cdb6eb2e3",
+  "orderId": "103cfece-759e-4aae-aa6b-68e11edfc1a3",
+  "campaignId": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+  "revenue": [
+    {
+      "event_id": "invoice:in_1UKkLzJXCvRIbAjBhazVEVYu",
+      "amount_paid_cents": 995,
+      "discount_cents": 995
+    }
+  ],
+  "campaign": {
+    "id": "b5c272fb-ec3b-4b47-8d6b-aeae87d4dc4f",
+    "customers": 1,
+    "sales": 1,
+    "revenue": 995,
+    "discount": 995,
+    "unknown_discounts": 0
+  },
+  "testPaymentPublished": false,
+  "checks": [
+    "CRM assignment created TEST coupon",
+    "Hosted Checkout paid 995 cents",
+    "Real invoice.paid replay accepted idempotently",
+    "995 cents revenue and 995 cents discount attributed",
+    "Paid campaign mutation rejected",
+    "TEST payment did not publish"
+  ]
+}

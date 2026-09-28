@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-28",
+  "scope": "staging-only",
+  "productionChanged": false,
+  "messagesSent": false,
+  "catalog": {
+    "branch": "agent/catalog-roadmap-v2-safe",
+    "codeCommit": "d5cd4f23bf4b9cc7837dc32068637f18df99d4ef",
+    "deploymentId": "7ee41e01-6073-4b3d-b604-8cfe88a44ab5",
+    "status": "SUCCESS",
+    "health": 200,
+    "ci": "https://github.com/NoePerezBlancoo/noeapps/actions/runs/36475138376",
+    "ciConclusion": "success",
+    "testsPassed": 15,
+    "migration": "003_crm_operations.sql"
+  },
+  "tunegocio": {
+    "branch": "agent/roadmap-v2-safe",
+    "codeCommit": "d1919f8adee8dd545cd1665199f7d55d921bd2f2",
+    "deploymentId": "0cb33f69-225a-4532-9511-7fde164198d4",
+    "status": "SUCCESS",
+    "health": 200,
+    "ci": "https://github.com/NoePerezBlancoo/TuNegocio/actions/runs/36475140997",
+    "ciConclusion": "success",
+    "unitTestsPassed": 398,
+    "unitTestsSkipped": 1,
+    "isolatedDatabaseTestsPassed": 29,
+    "predeployChecksPassed": 35,
+    "migration": "025_crm_roadmap.sql"
+  },
+  "mobile": {"viewportWidth":390,"documentWidth":390,"wideTables":"internal horizontal scroll"},
+  "billingProof": {"mode":"test","monthlyPaidCents":[995,995,995,995,1990],"combinedCampaignPaidCents":1990,"combinedCampaignDiscountCents":1990},
+  "notes": [
+    "The later documentation commits contain reports/evidence only; deployed application code is identified above.",
+    "Catalog claimable Stripe TEST supports its initial paid invoice but not test clocks; five-cycle timing was verified in the separate TuNegocio TEST account.",
+    "No production deployment, migration, configuration change or merge was performed."
+  ]
+}
