@@ -483,9 +483,15 @@ async function combinedAnalytics(tunegocio){
   let tnMrrCents=0,tnCommissionsCents=0;
   for(const item of tnProjects){
     if(item.paymentStatus==='paid'&&item.paidUntil&&new Date(item.paidUntil).getTime()>Date.now()){
-      const amount=Number(item.amountCents||0);
-      if(item.planId==='monthly')tnMrrCents+=amount;
-      else if(item.planId==='annual'||item.planId==='annual-prepaid')tnMrrCents+=Math.round(amount/12);
+      let amount=Number(item.amountCents||0);
+      if(item.planId==='monthly'){
+        if(Number(item.offerPercentOff)>0&&Number(item.offerDurationMonths)>0&&item.firstPaidAt){
+          const offerEnd=new Date(item.firstPaidAt);
+          offerEnd.setUTCMonth(offerEnd.getUTCMonth()+Number(item.offerDurationMonths));
+          if(offerEnd.getTime()>Date.now())amount=Math.round(amount*(100-Number(item.offerPercentOff))/100);
+        }
+        tnMrrCents+=amount;
+      }else if(item.planId==='annual'||item.planId==='annual-prepaid')tnMrrCents+=Math.round(amount/12);
     }
     if(item.salespersonId&&Number(item.firstAmountCents)>0)tnCommissionsCents+=Math.round(Number(item.firstAmountCents)*SALESPERSON_COMMISSION_PERCENT/100);
   }
