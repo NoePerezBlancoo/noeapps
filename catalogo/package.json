@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js",
+    "typecheck": "node scripts/check-build.js",
+    "build": "node scripts/check-build.js"
   },
   "engines": {
     "node": ">=18"

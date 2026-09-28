@@ -3,6 +3,9 @@ const fs=require('fs');
 const path=require('path');
 const crypto=require('crypto');
 const {Pool}=require('pg');
+const subscriptions=require('./subscriptions');
+const discovery=require('./catalog-discovery');
+subscriptions.assertStaging();
 
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
 const requestHtml=fs.readFileSync(path.join(__dirname,'solicitar.html'));
@@ -36,6 +39,7 @@ const CRM_BRIDGE_SECRET=(process.env.NOEAPPS_CRM_BRIDGE_SECRET||'').trim();
 const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace(/\/$/,'');
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
+const catalogDiscovery=discovery.createDiscovery(pool,LIBRARY_ORIGIN);
 let schemaPromise=null;
 let legacyMigrationPromise=null;
 
@@ -203,7 +207,7 @@ async function ensureSchema(){
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_payment_token_uidx ON catalog_requests(payment_token) WHERE payment_token <> '';
-  `).catch(error=>{schemaPromise=null;throw error});
+  `).then(async()=>{if(subscriptions.enabled()||discovery.enabled())await subscriptions.migrate(pool)}).catch(error=>{schemaPromise=null;throw error});
   return schemaPromise;
 }
 
@@ -682,6 +686,7 @@ function safeSiteOrigin(value){
 }
 function siteIsPaid(row){
   if(!row)return false;
+  if(subscriptions.enabled()&&row.subscription_state&&row.stripe_subscription_id)return subscriptions.hasPaidAccess(row);
   const sub=String(row.stripe_subscription_status||'').toLowerCase();
   if(['canceled','unpaid','incomplete_expired'].includes(sub))return false;
   if(row.stripe_subscription_id)return ['active','trialing','past_due'].includes(sub)||String(row.stripe_payment_status||'').toLowerCase()==='paid';
@@ -707,6 +712,10 @@ async function ensureSiteSlugs(rows){
 }
 async function refreshSiteState(row){
   if(!row)return row;
+  if(subscriptions.enabled()&&row.subscription_state&&row.stripe_subscription_id&&!subscriptions.hasPaidAccess(row)&&row.site_status==='active'){
+    const r=await pool.query("UPDATE catalog_requests SET site_status='suspended',updated_at=now() WHERE id=$1 AND (subscription_paid_until IS NULL OR subscription_paid_until<=now()) RETURNING *",[row.id]);
+    return r.rows[0]||row;
+  }
   if(siteIsPaid(row)&&row.site_status!=='active'){
     const r=await pool.query("UPDATE catalog_requests SET site_status='active',preview_expires_at=NULL,status=CASE WHEN status='published' THEN status ELSE 'paid' END,updated_at=now() WHERE id=$1 RETURNING *",[row.id]);
     return r.rows[0]||row;
@@ -942,7 +951,7 @@ async function proxyCustomerSite(req,res,slug,pathname,search){
     }
     const responseHeaders={
       'Content-Type':upstream.headers.get('content-type')||contentType(pathname,upstream.headers.get('content-type')),
-      'Cache-Control':row.site_status==='preview'?'private, no-store, max-age=0':(upstream.headers.get('cache-control')||'public, max-age=60'),
+      'Cache-Control':row.site_status==='preview'||(subscriptions.enabled()&&row.subscription_state&&row.stripe_subscription_id)?'private, no-store, max-age=0':(upstream.headers.get('cache-control')||'public, max-age=60'),
       'X-Content-Type-Options':'nosniff'
     };
     if(row.site_status==='preview')responseHeaders['X-Robots-Tag']='noindex, nofollow, noarchive';
@@ -960,6 +969,7 @@ async function proxyCustomerSite(req,res,slug,pathname,search){
 async function createCustomerPortal(res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   await ensureSchema();
+  if(subscriptions.enabled())return json(res,200,await subscriptions.manage(pool,id,'portal',subscriptions.stripeClient(STRIPE_SECRET_KEY),PUBLIC_ORIGIN));
   const found=await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[id]);
   const row=found.rows[0];if(!row)return json(res,404,{error:'Solicitud no encontrada.'});
   if(!row.stripe_customer_id)return json(res,400,{error:'Este cliente todavía no tiene una suscripción Stripe.'});
@@ -988,14 +998,30 @@ async function handleStripeWebhook(req,res){
   const payload=await rawBody(req);
   if(!verifyStripeSignature(payload,req.headers['stripe-signature']))return json(res,400,{error:'Firma Stripe no válida.'});
   let event;try{event=JSON.parse(payload.toString('utf8'))}catch{return json(res,400,{error:'Evento Stripe no válido.'})}
+  if(subscriptions.enabled()&&event.livemode!==/^(sk|rk)_live_/.test(STRIPE_SECRET_KEY))return json(res,400,{error:'Entorno Stripe no válido.'});
   await ensureSchema();
   const client=await pool.connect();
   try{
     await client.query('BEGIN');
     const inserted=await client.query('INSERT INTO stripe_events(id) VALUES($1) ON CONFLICT DO NOTHING RETURNING id',[event.id]);
     if(!inserted.rows[0]){await client.query('COMMIT');return json(res,200,{received:true,duplicate:true})}
-    const obj=event.data&&event.data.object?event.data.object:{};
+    let obj=event.data&&event.data.object?event.data.object:{};
     const type=event.type||'';
+    let subscriptionRequestId='';
+    const stripeV2=subscriptions.enabled()?subscriptions.stripeClient(STRIPE_SECRET_KEY):null;
+    if(stripeV2&&/^(checkout\.session\.|invoice\.|customer\.subscription\.)/.test(type)){
+      const sid=type.startsWith('customer.subscription.')?obj.id:invoiceSubscriptionId(obj);
+      const metadataId=invoiceRequestId(obj)||obj.client_reference_id||'';
+      const mapped=sid?(await client.query('SELECT id FROM catalog_requests WHERE stripe_subscription_id=$1',[sid])).rows[0]:null;
+      subscriptionRequestId=mapped?String(mapped.id):validUuid(metadataId)?metadataId:'';
+      if(subscriptionRequestId){
+        await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',['catalog-subscription:'+subscriptionRequestId]);
+        const endpoint=type.startsWith('checkout.')?'/checkout/sessions/':type.startsWith('invoice.')?'/invoices/':'/subscriptions/';
+        obj=await stripeV2.request('GET',endpoint+encodeURIComponent(obj.id));
+        const canonicalId=invoiceRequestId(obj)||obj.client_reference_id||'';
+        if(canonicalId&&canonicalId!==subscriptionRequestId)throw new Error('Stripe request binding mismatch');
+      }
+    }
     if(type==='checkout.session.completed'||type==='checkout.session.async_payment_succeeded'){
       const requestId=(obj.metadata&&obj.metadata.catalog_request_id)||obj.client_reference_id||'';
       if(validUuid(requestId)){
@@ -1024,6 +1050,7 @@ async function handleStripeWebhook(req,res){
       else if(subscriptionId){where='stripe_subscription_id=$3'}
       if(where){
         await client.query(`UPDATE catalog_requests SET stripe_payment_status=$1,stripe_last_invoice_id=$2,stripe_last_event_at=now(),
+          stripe_subscription_id=COALESCE(NULLIF($3::text,''),stripe_subscription_id),
           paid_at=CASE WHEN $1='paid' THEN COALESCE(paid_at,now()) ELSE paid_at END,
           site_status=CASE WHEN $1='paid' THEN 'active' ELSE site_status END,
           preview_expires_at=CASE WHEN $1='paid' THEN NULL ELSE preview_expires_at END,
@@ -1046,6 +1073,10 @@ async function handleStripeWebhook(req,res){
       }else if(obj.id){
         await client.query("UPDATE catalog_requests SET stripe_subscription_status=$2,site_status=CASE WHEN $3 THEN 'active' WHEN $4 THEN 'suspended' ELSE site_status END,preview_expires_at=CASE WHEN $3 THEN NULL ELSE preview_expires_at END,stripe_last_event_at=now(),updated_at=now() WHERE stripe_subscription_id=$1",[String(obj.id),subStatus,activeSub,deleted]);
       }
+    }
+    if(stripeV2&&subscriptionRequestId){
+      const row=(await client.query('SELECT * FROM catalog_requests WHERE id=$1',[subscriptionRequestId])).rows[0];
+      if(row?.stripe_subscription_id&&row?.stripe_customer_id)await subscriptions.sync(client,row,stripeV2);
     }
     await client.query('COMMIT');
     return json(res,200,{received:true});
@@ -1175,6 +1206,20 @@ http.createServer(async(req,res)=>{
       try{await ensureSchema();res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok')}catch{res.writeHead(503,{'Content-Type':'text/plain'});return res.end('database unavailable')}
     }
     if(url.pathname==='/catalog-data')return proxy(req,res,LIBRARY_ORIGIN+'/catalog.json','catalog.json');
+    if(['/assets/catalog-search.js','/assets/catalog-search-ui.js','/assets/catalog-search.css'].includes(url.pathname)&&req.method==='GET'){
+      const name={'/assets/catalog-search.js':'search-engine.js','/assets/catalog-search-ui.js':'search-ui.js','/assets/catalog-search.css':'search.css'}[url.pathname];
+      res.writeHead(200,{'Content-Type':name.endsWith('.css')?'text/css; charset=utf-8':'application/javascript; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff'});
+      return res.end(fs.readFileSync(path.join(__dirname,name)));
+    }
+    if(url.pathname==='/api/catalog/discovery'&&req.method==='GET'){
+      if(!discovery.enabled())return json(res,200,{enabled:false});
+      await ensureSchema();return json(res,200,await catalogDiscovery.report());
+    }
+    if(url.pathname==='/api/crm/design-stats'&&req.method==='GET'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      if(!discovery.enabled())return json(res,404,{error:'Función no habilitada.'});
+      await ensureSchema();return json(res,200,await catalogDiscovery.report(true));
+    }
     if(url.pathname.startsWith('/library/')){
       const assetPath=url.pathname.slice('/library/'.length);
       return proxy(req,res,LIBRARY_ORIGIN+'/'+assetPath,assetPath);
@@ -1214,7 +1259,7 @@ http.createServer(async(req,res)=>{
       await ensureSiteSlugs(result.rows);
       const analytics=await combinedAnalytics(tunegocio);
       return json(res,200,{
-        requests:result.rows,
+        requests:result.rows.map(row=>({...row,subscriptionControlsEnabled:subscriptions.enabled()})),
         tunegocio:tunegocio.projects,
         tunegocioAvailable:tunegocio.available,
         salespeople:config.salespeople,
@@ -1260,6 +1305,22 @@ http.createServer(async(req,res)=>{
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       return await updateTunegocioOperation(req,res,tunegocioMatch[1]);
     }
+    const subscriptionMatch=url.pathname.match(/^\/api\/crm\/(requests|tunegocio)\/([0-9a-f-]{36})\/subscription$/i);
+    if(subscriptionMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      if(req.headers.origin!==PUBLIC_ORIGIN||!/^application\/json(?:;|$)/i.test(req.headers['content-type']||'')||!['same-origin','none',undefined].includes(req.headers['sec-fetch-site']))return json(res,403,{error:'Abre esta acción desde el CRM.'});
+      if(!subscriptions.enabled())return json(res,404,{error:'Función no habilitada.'});
+      const data=await bodyJson(req,2048);
+      if(!data||typeof data!=='object'||Array.isArray(data)||Object.keys(data).some(key=>key!=='action')||!['refresh','cancel','reactivate','portal'].includes(data.action))return json(res,400,{error:'Acción no válida.'});
+      await ensureSchema();
+      if(subscriptionMatch[1]==='requests')return json(res,200,await subscriptions.manage(pool,subscriptionMatch[2],data.action,subscriptions.stripeClient(STRIPE_SECRET_KEY),PUBLIC_ORIGIN));
+      const bundle=await fetchTunegocioOperations();
+      const remote=bundle.projects.find(item=>item.id===subscriptionMatch[2]);
+      if(!remote?.orderId)return json(res,503,{error:'No se pudo verificar la suscripción de TuNegocio.'});
+      const response=await fetch(TUNEGOCIO_CRM_ORIGIN+'/api/internal/crm-subscription',{method:'POST',headers:{Authorization:'Bearer '+CRM_BRIDGE_SECRET,'Content-Type':'application/json'},body:JSON.stringify({orderId:remote.orderId,action:data.action}),signal:AbortSignal.timeout(45000)});
+      const result=await response.json();
+      return json(res,response.status,result);
+    }
     const publishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/site\/publish$/i);
     if(publishMatch&&req.method==='POST'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
@@ -1273,6 +1334,7 @@ http.createServer(async(req,res)=>{
     const portalMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/portal$/i);
     if(portalMatch&&req.method==='POST'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      if(subscriptions.enabled()&&req.headers.origin!==PUBLIC_ORIGIN)return json(res,403,{error:'Abre esta acción desde el CRM.'});
       return await createCustomerPortal(res,portalMatch[1]);
     }
     const match=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})$/i);
@@ -1292,7 +1354,7 @@ http.createServer(async(req,res)=>{
   }
 }).listen(port,'0.0.0.0',()=>{
   console.log('NoeApps catalog listening on '+port);
-  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
+  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('rkcs_test_')?'sandbox_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
   migrateLegacyData().catch(()=>{});
   expireOverduePreviews().catch(()=>{});
   fetchTunegocioOperations().then(result=>console.log('TuNegocio CRM bridge: '+(result.available?'ready ('+result.projects.length+' project(s))':'unavailable'))).catch(()=>{});

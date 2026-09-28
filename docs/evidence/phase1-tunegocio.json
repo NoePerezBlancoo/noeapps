@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-09-28T17:32:57.754Z",
+  "projectId": "a44cc8af-bf19-4c9e-856c-9e89a68e4ae8",
+  "orderId": "0463dd89-f4f7-4980-87b7-dbdd32d3abd1",
+  "checks": [
+    "real Stripe TEST checkout paid via browser",
+    "real webhook fulfillment",
+    "central CRM bridge",
+    "scheduled cancellation",
+    "reactivation",
+    "safe period-end portal",
+    "paid entitlement unchanged",
+    "TEST publication isolated",
+    "action audit"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-09-28T17:55:06.218Z",
+  "fixtureId": "198acf02-9b82-49c1-abab-376d6a75f861",
+  "designId": "noeapps-beauty-velvet",
+  "checks": [
+    "private CRM authentication",
+    "public metrics exclude revenue and personal data",
+    "real Stripe TEST payment counted once",
+    "duplicate webhook does not inflate sales",
+    "renewals do not multiply sales or requests",
+    "zero payment is not a sale",
+    "conversion has the correct denominator",
+    "CRM revenue equals the stored ledger",
+    "dates are explicitly unknown for baseline inventory"
+  ]
+}

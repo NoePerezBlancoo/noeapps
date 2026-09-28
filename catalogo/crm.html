@@ -12,6 +12,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.filters{display:flex;gap:5px;flex-wrap:wrap}.filters button{border:1px solid var(--line);background:#10151c;color:#aab5c3;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:850}.filters button.active{background:#f5f7fb;color:#0b0e12;border-color:#f5f7fb}.search{margin-left:auto;min-width:220px}.opsLayout{display:grid;grid-template-columns:minmax(380px,.92fr) minmax(460px,1.08fr);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:620px;background:#0a0e13}.list{border-right:1px solid var(--line);padding:11px;overflow:auto;max-height:75vh}.row{width:100%;display:grid;grid-template-columns:1.25fr .8fr auto;gap:10px;text-align:left;padding:12px;margin-bottom:7px;border:1px solid #222a34;border-radius:11px;background:#0d1218;color:#fff}.row:hover{border-color:#3a4553}.row.active{border-color:#7165ff;background:#121527}.row strong,.row small{display:block}.row small{margin-top:3px;color:#7d8999;font-size:9px}.row em{font-style:normal;color:#a9b4c3;font-size:10px}.pill{align-self:center;padding:5px 7px;border-radius:999px;background:#1b222c;font-size:8px;text-transform:uppercase}.source{display:inline-flex;padding:3px 6px;border-radius:999px;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-right:5px}.source.catalog{background:#2a224e;color:#d0c9ff}.source.tn{background:#113348;color:#a6e7ff}.detail{padding:22px;overflow:auto;max-height:75vh}.detail h2{font-size:31px;letter-spacing:-.05em;margin:6px 0 3px}.sub{font-size:10px;color:var(--muted)}.statusline{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.tag{padding:6px 8px;border:1px solid #2d3743;border-radius:999px;background:#111821;font-size:8px;color:#b9c3cf}.tag.good{border-color:#2c654d;color:var(--green)}.tag.warn{border-color:#765e2a;color:var(--yellow)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.box{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0e1319}.box span{display:block;color:#768394;font-size:8px;text-transform:uppercase;font-weight:900}.box p{margin:6px 0 0;font-size:11px;line-height:1.55;white-space:pre-wrap}.field{display:block;margin-top:10px}.field>span{display:block;color:#8f9baa;font-size:8px;font-weight:900;text-transform:uppercase;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line2);background:#090d12;color:#fff;border-radius:9px;padding:9px}.field textarea{min-height:75px;resize:vertical}.summary{margin-top:12px;padding:13px;border:1px solid #343d49;border-radius:11px;background:#0a0f15}.summary strong{display:block;font-size:17px}.summary small{display:block;color:#8d99a8;margin-top:4px;font-size:9px;line-height:1.5}.actions{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}.actions a{padding:9px 11px;border-radius:8px;border:1px solid var(--line2);background:#151b23;color:#fff;text-decoration:none;font-size:9px;font-weight:850}.empty{padding:50px 20px;color:#758090;text-align:center}
 .sectionHead{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:2px 0 16px}.sectionHead h2{font-size:30px;letter-spacing:-.05em;margin:4px 0}.sectionHead p{font-size:11px;color:var(--muted);margin:0}.panelGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:17px}.panel h3{margin:0 0 12px;font-size:16px}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;border-bottom:1px solid #222a33;padding:9px 7px;font-size:10px}.table th{color:#7d8998;text-transform:uppercase;font-size:8px}.table td strong{display:block}.table td small{color:#7e8996}.formRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.formRow .field{margin:0}.rank{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #222a33}.rank:last-child{border-bottom:0}.rank strong{font-size:11px}.rank small{color:var(--muted)}.bar{height:5px;background:#1a212a;border-radius:99px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#7165ff,#77dfff);border-radius:99px}.note{font-size:9px;color:#748090;line-height:1.55}.financialHero{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.financialHero .metric{min-height:90px}.goodText{color:var(--green)}.warnText{color:var(--yellow)}
 @media(max-width:1100px){.metrics{grid-template-columns:repeat(3,1fr)}.opsLayout{grid-template-columns:1fr}.list{border-right:0;border-bottom:1px solid var(--line);max-height:380px}.detail{max-height:none}.panelGrid{grid-template-columns:1fr}.financialHero{grid-template-columns:1fr 1fr}}@media(max-width:680px){.top,.page,.nav{padding-left:14px;padding-right:14px}.metrics{grid-template-columns:1fr 1fr}.formRow{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}.row>div:nth-child(2){display:none}.search{margin-left:0;width:100%}.financialHero{grid-template-columns:1fr 1fr}}
+#designStatsTable td small{display:block;margin-top:4px;color:#aab6c8}
 </style>
 </head>
 <body>
@@ -86,6 +87,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
     <article class="panel"><h3>Consumo IA</h3><div id="aiDetails"></div></article>
   </div>
   <p class="note" style="margin-top:14px">La facturación histórica empieza a consolidarse desde el ledger del CRM v2. No se inventan importes antiguos que Stripe no haya confirmado al nuevo ledger.</p>
+  <article class="panel hidden" id="designPerformance" style="margin-top:20px">
+    <h3>Rendimiento por diseño · Catálogo</h3>
+    <p class="note" id="designStatsNote"></p>
+    <div class="toolbar"><label>Buscar diseño<input class="input" id="designStatsQuery" type="search" placeholder="Nombre o categoría"></label>
+    <label>Ordenar<select class="input" id="designStatsSort"><option value="sales">Más vendidos</option><option value="requests">Más solicitudes</option><option value="conversion">Mayor conversión</option><option value="revenueCents">Mayor facturación</option><option value="name">Nombre</option></select></label></div>
+    <div id="designStatsTable" style="overflow-x:auto"></div>
+    <button class="btn" id="designStatsMore" type="button" hidden>Ver más diseños</button>
+  </article>
 </section>
 
 <section class="page hidden" id="view-sales">
@@ -139,6 +148,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <script>
 let catalogItems=[],tnItems=[],items=[],selected=null,salespeople=[],offers=[],expenses=[],analytics=null;
 let sourceFilter='all',searchTerm='',stripeConfigured=false,siteDomain='noeapps.com',commissionPercent=30;
+let designReport=null,designStatsVisible=50;
+async function loadDesignStats(){
+  const panel=document.getElementById('designPerformance');
+  try{
+    const response=await fetch('/api/crm/design-stats',{cache:'no-store'});
+    if(response.status===404){panel.classList.add('hidden');return;}
+    panel.classList.remove('hidden');
+    if(!response.ok)throw new Error('Estadísticas no disponibles. Actualiza el CRM para reintentar.');
+    designReport=await response.json();
+    if(!designReport.metricsAvailable)throw new Error('Estadísticas no disponibles. No se muestran ceros como si fueran datos confirmados.');
+    document.getElementById('designStatsNote').textContent=(designReport.mode==='test'?'DATOS DE PRUEBA · ':'')+'Ventas: solicitudes con algún cobro positivo confirmado. Las renovaciones suman cobros, no ventas. Conversión: ventas / solicitudes. Facturación: cobros brutos registrados, antes de devoluciones. Sin estimaciones ni reconstrucción del historial anterior al ledger. Actualizado: '+new Date(designReport.generatedAt).toLocaleString('es-ES')+'.';
+    renderDesignStats();
+  }catch(error){panel.classList.remove('hidden');document.getElementById('designStatsNote').textContent=error.message;document.getElementById('designStatsTable').innerHTML='';document.getElementById('designStatsMore').hidden=true;}
+}
+function renderDesignStats(){
+  if(!designReport?.metricsAvailable)return;
+  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const q=normalize(document.getElementById('designStatsQuery').value),sort=document.getElementById('designStatsSort').value;
+  const rows=designReport.designs.filter(x=>normalize(x.name+' '+x.category+' '+x.id).includes(q));
+  rows.sort((a,b)=>(sort==='name'?String(a.name).localeCompare(String(b.name),'es'):(b[sort]??-1)-(a[sort]??-1))||b.requests-a.requests||a.id.localeCompare(b.id));
+  document.getElementById('designStatsTable').innerHTML='<table class="table"><thead><tr><th>Diseño</th><th>Solicitudes</th><th>Ventas</th><th>Conversión</th><th>Cobros registrados</th></tr></thead><tbody>'+rows.slice(0,designStatsVisible).map(x=>'<tr><td><strong>'+esc(x.name)+'</strong><small>'+esc(x.category)+' · '+esc(x.id)+'</small></td><td>'+x.requests+'</td><td>'+x.sales+'</td><td>'+(x.conversion==null?'Sin solicitudes':(x.conversion*100).toLocaleString('es-ES',{maximumFractionDigits:1})+'%<small>'+x.sales+' de '+x.requests+' solicitudes</small>')+'</td><td>'+cents(x.revenueCents)+'</td></tr>').join('')+'</tbody></table><p class="note">'+Math.min(rows.length,designStatsVisible)+' de '+rows.length+' diseños</p>';
+  document.getElementById('designStatsMore').hidden=rows.length<=designStatsVisible;
+}
 
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const eur=c=>Number(c||0).toLocaleString('es-ES',{style:'currency',currency:'EUR'});
@@ -166,6 +198,7 @@ async function load(){
     salespeople=j.salespeople||[];offers=j.offers||[];expenses=j.expenses||[];analytics=j.analytics||null;
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
+    void loadDesignStats();
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
   }catch{}
 }
@@ -214,19 +247,47 @@ function renderDetail(){
   if(selected.source==='tunegocio')return renderTnDetail();
   renderCatalogDetail();
 }
+function subscriptionPanel(x){
+  if(!x.subscriptionControlsEnabled||!(x.subscriptionId||x.stripe_subscription_id))return '';
+  const s=x.source==='tunegocio'?x.subscription:x.subscription_state;
+  const labels={active:'ACTIVA',trialing:'EN PRUEBA',past_due:'PAGO PENDIENTE',unpaid:'IMPAGADA',canceled:'CANCELADA',incomplete:'PAGO INCOMPLETO',incomplete_expired:'CADUCADA',paused:'PAUSADA'};
+  const scheduled=s&&(s.cancelAtPeriodEnd||s.cancelAt);
+  const label=s?(scheduled?'CANCELACIÓN PROGRAMADA':labels[s.status]||s.status):'ESTADO STRIPE SIN CONSULTAR';
+  const period=s?(s.paidUntil?'Servicio pagado hasta '+date(s.paidUntil):'Periodo pagado no disponible'):'';
+  return '<section class="summary" aria-label="Suscripción Stripe"><strong>'+esc(label)+'</strong>'+(s&&s.amountCents!=null?'<p>Cuota base: '+cents(s.amountCents)+({month:'/mes',year:'/año',week:'/semana',day:'/día'}[s.interval]||'')+'</p>':'')+'<small>'+esc(period)+(scheduled?'<br>No se volverá a cobrar la renovación.':s&&s.nextRenewalAt?'<br>Próximo cobro: '+date(s.nextRenewalAt):'')+'</small><div class="actions"><button class="btn" data-subscription="refresh">Actualizar desde Stripe</button><button class="btn" data-subscription="portal">Abrir portal Stripe ↗</button>'+(s&&s.canCancel?'<button class="btn" data-subscription="cancel">Cancelar al final del periodo</button>':'')+(s&&s.canReactivate?'<button class="btn" data-subscription="reactivate">Reactivar suscripción</button>':'')+'</div><div id="subscriptionMsg" class="msg" role="status"></div></section>';
+}
+function bindSubscriptionActions(){
+  document.querySelectorAll('[data-subscription]').forEach(button=>button.onclick=()=>subscriptionAction(button.dataset.subscription));
+}
+async function subscriptionAction(action){
+  const item=selected,source=item.source,id=item.id;
+  if(action==='cancel'&&!window.confirm('Se cancelará al finalizar el periodo. El servicio se conserva hasta la fecha pagada. ¿Continuar?'))return;
+  if(action==='reactivate'&&!window.confirm('La suscripción volverá a renovarse y Stripe podrá cobrar en la próxima fecha. ¿Continuar?'))return;
+  const msg=el('subscriptionMsg');msg.textContent='Consultando Stripe…';
+  document.querySelectorAll('[data-subscription]').forEach(button=>button.disabled=true);
+  try{
+    const route='/api/crm/'+(source==='tunegocio'?'tunegocio':'requests')+'/'+id+'/subscription';
+    const result=await api(route,{method:'POST',body:JSON.stringify({action})});
+    if(selected.id!==id||selected.source!==source)return;
+    if(source==='tunegocio')selected.subscription=result.subscription;else selected.subscription_state=result.subscription;
+    renderDetail();
+    el('subscriptionMsg').textContent=action==='cancel'?'Cancelación programada.':action==='reactivate'?'Renovación reactivada.':'Estado actualizado desde Stripe.';
+    if(result.url){const u=new URL(result.url);if(u.origin!=='https://billing.stripe.com')throw new Error('Portal no verificado.');window.location.assign(result.url);}
+  }catch(error){if(selected.id===id&&selected.source===source){el('subscriptionMsg').textContent=error.message;document.querySelectorAll('[data-subscription]').forEach(button=>button.disabled=false);}}
+}
 function renderTnDetail(){
   const x=selected,first=Number(x.firstAmountCents||0),commission=Number(x.commissionCents||0);
   el('detail').innerHTML=
     '<div class="sub"><span class="source tn">TuNegocio · IA</span> Proyecto '+esc(String(x.id).slice(0,8).toUpperCase())+'</div>'+
     '<h2>'+esc(x.businessName||x.slug)+'</h2><div class="sub">'+esc(x.category||'Web generada con IA')+' · '+esc(x.city||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(x.published?'good':'')+'">Web: '+(x.published?'publicada':'no publicada')+'</span><span class="tag '+(x.paymentStatus==='paid'?'good':'')+'">Pago: '+esc(x.paymentStatus||'none')+'</span><span class="tag '+(needsReview(x)?'warn':'good')+'">Manual: '+esc(x.manualStatus||'auto')+'</span></div>'+
-    '<div class="grid2"><div class="box"><span>Cuenta</span><p>'+esc(x.accountEmail||'—')+'</p></div><div class="box"><span>Contacto negocio</span><p>'+esc(x.businessEmail||'')+'\n'+esc(x.phone||'')+'\n'+esc(x.whatsapp||'')+'</p></div><div class="box"><span>Proyecto</span><p>'+esc(x.slug)+'\nEstilo: '+esc(x.styleId||'—')+'</p></div><div class="box"><span>Vigencia</span><p>Pagado hasta: '+date(x.paidUntil)+'\nPublicado hasta: '+date(x.publishedUntil)+'</p></div></div>'+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Cuenta</span><p>'+esc(x.accountEmail||'—')+'</p></div><div class="box"><span>Contacto negocio</span><p>'+esc(x.businessEmail||'')+'\n'+esc(x.phone||'')+'\n'+esc(x.whatsapp||'')+'</p></div><div class="box"><span>Proyecto</span><p>'+esc(x.slug)+'\nEstilo: '+esc(x.styleId||'—')+'</p></div><div class="box"><span>Vigencia</span><p>Pagado hasta: '+date(x.paidUntil)+'\nPublicado hasta: '+date(x.publishedUntil)+'</p></div></div>'+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="tnSalesperson" '+(x.firstAmountCents&&x.salespersonId?'disabled':'')+'>'+salespersonOptions(x.salespersonId)+'</select></label><label class="field"><span>Oferta</span><select id="tnOffer" '+(x.paymentStatus==='paid'?'disabled':'')+'>'+offerOptions('tunegocio',x.offerId)+'</select></label></div>'+
     '<div class="summary"><strong>'+ (first?('Primer cobro: '+cents(first)):'Primer cobro pendiente') +'</strong><small>Comisión comercial: '+(x.salespersonId&&first?cents(commission)+' ('+commissionPercent+'%)':'—')+(x.offerName?' · Oferta: '+esc(x.offerName):'')+'</small></div>'+
     '<label class="field"><span>Estado manual</span><select id="tnManual"><option value="auto" '+(x.manualStatus==='auto'?'selected':'')+'>Automático / sin intervención</option><option value="review" '+(x.manualStatus==='review'?'selected':'')+'>Revisar</option><option value="in_progress" '+(x.manualStatus==='in_progress'?'selected':'')+'>Intervención en curso</option><option value="resolved" '+(x.manualStatus==='resolved'?'selected':'')+'>Resuelto</option><option value="closed" '+(x.manualStatus==='closed'?'selected':'')+'>Cerrado</option></select></label>'+
     '<label class="field"><span>Notas internas</span><textarea id="tnNotes">'+esc(x.adminNotes||'')+'</textarea></label>'+
     '<div class="actions"><button class="btn primary" id="tnSave">Guardar gestión</button>'+(x.publicUrl?'<a target="_blank" href="'+esc(x.publicUrl)+'">Abrir web ↗</a>':'')+'</div><div id="detailMsg" class="msg"></div>';
-  document.getElementById('tnSave').onclick=saveTn;
+  document.getElementById('tnSave').onclick=saveTn;bindSubscriptionActions();
 }
 async function saveTn(){
   const m=document.getElementById('detailMsg');m.textContent='Guardando…';
@@ -249,7 +310,7 @@ function renderCatalogDetail(){
   el('detail').innerHTML=
     '<div class="sub"><span class="source catalog">Catálogo</span> Solicitud '+esc(String(x.id).slice(0,8).toUpperCase())+'</div><h2>'+esc(x.business_name)+'</h2><div class="sub">'+esc(x.design_name)+' · '+esc(x.category||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente')+'</span><span class="tag '+(x.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(x.stripe_payment_status||'sin cobrar')+'</span><span class="tag '+(['active','trialing'].includes(x.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(x.stripe_subscription_status||'—')+'</span><span class="tag '+(x.site_status==='active'?'good':'')+'">Web: '+esc(x.site_status||'draft')+'</span></div>'+
-    '<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="catSalesperson" '+(x.first_paid_amount_cents!=null&&x.salesperson_id?'disabled':'')+'>'+salespersonOptions(x.salesperson_id)+'</select></label><label class="field"><span>Oferta mensual</span><select id="catOffer" '+(x.first_paid_amount_cents!=null?'disabled':'')+'>'+offerOptions('catalog',x.offer_id)+'</select></label></div>'+
     '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+x.offer_percent_off+'% durante '+x.offer_duration_months+' mes(es)':'')+'</small></div>'+
     '<div class="grid2"><label class="field"><span>Precio creación (€)</span><input id="creationPrice" type="number" min="0" max="10000" step="1" value="'+esc(x.creation_price||0)+'"></label><label class="field"><span>Cuota mensual (€)</span><input id="monthlyPrice" type="number" min="1" max="1000" step=".01" value="'+(Number(x.monthly_price_cents||1990)/100).toFixed(2)+'"></label></div>'+
@@ -261,7 +322,7 @@ function renderCatalogDetail(){
   document.getElementById('catSave').onclick=()=>saveCatalog(true);
   document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
-  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;
+  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();
 }
 async function saveCatalog(reload=true){
   const m=document.getElementById('detailMsg');if(m)m.textContent='';
@@ -317,6 +378,9 @@ function el(id){return document.getElementById(id)}function val(id){return el(id
 document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=el('loginMsg');m.textContent='';try{await api('/api/crm/login',{method:'POST',body:JSON.stringify({password:val('password')})});el('password').value='';await load()}catch(err){m.textContent=err.message}};
 el('refresh').onclick=load;el('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};
 document.querySelectorAll('#nav [data-view]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav [data-view]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));el('view-'+b.dataset.view).classList.remove('hidden')});
+document.getElementById('designStatsQuery').oninput=()=>{designStatsVisible=50;renderDesignStats()};
+document.getElementById('designStatsSort').onchange=()=>{designStatsVisible=50;renderDesignStats()};
+document.getElementById('designStatsMore').onclick=()=>{designStatsVisible+=50;renderDesignStats()};
 document.querySelectorAll('#filters [data-filter]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.filter;document.querySelectorAll('#filters [data-filter]').forEach(x=>x.classList.toggle('active',x===b));selected=null;renderList();renderDetail()});
 el('search').oninput=e=>{searchTerm=e.target.value;renderList()};
 el('salesForm').onsubmit=async e=>{e.preventDefault();const m=el('salesMsg');m.textContent='';try{await api('/api/crm/salespeople',{method:'POST',body:JSON.stringify({name:val('salesName'),email:val('salesEmail')})});e.target.reset();m.className='msg ok';m.textContent='Comercial añadido.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
