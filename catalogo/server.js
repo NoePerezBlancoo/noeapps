@@ -19,7 +19,7 @@ validateCatalogHtml(html);
 const port=process.env.PORT||3000;
 const LIBRARY_ORIGIN='https://catalog-production-53f9.up.railway.app';
 const DATABASE_URL=(process.env.NEON_DATABASE_URL||process.env.DATABASE_URL||'').trim();
-const LEGACY_DATABASE_URL=(process.env.LEGACY_DATABASE_URL||'').trim();
+const LEGACY_DATABASE_URL=(process.env.LEGACY_DATABASE_URL||process.env.DATABASE_URL||'').trim();
 const CRM_PASSWORD=process.env.CATALOG_CRM_PASSWORD||'';
 const SESSION_SECRET=process.env.CATALOG_SESSION_SECRET||'';
 const STRIPE_SECRET_KEY=(process.env.STRIPE_SECRET_KEY||'').trim();
