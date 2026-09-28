@@ -1,4 +1,4 @@
-// Post-release read-only smoke checks. No Stripe calls, business writes or messages.
+// Post-release smoke checks via normal CRM reads. No Stripe calls or business mutation requests.
 import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 const root=new URL('../../',import.meta.url);
@@ -7,8 +7,8 @@ const origin='https://catalogo.noeapps.com';
 assert.equal(env.PUBLIC_ORIGIN,origin);assert.equal(env.TUNEGOCIO_CRM_ORIGIN,'https://tunegocio-beta-production.up.railway.app');
 assert.match(env.STRIPE_SECRET_KEY,/^(sk|rk)_live_/);
 let cookie='';
-async function get(path){const r=await fetch(origin+path,{headers:{Cookie:cookie}});assert.equal(r.status,200,path);return r.json();}
-const evidence={at:new Date().toISOString(),origin,checks:[],stripeWrites:0,businessWrites:0,messagesSent:0};
+async function get(path){const r=await fetch(origin+path,{headers:{Cookie:cookie}});assert.equal(r.status,200,path);assert.match(r.headers.get('content-type')||'',/application\/json/,path);return r.json();}
+const evidence={at:new Date().toISOString(),origin,checks:[],stripeWrites:0,businessMutationRequests:0,messagesSent:0};
 assert.equal((await fetch(origin+'/health')).status,200);
 assert.equal((await fetch(env.TUNEGOCIO_CRM_ORIGIN+'/api/health')).status,200);
 assert.equal((await fetch(origin+'/api/crm/roadmap')).status,401);
@@ -25,12 +25,11 @@ try{
   evidence.checks.push('Six WhatsApp templates available; no message prepared or sent');
   const incidents=await get('/api/crm/roadmap/incidents');assert.ok(incidents.lastRun);assert.equal(incidents.lastRun.outcome,'succeeded');
   evidence.checks.push('Automatic production monitor completed successfully');
-  const offers=await get('/api/crm/offers');assert.ok(Array.isArray(offers.offers));
-  if(offers.offers.length){const customers=await get('/api/crm/roadmap/campaign?id='+offers.offers[0].id);assert.ok(Array.isArray(customers.customers));}
-  const expenses=await get('/api/crm/expenses');assert.ok(Array.isArray(expenses.expenses));
+  const bundle=await get('/api/crm/requests');assert.ok(Array.isArray(bundle.offers));assert.ok(Array.isArray(bundle.expenses));
+  if(bundle.offers.length){const customers=await get('/api/crm/roadmap/campaign?id='+bundle.offers[0].id);assert.ok(Array.isArray(customers.customers));}
   evidence.checks.push('Existing offers, campaign customer view and expense listing respond');
   evidence.products={catalogOperations:report.catalog.totals.operations,tunegocioOperations:report.tunegocio.totals.operations};
   evidence.monitor={outcome:incidents.lastRun.outcome,openCount:incidents.openCount};
-  evidence.offerCount=offers.offers.length;evidence.expenseCount=expenses.expenses.length;
+  evidence.offerCount=bundle.offers.length;evidence.expenseCount=bundle.expenses.length;
 }finally{await fetch(origin+'/api/crm/logout',{method:'POST',headers:{Origin:origin,Cookie:cookie}});}
 await writeFile(new URL('.env.operations-production-smoke.json',root),JSON.stringify(evidence,null,2));console.log(JSON.stringify(evidence,null,2));
