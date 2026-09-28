@@ -591,6 +591,11 @@ async function updateTunegocioOperation(req,res,id){
   const remoteBundle=await fetchTunegocioOperations();
   const remote=remoteBundle.projects.find(item=>String(item.id)===id);
   if(!remote)return json(res,503,{error:'No se pudo comprobar el proyecto de TuNegocio.'});
+  const salespersonChanged=String(currentLocal.salesperson_id||'')!==salespersonId;
+  const confirmedFirstAmount=Number(remote.firstAmountCents||currentLocal.first_paid_amount_cents||0);
+  if(confirmedFirstAmount>0&&currentLocal.salesperson_id&&salespersonChanged){
+    return json(res,409,{error:'El comercial queda fijado al registrar el primer cobro y su comisión.'});
+  }
 
   let offer=null;
   const offerChanged=String(currentLocal.offer_id||'')!==offerId;
@@ -1106,6 +1111,10 @@ async function updateRequest(req,res,id){
     const q=await pool.query("SELECT * FROM crm_salespeople WHERE id=$1 AND active=true LIMIT 1",[salespersonId]);
     salesperson=q.rows[0];
     if(!salesperson)return json(res,400,{error:'El comercial no está activo.'});
+  }
+  const salespersonChanged=String(existing.salesperson_id||'')!==salespersonId;
+  if(existing.first_paid_amount_cents!=null&&existing.salesperson_id&&salespersonChanged){
+    return json(res,409,{error:'El comercial queda fijado al registrar el primer cobro y su comisión.'});
   }
 
   let offer=null;
