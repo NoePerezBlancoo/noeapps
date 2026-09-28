@@ -117,6 +117,15 @@ export const showcase = {
     steps:['Abre la web del proyecto.','Explora noticias e información de cartas.','Contrasta las referencias que quieras utilizar.'],flow:['Noticias','Cartas','Consulta'],
     faq:[['¿Es una tienda de cartas?','La propuesta presentada es un portal de contenido y consulta. Las referencias de precios no son una oferta de compraventa.'],['¿Los precios son definitivos?','No. Pueden variar según la fuente, el momento y las características de cada carta.'],['¿La web está disponible?','Sí. Puedes visitarla desde esta ficha para conocer sus contenidos y su experiencia de consulta.']]
   },
+  'catalogo-noeapps': {
+    image:'comercio-panel.png',alt:'Panel visual de un pequeño comercio utilizado como imagen representativa del catálogo de webs NoeApps.',caption:'Imagen representativa de la línea de soluciones para pequeños negocios.',concept:true,
+    short:['Modelos de web','Precios claros','Solicitud online'],heading:'Explora una web adecuada para tu negocio.',
+    benefits:[['Compara propuestas','Revisa distintas direcciones de web pensadas para pequeños negocios antes de iniciar una solicitud.'],['Consulta precios','Encuentra las opciones y precios del servicio en un catálogo accesible y directo.'],['Pasa a la acción','Cuando encuentres una propuesta que encaje, continúa desde el propio catálogo con la solicitud de tu web.']],
+    audience:'Autónomos y pequeños negocios que quieren conocer opciones de web y precios antes de solicitar una propuesta.',
+    example:'Entras al catálogo, revisas los modelos y precios disponibles y continúas con la opción que mejor encaje con la presencia online que necesita tu negocio.',
+    steps:['Abre el catálogo público.','Explora los modelos y precios disponibles.','Continúa con la solicitud desde la opción que te interese.'],flow:['Explorar','Comparar','Solicitar'],
+    faq:[['¿El catálogo se puede visitar ahora?','Sí. El catálogo está disponible públicamente en catalogo.noeapps.com.'],['¿Puedo ver precios antes de solicitar una web?','Sí. La finalidad del catálogo es que puedas revisar propuestas y precios antes de continuar con una solicitud.'],['¿La solicitud se hace desde NoeApps?','El botón «Ver catálogo» abre el catálogo público, desde donde puedes continuar con el proceso disponible.']]
+  },
   'itflow-manager': {
     image:'it-support.png',alt:'Ilustración de un puesto de soporte IT con servidores, cableado y bandejas de trabajo.',caption:'Ilustración conceptual sobre soporte y mantenimiento IT.',concept:true,
     short:['Procesos de soporte','Mantenimiento de sistemas','Aplicación de gestión'],heading:'Un caso de portfolio sobre la organización del soporte.',
