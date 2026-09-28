@@ -6,9 +6,9 @@ Este repositorio es la **fuente de código/backup independiente** de la web. Per
 
 ## Versión actual
 
-**NoeApps 2.2.0** — catálogo completo restaurado e incorporación de TuTest el 14 de septiembre de 2026.
+**NoeApps 2.3.0** — incorporación de Catálogo NoeApps como proyecto público el 28 de septiembre de 2026.
 
-La versión 2.2 recupera las 17 fichas del catálogo anterior y añade TuNegocio y TuTest: auditoría web gratuita, pasiva y sin registro, con página propia, acceso directo, soporte y metadatos. Son 19 entradas: 4 aplicaciones, 6 herramientas, 3 integraciones Atlassian y 6 proyectos. Las fichas, capturas y documentación anteriores vuelven a formar parte de la fuente.
+La versión 2.3 incorpora **Catálogo NoeApps**, enlazado a `catalogo.noeapps.com`, como nuevo proyecto público. El catálogo pasa a 20 entradas: 4 aplicaciones, 6 herramientas, 3 integraciones Atlassian y 7 proyectos.\n\nLa versión 2.2 recupera las 17 fichas del catálogo anterior y añade TuNegocio y TuTest: auditoría web gratuita, pasiva y sin registro, con página propia, acceso directo, soporte y metadatos.
 
 La versión 2.1 incorpora **TuNegocio** como nuevo producto destacado de NoeApps, amplía la portada para representar una cartera más amplia que la línea Atlassian, añade su ficha pública, soporte, sitemap y validación de integridad.
 
@@ -58,6 +58,6 @@ El código de los productos no se duplica dentro de este repositorio; cada uno c
 
 ## Conservación del catálogo
 
-`scripts/catalog-data.mjs` contiene el inventario completo y `scripts/showcase-content.mjs` sus contenidos. `npm run build` regenera portada, fichas, soporte y sitemap, y valida que las 19 entradas sigan presentes. Conserva también las guías y páginas legales de las apps Atlassian. No sustituir el catálogo por una selección de destacados.
+`scripts/catalog-data.mjs` contiene el inventario completo y `scripts/showcase-content.mjs` sus contenidos. `npm run build` regenera portada, fichas, soporte y sitemap, y valida que las 20 entradas sigan presentes. Conserva también las guías y páginas legales de las apps Atlassian. No sustituir el catálogo por una selección de destacados.
 
 Las imágenes originales de mayor tamaño se conservan sin pérdidas en `assets-source/`. El build las reconstruye en `dist/assets/` y verifica su tamaño y SHA-256. No se depende de una publicación anterior para recuperar los recursos.
