@@ -22,7 +22,7 @@ const DATABASE_URL=(process.env.NEON_DATABASE_URL||process.env.DATABASE_URL||'')
 const LEGACY_DATABASE_URL=(process.env.LEGACY_DATABASE_URL||process.env.DATABASE_URL||'').trim();
 const CRM_PASSWORD=process.env.CATALOG_CRM_PASSWORD||'';
 const SESSION_SECRET=process.env.CATALOG_SESSION_SECRET||'';
-const STRIPE_SECRET_KEY=(process.env.STRIPE_SECRET_KEY||'').trim();
+const STRIPE_SECRET_KEY=(process.env.STRIPE_SECRET_KEY||'').trim().replace(/^['\"]|['\"]$/g,'');
 const STRIPE_WEBHOOK_SECRET=(process.env.STRIPE_WEBHOOK_SECRET||'').trim();
 const STRIPE_ACCOUNT_ID=(process.env.STRIPE_ACCOUNT_ID||'').trim();
 const STRIPE_CREATION_PRODUCT_ID=(process.env.STRIPE_CREATION_PRODUCT_ID||'').trim();
@@ -492,6 +492,6 @@ http.createServer(async(req,res)=>{
   }
 }).listen(port,'0.0.0.0',()=>{
   console.log('NoeApps catalog listening on '+port);
-  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'test':'unknown'));
+  console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
   migrateLegacyData().catch(()=>{});
 });
