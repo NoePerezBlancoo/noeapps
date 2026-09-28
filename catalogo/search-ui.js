@@ -5,6 +5,8 @@
     try{const r=await fetch('/api/catalog/discovery',{cache:'no-store',signal:AbortSignal.timeout(12000)});if(!r.ok)return null;report=await r.json();}catch{return null;}
     if(!report.enabled||!window.CatalogSearch)return null;
     const engine=window.CatalogSearch,controls=document.querySelector('.library-controls');
+    const spotlight=document.getElementById('impactSpotlight');
+    if(spotlight)spotlight.before(controls);
     const values=key=>[...new Set(state.items.map(x=>key==='sector'?engine.describe(x).sector:x[key]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
     const options=(items,first)=>'<option value="">'+first+'</option>'+items.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('');
     controls.classList.add('discovery-controls');
@@ -32,6 +34,7 @@
       filter(items){latest=engine.search(items,read());total=latest.length;return (onlyThree?latest.slice(0,3):latest).map(result=>result.item);},
       afterRender(){
         const options=read(),invalid=options.minPrice!==''&&options.maxPrice!==''&&Number(options.minPrice)>Number(options.maxPrice);
+        if(spotlight)spotlight.hidden=onlyThree||Boolean(options.query||options.category||options.style||options.sector||options.business||options.minPrice||options.maxPrice||options.sort!=='relevance');
         let message=invalid?'El precio mínimo no puede superar al máximo.':onlyThree?Math.min(3,total)+' demos recomendadas de '+total+' coincidencias.':total+' diseños coinciden con tu búsqueda.';
         if(onlyThree&&total>0&&total<3)message+=' No hay tres coincidencias con estos filtros.';
         const notes=['Precio de creación. Mantenimiento al activar: 19,90 €/mes.'];
