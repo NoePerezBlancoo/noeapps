@@ -76,7 +76,7 @@ for (const htmlPath of (await walk('dist')).filter((path) => path.endsWith('.htm
 }
 
 // Protect the complete catalog, including projects recovered from the previous publication.
-const expectedSlugs = ['tutest','tunegocio','forgeops','fivaki','pequeno-comercio','deleteguard','broken-link-guard','leaver-guard','quitar-fondo','texto-audio','descargas-multimedia','iagentes','automatizaciones-n8n','tugta','noticias-tcg','itflow-manager','opsdesk','edulabops','laboratorio-industrial'];
+const expectedSlugs = ['tutest','tunegocio','forgeops','fivaki','pequeno-comercio','deleteguard','broken-link-guard','leaver-guard','quitar-fondo','texto-audio','descargas-multimedia','iagentes','automatizaciones-n8n','tugta','noticias-tcg','catalogo-noeapps','itflow-manager','opsdesk','edulabops','laboratorio-industrial'];
 const home = await readFile('dist/index.html','utf8');
 for (const asset of ['/assets/favicon.svg','/assets/tutest-preview.svg','/assets/tunegocio-preview.svg']) {
  if (!home.includes(asset)) { console.error(`HOME ASSET MISSING: ${asset}`); failed=true; }
