@@ -208,7 +208,7 @@ function applyDiscount(cents,type,value,scope,target){
 }
 function checkoutFingerprint(row){
   return crypto.createHash('sha256').update(JSON.stringify([
-    row.creation_price,row.monthly_price_cents,row.discount_code,row.discount_type,row.discount_value,row.discount_scope,row.email,row.design_id
+    row.creation_price,row.monthly_price_cents,row.discount_code,row.discount_type,row.discount_value,row.discount_scope,row.salesperson,row.email,row.design_id
   ])).digest('hex');
 }
 function invoiceSubscriptionId(obj){
@@ -237,7 +237,7 @@ async function createStripeCheckout(res,id){
   const monthlyAmount=applyDiscount(monthlyBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'monthly');
   if(monthlyAmount<50)return json(res,400,{error:'La cuota mensual final debe ser al menos 0,50 €.'});
   const fingerprint=checkoutFingerprint(row);
-  if(row.payment_url&&row.checkout_fingerprint===fingerprint&&!['paid','complete'].includes(String(row.stripe_payment_status||'').toLowerCase())){
+  if(row.payment_url&&row.checkout_fingerprint===fingerprint&&!['paid','complete','expired','failed'].includes(String(row.stripe_payment_status||'').toLowerCase())){
     return json(res,200,{ok:true,reused:true,url:row.payment_url,request:row});
   }
   const lineItems=[];
