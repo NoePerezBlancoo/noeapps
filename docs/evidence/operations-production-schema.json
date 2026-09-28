@@ -1,0 +1,17 @@
+{
+  "at": "2026-09-28T20:19:13.466Z",
+  "product": "catalog",
+  "applied": [
+    "001_subscription_management.sql",
+    "002_catalog_discovery.sql",
+    "003_crm_operations.sql"
+  ],
+  "pending": [],
+  "mismatches": [],
+  "counts": {
+    "requests": 1,
+    "revenue_events": 0,
+    "offers": 1,
+    "expenses": 0
+  }
+}

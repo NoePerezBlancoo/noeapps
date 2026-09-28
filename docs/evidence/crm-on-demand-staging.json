@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-28T20:36:31.365Z",
+  "deployment": "c9709288-4ffd-42ce-8931-9c5c45b30342",
+  "idleRequests": 0,
+  "idleSeconds": 101,
+  "manualRefreshScanned": true,
+  "mobileDocumentWidth": 390,
+  "mobileViewport": 390,
+  "monitorUnchangedDuringIdle": true,
+  "navigationDoesNotFetch": true,
+  "origin": "https://catalogo-staging-v2-production.up.railway.app",
+  "postSaveReloadDoesNotScan": true,
+  "retryRecovered": true,
+  "simulatedNetworkFailureVisible": true,
+  "simultaneousRefreshesCoalesced": true
+}

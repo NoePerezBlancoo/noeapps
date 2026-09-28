@@ -1466,10 +1466,6 @@ http.createServer(async(req,res)=>{
   console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('rkcs_test_')?'sandbox_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
   migrateLegacyData().catch(()=>{});
   expireOverduePreviews().catch(()=>{});
-  fetchTunegocioOperations().then(result=>console.log('TuNegocio CRM bridge: '+(result.available?'ready ('+result.projects.length+' project(s))':'unavailable'))).catch(()=>{});
   setInterval(()=>expireOverduePreviews().catch(error=>console.error('Preview expiry sweep failed',error&&error.message?error.message:error)),60*60*1000).unref();
-  if(roadmap.enabled()){
-    setTimeout(()=>crmRoadmap.scan().catch(()=>console.error('CRM monitor failed; inspect monitor runs')),10000).unref();
-    setInterval(()=>crmRoadmap.scan().catch(()=>console.error('CRM monitor failed; inspect monitor runs')),5*60*1000).unref();
-  }
+  // CRM reads and incident scans run only on authenticated user requests.
 });

@@ -1,0 +1,8 @@
+{
+  "at": "2026-09-28T20:11:55.811Z",
+  "mode": "test",
+  "passiveSubscriptionRefresh": true,
+  "mutationControlsDisabled": true,
+  "stripeSubscriptionUnchanged": true,
+  "legacyOfferPayloadStatus": 404
+}
