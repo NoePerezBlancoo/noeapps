@@ -199,10 +199,11 @@ async function load(){
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
     void loadDesignStats();
+    window.dispatchEvent(new CustomEvent('crm:loaded',{detail:j}));
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
   }catch{}
 }
-function needsReview(x){return x.source==='tunegocio'&&(['review','in_progress'].includes(x.manualStatus)||(x.paymentStatus==='paid'&&!x.published))}
+function needsReview(x){return (window.crmOpenIncidents||[]).some(i=>i.source===x.source&&i.entity_id===x.id&&i.state!=='resolved')||x.source==='tunegocio'&&(['review','in_progress'].includes(x.manualStatus)||(x.paymentStatus==='paid'&&!x.published))}
 function paid(x){return x.source==='catalog'?x.first_paid_amount_cents!=null||x.stripe_payment_status==='paid':x.paymentStatus==='paid'}
 function published(x){return x.source==='catalog'?['active'].includes(x.site_status)||x.status==='published':!!x.published}
 function renderMetrics(){
@@ -244,8 +245,8 @@ function offerOptions(source,current){
 function renderDetail(){
   const el=document.getElementById('detail');
   if(!selected){el.innerHTML='<div class="empty">Selecciona una operación.</div>';return}
-  if(selected.source==='tunegocio')return renderTnDetail();
-  renderCatalogDetail();
+  if(selected.source==='tunegocio')renderTnDetail();else renderCatalogDetail();
+  window.dispatchEvent(new Event('crm:detail'));
 }
 function subscriptionPanel(x){
   if(!x.subscriptionControlsEnabled||!(x.subscriptionId||x.stripe_subscription_id))return '';
@@ -388,5 +389,6 @@ el('offerForm').onsubmit=async e=>{e.preventDefault();const m=el('offerMsg');m.t
 el('expenseForm').onsubmit=async e=>{e.preventDefault();const m=el('expenseMsg');m.textContent='';try{await api('/api/crm/expenses',{method:'POST',body:JSON.stringify({name:val('expenseName'),category:val('expenseCategory'),amountCents:Math.round(Number(val('expenseAmount'))*100),cadence:val('expenseCadence'),expenseDate:val('expenseDate')||null,notes:val('expenseNotes')})});e.target.reset();m.className='msg ok';m.textContent='Gasto registrado.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
 load();
 </script>
+<script src="/assets/crm-roadmap.js"></script>
 </body>
 </html>
