@@ -702,7 +702,8 @@ function applyDiscount(cents,type,value,scope,target){
 }
 function checkoutFingerprint(row){
   return crypto.createHash('sha256').update(JSON.stringify([
-    row.creation_price,row.monthly_price_cents,row.discount_code,row.discount_type,row.discount_value,row.discount_scope,row.salesperson,row.email,row.design_id
+    row.creation_price,row.monthly_price_cents,row.discount_code,row.discount_type,row.discount_value,row.discount_scope,
+    row.salesperson,row.salesperson_id,row.email,row.design_id,row.offer_id,row.offer_name,row.offer_percent_off,row.offer_duration_months
   ])).digest('hex');
 }
 function invoiceSubscriptionId(obj){
@@ -733,10 +734,12 @@ async function ensurePaymentToken(row){
   throw new Error('payment_token_generation_failed');
 }
 async function createStripeSessionForRow(row){
+  const hasOffer=Number(row.offer_percent_off)>0&&Number(row.offer_duration_months)>0;
+  if(hasOffer)row=await ensureCatalogOfferPromotion(row);
   const creationBase=Math.max(0,Math.round(Number(row.creation_price)*100));
   const monthlyBase=Math.max(0,Math.round(Number(row.monthly_price_cents)));
   const creationAmount=applyDiscount(creationBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'creation');
-  const monthlyAmount=applyDiscount(monthlyBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'monthly');
+  const monthlyAmount=hasOffer?monthlyBase:applyDiscount(monthlyBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'monthly');
   if(monthlyAmount<50){const e=new Error('monthly_price_too_low');e.status=400;e.publicMessage='La cuota mensual final debe ser al menos 0,50 €.';throw e}
   const fingerprint=checkoutFingerprint(row);
   const rawExpiry=row.stripe_checkout_expires_at?new Date(row.stripe_checkout_expires_at).getTime():0;
@@ -757,7 +760,11 @@ async function createStripeSessionForRow(row){
     catalog_request_id:row.id,
     design_id:row.design_id,
     salesperson:row.salesperson||'',
+    salesperson_id:row.salesperson_id||'',
     discount_code:row.discount_code||'',
+    offer_id:row.offer_id||'',
+    offer_percent_off:String(row.offer_percent_off||0),
+    offer_duration_months:String(row.offer_duration_months||0),
     site_slug:row.site_slug||''
   };
   const params={
@@ -770,7 +777,8 @@ async function createStripeSessionForRow(row){
     success_url:PUBLIC_ORIGIN+'/pago-ok?session_id={CHECKOUT_SESSION_ID}',
     cancel_url:row.preview_url||PUBLIC_ORIGIN+'/',
     metadata,
-    subscription_data:{metadata}
+    subscription_data:{metadata},
+    ...(hasOffer?{discounts:[{promotion_code:row.stripe_offer_promotion_code_id}]}:{})
   };
   if(row.email)params.customer_email=row.email;
   if(STRIPE_AUTOMATIC_TAX)params.automatic_tax={enabled:true};
