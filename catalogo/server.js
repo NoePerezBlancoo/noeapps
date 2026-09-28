@@ -283,6 +283,180 @@ function safeTunegocioOrigin(){
     return u.origin;
   }catch{return''}
 }
+function offerUsable(row,source){
+  if(!row||row.active!==true)return false;
+  if(!['both',source].includes(String(row.source||'')))return false;
+  const now=Date.now();
+  if(row.starts_at&&new Date(row.starts_at).getTime()>now)return false;
+  if(row.ends_at&&new Date(row.ends_at).getTime()<=now)return false;
+  return true;
+}
+async function crmConfig(){
+  await ensureSchema();
+  const [salespeople,offers]=await Promise.all([
+    pool.query("SELECT id,name,email,active,created_at,updated_at FROM crm_salespeople ORDER BY active DESC,name ASC"),
+    pool.query("SELECT id,name,source,percent_off,duration_months,active,starts_at,ends_at,created_at,updated_at FROM crm_offers ORDER BY active DESC,created_at DESC")
+  ]);
+  return{salespeople:salespeople.rows,offers:offers.rows};
+}
+async function createSalesperson(req,res){
+  const data=await bodyJson(req,8000);
+  const name=text(data.name,120),email=text(data.email,180).toLowerCase();
+  if(!name)return json(res,400,{error:'Indica el nombre del comercial.'});
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email del comercial.'});
+  await ensureSchema();
+  const id=crypto.randomUUID();
+  const result=await pool.query("INSERT INTO crm_salespeople(id,name,email) VALUES($1,$2,$3) RETURNING *",[id,name,email]);
+  return json(res,201,{ok:true,salesperson:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
+}
+async function updateSalesperson(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Comercial no válido.'});
+  const data=await bodyJson(req,8000);
+  const name=text(data.name,120),email=text(data.email,180).toLowerCase(),active=data.active!==false;
+  if(!name)return json(res,400,{error:'Indica el nombre del comercial.'});
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email del comercial.'});
+  await ensureSchema();
+  const result=await pool.query("UPDATE crm_salespeople SET name=$2,email=$3,active=$4,updated_at=now() WHERE id=$1 RETURNING *",[id,name,email,active]);
+  if(!result.rows[0])return json(res,404,{error:'Comercial no encontrado.'});
+  return json(res,200,{ok:true,salesperson:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
+}
+async function createOffer(req,res){
+  const data=await bodyJson(req,10000);
+  const name=text(data.name,120),source=text(data.source,20);
+  const percentOff=Math.round(Number(data.percentOff)),durationMonths=Math.round(Number(data.durationMonths));
+  const startsAt=data.startsAt?new Date(String(data.startsAt)):null,endsAt=data.endsAt?new Date(String(data.endsAt)):null;
+  if(!name||!['catalog','tunegocio','both'].includes(source))return json(res,400,{error:'Oferta no válida.'});
+  if(!Number.isInteger(percentOff)||percentOff<1||percentOff>100)return json(res,400,{error:'El descuento debe estar entre 1% y 100%.'});
+  if(!Number.isInteger(durationMonths)||durationMonths<1||durationMonths>24)return json(res,400,{error:'La duración debe estar entre 1 y 24 meses.'});
+  if((startsAt&&!Number.isFinite(startsAt.getTime()))||(endsAt&&!Number.isFinite(endsAt.getTime()))||(startsAt&&endsAt&&endsAt<=startsAt))return json(res,400,{error:'Revisa las fechas de la oferta.'});
+  await ensureSchema();
+  const id=crypto.randomUUID();
+  const result=await pool.query("INSERT INTO crm_offers(id,name,source,percent_off,duration_months,starts_at,ends_at) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+    [id,name,source,percentOff,durationMonths,startsAt?startsAt.toISOString():null,endsAt?endsAt.toISOString():null]);
+  return json(res,201,{ok:true,offer:result.rows[0]});
+}
+async function updateOffer(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Oferta no válida.'});
+  const data=await bodyJson(req,10000);
+  const active=data.active!==false;
+  await ensureSchema();
+  const result=await pool.query("UPDATE crm_offers SET active=$2,updated_at=now() WHERE id=$1 RETURNING *",[id,active]);
+  if(!result.rows[0])return json(res,404,{error:'Oferta no encontrada.'});
+  return json(res,200,{ok:true,offer:result.rows[0]});
+}
+async function getOffer(id,source){
+  if(!id||!validUuid(String(id)))return null;
+  await ensureSchema();
+  const q=await pool.query("SELECT * FROM crm_offers WHERE id=$1 LIMIT 1",[id]);
+  return offerUsable(q.rows[0],source)?q.rows[0]:null;
+}
+async function syncTunegocioOffer(projectId,offer){
+  const origin=safeTunegocioOrigin();
+  if(!origin||CRM_BRIDGE_SECRET.length<32)throw new Error('bridge_not_configured');
+  const response=await fetch(origin+'/api/internal/crm-offer',{
+    method:offer?'POST':'DELETE',
+    headers:{'Authorization':'Bearer '+CRM_BRIDGE_SECRET,'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify(offer?{projectId,name:offer.name,percentOff:Number(offer.percent_off),durationMonths:Number(offer.duration_months)}:{projectId}),
+    signal:AbortSignal.timeout(12000)
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||'offer_sync_failed');
+  return data;
+}
+async function ensureCatalogOfferPromotion(row){
+  if(!row||!Number(row.offer_percent_off)||!Number(row.offer_duration_months))return row;
+  if(row.stripe_offer_coupon_id&&row.stripe_offer_promotion_code_id)return row;
+  if(!STRIPE_MAINTENANCE_PRODUCT_ID)throw Object.assign(new Error('offer_product_missing'),{status:503,publicMessage:'Falta configurar el producto mensual de Stripe.'});
+  const months=Number(row.offer_duration_months),percent=Number(row.offer_percent_off);
+  const coupon=await stripePost('/coupons',{
+    name:row.offer_name||('Oferta NoeApps '+percent+'%'),
+    percent_off:percent,
+    duration:months===1?'once':'repeating',
+    ...(months>1?{duration_in_months:months}:{}),
+    applies_to:{products:[STRIPE_MAINTENANCE_PRODUCT_ID]},
+    metadata:{application:'noeapps-catalog',request_id:row.id,offer_id:row.offer_id||''}
+  },'catalog-offer-coupon-'+row.id+'-'+String(row.offer_id||'custom'));
+  const promotion=await stripePost('/promotion_codes',{
+    active:true,
+    promotion:{type:'coupon',coupon:coupon.id},
+    metadata:{application:'noeapps-catalog',request_id:row.id,offer_id:row.offer_id||''}
+  },'catalog-offer-promo-'+row.id+'-'+String(row.offer_id||'custom'));
+  const updated=await pool.query("UPDATE catalog_requests SET stripe_offer_coupon_id=$2,stripe_offer_promotion_code_id=$3,updated_at=now() WHERE id=$1 RETURNING *",
+    [row.id,String(coupon.id||''),String(promotion.id||'')]);
+  return updated.rows[0]||row;
+}
+async function catalogAnalytics(){
+  await ensureSchema();
+  const [revenue,totals,topDesigns]=await Promise.all([
+    pool.query(`SELECT coalesce(sum(amount_paid_cents),0)::bigint AS revenue_cents,
+      coalesce(sum(amount_paid_cents) FILTER (WHERE paid_at>=date_trunc('month',now())),0)::bigint AS month_revenue_cents,
+      count(*)::integer AS payments FROM catalog_revenue_events`),
+    pool.query(`SELECT count(*)::integer AS requests,
+      count(*) FILTER (WHERE first_paid_amount_cents IS NOT NULL)::integer AS paid,
+      count(*) FILTER (WHERE site_status='active')::integer AS active,
+      coalesce(sum(commission_cents),0)::bigint AS commissions_cents
+      FROM catalog_requests`),
+    pool.query(`SELECT design_id,design_name,count(*)::integer AS requests,
+      count(*) FILTER (WHERE first_paid_amount_cents IS NOT NULL)::integer AS paid,
+      coalesce(sum(first_paid_amount_cents),0)::bigint AS first_revenue_cents
+      FROM catalog_requests GROUP BY design_id,design_name ORDER BY paid DESC,requests DESC LIMIT 10`)
+  ]);
+  const activeRows=await pool.query("SELECT monthly_price_cents,offer_percent_off,offer_duration_months,paid_at FROM catalog_requests WHERE stripe_subscription_status IN ('active','trialing','past_due')");
+  let mrrCents=0;
+  for(const row of activeRows.rows){
+    let amount=Number(row.monthly_price_cents||0);
+    if(row.paid_at&&Number(row.offer_percent_off)>0&&Number(row.offer_duration_months)>0){
+      const end=new Date(row.paid_at);end.setUTCMonth(end.getUTCMonth()+Number(row.offer_duration_months));
+      if(end.getTime()>Date.now())amount=Math.round(amount*(100-Number(row.offer_percent_off))/100);
+    }
+    mrrCents+=amount;
+  }
+  return{
+    revenueCents:Number(revenue.rows[0]?.revenue_cents||0),
+    monthRevenueCents:Number(revenue.rows[0]?.month_revenue_cents||0),
+    payments:Number(revenue.rows[0]?.payments||0),
+    requests:Number(totals.rows[0]?.requests||0),
+    paid:Number(totals.rows[0]?.paid||0),
+    active:Number(totals.rows[0]?.active||0),
+    commissionsCents:Number(totals.rows[0]?.commissions_cents||0),
+    mrrCents,
+    topDesigns:topDesigns.rows
+  };
+}
+async function combinedAnalytics(tunegocio){
+  const catalog=await catalogAnalytics();
+  const tnCommercial=tunegocio&&tunegocio.analytics&&tunegocio.analytics.commercial?tunegocio.analytics.commercial:null;
+  const tnAi=tunegocio&&tunegocio.analytics&&tunegocio.analytics.aiUsage?tunegocio.analytics.aiUsage:null;
+  const tnProjects=Array.isArray(tunegocio?.projects)?tunegocio.projects:[];
+  let tnMrrCents=0,tnCommissionsCents=0;
+  for(const item of tnProjects){
+    if(item.paymentStatus==='paid'&&item.paidUntil&&new Date(item.paidUntil).getTime()>Date.now()){
+      const amount=Number(item.amountCents||0);
+      if(item.planId==='monthly')tnMrrCents+=amount;
+      else if(item.planId==='annual'||item.planId==='annual-prepaid')tnMrrCents+=Math.round(amount/12);
+    }
+    if(item.salespersonId&&Number(item.firstAmountCents)>0)tnCommissionsCents+=Math.round(Number(item.firstAmountCents)*SALESPERSON_COMMISSION_PERCENT/100);
+  }
+  const totalRevenueCents=catalog.revenueCents+Number(tnCommercial?.revenueCents||0);
+  const totalCommissionsCents=catalog.commissionsCents+tnCommissionsCents;
+  const totalOperations=catalog.requests+tnProjects.length;
+  const totalPaid=catalog.paid+tnProjects.filter(x=>x.paymentStatus==='paid').length;
+  return{
+    catalog,
+    tunegocio:{commercial:tnCommercial,aiUsage:tnAi,mrrCents:tnMrrCents,commissionsCents:tnCommissionsCents,bridgeAvailable:!!tunegocio?.available},
+    totals:{
+      operations:totalOperations,
+      paid:totalPaid,
+      conversionPct:totalOperations?Number((totalPaid*100/totalOperations).toFixed(1)):0,
+      revenueCents:totalRevenueCents,
+      monthRevenueCents:catalog.monthRevenueCents+Number(tnCommercial?.monthRevenueCents||0),
+      mrrCents:catalog.mrrCents+tnMrrCents,
+      commissionsCents:totalCommissionsCents,
+      averageFirstTicketCents:totalPaid?Math.round((catalog.topDesigns.reduce((s,x)=>s+Number(x.first_revenue_cents||0),0)+tnProjects.filter(x=>x.paymentStatus==='paid').reduce((s,x)=>s+Number(x.firstAmountCents||0),0))/totalPaid):0
+    }
+  };
+}
+
 async function fetchTunegocioOperations(){
   const origin=safeTunegocioOrigin();
   if(!origin||CRM_BRIDGE_SECRET.length<32)return{available:false,projects:[],error:'bridge_not_configured'};
