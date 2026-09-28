@@ -242,13 +242,13 @@ async function createStripeCheckout(res,id){
   }
   const lineItems=[];
   if(creationAmount>0){
-    lineItems.push({price_data:{currency:'eur',product:STRIPE_CREATION_PRODUCT_ID,unit_amount:creationAmount},quantity:1});
+    lineItems.push({price_data:{currency:'eur',product:STRIPE_CREATION_PRODUCT_ID,unit_amount:creationAmount,tax_behavior:'inclusive'},quantity:1});
   }
   const monthlyDiscounted=monthlyAmount!==monthlyBase;
   if(monthlyAmount===1990&&!monthlyDiscounted&&STRIPE_DEFAULT_MONTHLY_PRICE_ID){
     lineItems.push({price:STRIPE_DEFAULT_MONTHLY_PRICE_ID,quantity:1});
   }else{
-    lineItems.push({price_data:{currency:'eur',product:STRIPE_MAINTENANCE_PRODUCT_ID,unit_amount:monthlyAmount,recurring:{interval:'month',interval_count:1}},quantity:1});
+    lineItems.push({price_data:{currency:'eur',product:STRIPE_MAINTENANCE_PRODUCT_ID,unit_amount:monthlyAmount,tax_behavior:'inclusive',recurring:{interval:'month',interval_count:1}},quantity:1});
   }
   const metadata={
     catalog_request_id:row.id,
