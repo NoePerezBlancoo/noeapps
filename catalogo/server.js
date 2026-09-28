@@ -355,20 +355,29 @@ function invoiceRequestId(obj){
     (obj.subscription_details&&obj.subscription_details.metadata&&obj.subscription_details.metadata.catalog_request_id)
   )||'';
 }
-async function createStripeCheckout(res,id){
-  if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
-  if(!STRIPE_CREATION_PRODUCT_ID||!STRIPE_MAINTENANCE_PRODUCT_ID){return json(res,503,{error:'Stripe todavía no está terminado de configurar.'})}
-  await ensureSchema();
-  const found=await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[id]);
-  const row=found.rows[0];if(!row)return json(res,404,{error:'Solicitud no encontrada.'});
+async function ensurePaymentToken(row){
+  if(row.payment_token)return row;
+  for(let i=0;i<5;i++){
+    const token=crypto.randomBytes(24).toString('base64url');
+    try{
+      const r=await pool.query("UPDATE catalog_requests SET payment_token=$2,updated_at=now() WHERE id=$1 AND payment_token='' RETURNING *",[row.id,token]);
+      if(r.rows[0])return r.rows[0];
+      const current=await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[row.id]);
+      if(current.rows[0]&&current.rows[0].payment_token)return current.rows[0];
+    }catch(error){if(error&&error.code!=='23505')throw error}
+  }
+  throw new Error('payment_token_generation_failed');
+}
+async function createStripeSessionForRow(row){
   const creationBase=Math.max(0,Math.round(Number(row.creation_price)*100));
   const monthlyBase=Math.max(0,Math.round(Number(row.monthly_price_cents)));
   const creationAmount=applyDiscount(creationBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'creation');
   const monthlyAmount=applyDiscount(monthlyBase,row.discount_type,Number(row.discount_value)||0,row.discount_scope,'monthly');
-  if(monthlyAmount<50)return json(res,400,{error:'La cuota mensual final debe ser al menos 0,50 €.'});
+  if(monthlyAmount<50){const e=new Error('monthly_price_too_low');e.status=400;e.publicMessage='La cuota mensual final debe ser al menos 0,50 €.';throw e}
   const fingerprint=checkoutFingerprint(row);
-  if(row.payment_url&&row.checkout_fingerprint===fingerprint&&!['paid','complete','expired','failed'].includes(String(row.stripe_payment_status||'').toLowerCase())){
-    return json(res,200,{ok:true,reused:true,url:row.payment_url,request:row});
+  const rawExpiry=row.stripe_checkout_expires_at?new Date(row.stripe_checkout_expires_at).getTime():0;
+  if(row.stripe_checkout_url&&row.checkout_fingerprint===fingerprint&&rawExpiry>Date.now()+60000&&!['paid','complete','failed'].includes(String(row.stripe_payment_status||'').toLowerCase())){
+    return {row,url:row.stripe_checkout_url,reused:true};
   }
   const lineItems=[];
   if(creationAmount>0){
@@ -384,7 +393,8 @@ async function createStripeCheckout(res,id){
     catalog_request_id:row.id,
     design_id:row.design_id,
     salesperson:row.salesperson||'',
-    discount_code:row.discount_code||''
+    discount_code:row.discount_code||'',
+    site_slug:row.site_slug||''
   };
   const params={
     mode:'subscription',
@@ -400,11 +410,113 @@ async function createStripeCheckout(res,id){
   };
   if(row.email)params.customer_email=row.email;
   if(STRIPE_AUTOMATIC_TAX)params.automatic_tax={enabled:true};
-  const session=await stripePost('/checkout/sessions',params,'catalog-checkout-'+row.id+'-'+fingerprint.slice(0,24));
-  const updated=await pool.query(`UPDATE catalog_requests SET payment_url=$2,stripe_checkout_session_id=$3,stripe_payment_status=$4,checkout_fingerprint=$5,updated_at=now() WHERE id=$1 RETURNING *`,
-    [row.id,session.url||'',session.id||'',session.payment_status||session.status||'open',fingerprint]);
-  return json(res,200,{ok:true,url:session.url,request:updated.rows[0]});
+  const window=Math.floor(Date.now()/(5*60*1000));
+  const session=await stripePost('/checkout/sessions',params,'catalog-checkout-'+row.id+'-'+fingerprint.slice(0,16)+'-'+window);
+  const expiresAt=session.expires_at?new Date(Number(session.expires_at)*1000):new Date(Date.now()+23*60*60*1000);
+  const updated=await pool.query(`UPDATE catalog_requests SET stripe_checkout_session_id=$2,stripe_checkout_url=$3,stripe_checkout_expires_at=$4,stripe_payment_status=$5,checkout_fingerprint=$6,updated_at=now() WHERE id=$1 RETURNING *`,
+    [row.id,session.id||'',session.url||'',expiresAt,session.payment_status||session.status||'open',fingerprint]);
+  return {row:updated.rows[0]||row,url:session.url,reused:false};
 }
+async function createStripeCheckout(res,id){
+  if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
+  if(!STRIPE_CREATION_PRODUCT_ID||!STRIPE_MAINTENANCE_PRODUCT_ID)return json(res,503,{error:'Stripe todavía no está terminado de configurar.'});
+  await ensureSchema();
+  const found=await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[id]);
+  let row=found.rows[0];if(!row)return json(res,404,{error:'Solicitud no encontrada.'});
+  row=await ensurePaymentToken(row);
+  const checkout=await createStripeSessionForRow(row);
+  const durableUrl=PUBLIC_ORIGIN+'/pagar/'+encodeURIComponent(checkout.row.payment_token);
+  const updated=await pool.query('UPDATE catalog_requests SET payment_url=$2,updated_at=now() WHERE id=$1 RETURNING *',[row.id,durableUrl]);
+  return json(res,200,{ok:true,reused:checkout.reused,url:durableUrl,request:updated.rows[0]||checkout.row});
+}
+function simpleSitePage(res,status,title,message){
+  res.writeHead(status,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow, noarchive','X-Content-Type-Options':'nosniff'});
+  return res.end('<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+' · NoeApps</title><body style="margin:0;background:#080a0e;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:24px"><main style="max-width:640px;text-align:center"><div style="font-size:46px">●</div><h1 style="font-size:38px;margin:14px 0">'+title+'</h1><p style="color:#aeb7c4;line-height:1.65">'+message+'</p></main></body></html>');
+}
+async function handlePublicPayment(res,token){
+  if(!/^[A-Za-z0-9_-]{20,80}$/.test(token))return simpleSitePage(res,404,'Enlace no válido','Este enlace de pago no es válido.');
+  await ensureSchema();
+  const q=await pool.query('SELECT * FROM catalog_requests WHERE payment_token=$1',[token]);
+  let row=q.rows[0];if(!row)return simpleSitePage(res,404,'Enlace no encontrado','Este enlace de pago ya no está disponible.');
+  row=await refreshSiteState(row);
+  if(siteIsPaid(row)){
+    res.writeHead(303,{'Location':row.preview_url||PUBLIC_ORIGIN+'/pago-ok','Cache-Control':'no-store'});return res.end();
+  }
+  if(row.site_status==='expired')return simpleSitePage(res,410,'Vista previa caducada','Han pasado los 10 días de disponibilidad. Ponte en contacto con NoeApps si quieres reactivar esta web.');
+  const checkout=await createStripeSessionForRow(row);
+  res.writeHead(303,{'Location':checkout.url,'Cache-Control':'no-store','X-Robots-Tag':'noindex'});return res.end();
+}
+async function publishSite(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
+  const data=await bodyJson(req,8000);
+  const requested=normalizeSiteSlug(text(data.siteSlug,80));
+  if(!validSiteSlug(requested))return json(res,400,{error:'El subdominio no es válido.'});
+  const origin=safeSiteOrigin(data.siteOriginUrl);
+  if(!origin)return json(res,400,{error:'Indica la URL privada/origen HTTPS donde está desplegada la web.'});
+  await ensureSchema();
+  const found=await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[id]);
+  let row=found.rows[0];if(!row)return json(res,404,{error:'Solicitud no encontrada.'});
+  const clash=await pool.query('SELECT id FROM catalog_requests WHERE site_slug=$1 AND id<>$2 LIMIT 1',[requested,id]);
+  if(clash.rows[0])return json(res,409,{error:'Ese subdominio ya está asignado a otra web.'});
+  const paid=siteIsPaid(row);
+  const publicUrl=sitePublicUrl(requested);
+  const r=await pool.query(`UPDATE catalog_requests SET site_slug=$2,site_origin_url=$3,site_status=$4,preview_published_at=COALESCE(preview_published_at,now()),preview_expires_at=$5,preview_url=$6,status=$7,updated_at=now() WHERE id=$1 RETURNING *`,
+    [id,requested,origin,paid?'active':'preview',paid?null:new Date(Date.now()+10*24*60*60*1000),publicUrl,paid?'published':'preview_ready']);
+  return json(res,200,{ok:true,publicUrl,request:r.rows[0]});
+}
+async function publicSiteRoute(res,slug){
+  if(!validSiteSlug(slug))return json(res,404,{managed:false});
+  await ensureSchema();
+  const q=await pool.query('SELECT * FROM catalog_requests WHERE site_slug=$1',[slug]);
+  if(!q.rows[0])return json(res,404,{managed:false});
+  const row=await refreshSiteState(q.rows[0]);
+  return json(res,200,{managed:true,status:row.site_status,publicUrl:sitePublicUrl(slug)});
+}
+async function proxyCustomerSite(req,res,slug,pathname,search){
+  if(!validSiteSlug(slug))return simpleSitePage(res,404,'Web no encontrada','No encontramos esta web.');
+  await ensureSchema();
+  const q=await pool.query('SELECT * FROM catalog_requests WHERE site_slug=$1',[slug]);
+  let row=q.rows[0];if(!row)return simpleSitePage(res,404,'Web no encontrada','No encontramos esta web.');
+  row=await refreshSiteState(row);
+  if(row.site_status==='expired')return simpleSitePage(res,410,'Vista previa caducada','Esta vista previa estuvo disponible durante 10 días y ha caducado al no activarse.');
+  if(row.site_status==='suspended')return simpleSitePage(res,402,'Web temporalmente desactivada','Esta web no está activa en este momento.');
+  if(!['preview','active'].includes(row.site_status)||!row.site_origin_url)return simpleSitePage(res,503,'Web en preparación','La web todavía se está preparando.');
+  if(req.method!=='GET'&&req.method!=='HEAD')return json(res,405,{error:'Method not allowed'},{'Allow':'GET, HEAD'});
+  let target;
+  try{
+    const base=row.site_origin_url.endsWith('/')?row.site_origin_url:row.site_origin_url+'/';
+    target=new URL((pathname||'/').replace(/^\//,''),base);
+    target.search=search||'';
+  }catch{return simpleSitePage(res,502,'Web no disponible','No se pudo abrir el origen de esta web.')}
+  try{
+    const headers={};
+    for(const name of ['accept','accept-language','user-agent','if-none-match','if-modified-since']){
+      if(req.headers[name])headers[name]=req.headers[name];
+    }
+    const upstream=await fetch(target,{method:req.method,headers,redirect:'manual',signal:AbortSignal.timeout(15000)});
+    if(upstream.status>=300&&upstream.status<400&&upstream.headers.get('location')){
+      const loc=new URL(upstream.headers.get('location'),target);
+      let location=loc.toString();
+      if(loc.hostname===target.hostname)location=sitePublicUrl(slug).replace(/\/$/,'')+loc.pathname+loc.search+loc.hash;
+      res.writeHead(upstream.status,{'Location':location,'Cache-Control':'no-store'});return res.end();
+    }
+    const responseHeaders={
+      'Content-Type':upstream.headers.get('content-type')||contentType(pathname,upstream.headers.get('content-type')),
+      'Cache-Control':row.site_status==='preview'?'private, no-store, max-age=0':(upstream.headers.get('cache-control')||'public, max-age=60'),
+      'X-Content-Type-Options':'nosniff'
+    };
+    if(row.site_status==='preview')responseHeaders['X-Robots-Tag']='noindex, nofollow, noarchive';
+    if(upstream.headers.get('etag'))responseHeaders['ETag']=upstream.headers.get('etag');
+    if(upstream.headers.get('last-modified'))responseHeaders['Last-Modified']=upstream.headers.get('last-modified');
+    res.writeHead(upstream.status,responseHeaders);
+    if(req.method==='HEAD')return res.end();
+    return res.end(Buffer.from(await upstream.arrayBuffer()));
+  }catch(error){
+    console.error('Customer site proxy failed',slug,error&&error.message?error.message:error);
+    return simpleSitePage(res,502,'Web no disponible','La web no está disponible temporalmente.');
+  }
+}
+
 async function createCustomerPortal(res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   await ensureSchema();
