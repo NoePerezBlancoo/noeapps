@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0 — 2026-09-28
+
+- Añade **Catálogo NoeApps** a la sección Proyectos de la portada.
+- Incorpora ficha propia y enlace a `https://catalogo.noeapps.com/`.
+- Actualiza soporte, sitemap y validación del catálogo completo a 20 entradas.
+
+
 ## 2.2.0 — 2026-09-14
 
 - Restaurado el catálogo anterior completo: ForgeOps, Fivaki, Pequeño Comercio, herramientas y proyectos, con sus capturas, guías y documentos.
