@@ -99,8 +99,10 @@ function createRoadmap({pool,ensureSchema,bridgeOrigin,bridgeSecret,publicOrigin
         coalesce(sum(amount_paid_cents) FILTER(WHERE paid_at>=date_trunc('year',now() AT TIME ZONE 'Europe/Madrid') AT TIME ZONE 'Europe/Madrid'),0)::float8 AS year,
         min(paid_at) AS since FROM catalog_revenue_events WHERE paid_at<=now()`),
       pool.query(`SELECT count(*)::int AS operations,count(*) FILTER(WHERE first_paid_amount_cents>0)::int AS paid,
-        count(*) FILTER(WHERE site_status='active' AND subscription_paid_until>now())::int AS active_customers,
-        count(*) FILTER(WHERE paid_at>=date_trunc('month',now() AT TIME ZONE 'Europe/Madrid') AT TIME ZONE 'Europe/Madrid')::int AS new_customers,
+        count(DISTINCT coalesce(nullif(lower(trim(email)),''),nullif(regexp_replace(whatsapp,'[^0-9]','','g'),''),id::text)) FILTER(WHERE site_status='active' AND subscription_paid_until>now())::int AS active_customers,
+        count(*) FILTER(WHERE site_status='active' AND subscription_paid_until>now())::int AS published,
+        (SELECT count(*)::int FROM (SELECT coalesce(nullif(lower(trim(email)),''),nullif(regexp_replace(whatsapp,'[^0-9]','','g'),''),id::text)
+          FROM catalog_requests WHERE first_paid_amount_cents>0 GROUP BY 1 HAVING min(paid_at)>=date_trunc('month',now() AT TIME ZONE 'Europe/Madrid') AT TIME ZONE 'Europe/Madrid') customers)::int AS new_customers,
         coalesce(sum(first_paid_amount_cents),0)::float8 AS first_revenue,coalesce(sum(commission_cents),0)::float8 AS commissions,
         coalesce(sum(commission_cents) FILTER(WHERE paid_at>=date_trunc('month',now() AT TIME ZONE 'Europe/Madrid') AT TIME ZONE 'Europe/Madrid'),0)::float8 AS month_commissions,
         coalesce(sum(monthly_price_cents) FILTER(WHERE stripe_subscription_status='active' AND subscription_paid_until>now()),0)::float8 AS mrr,

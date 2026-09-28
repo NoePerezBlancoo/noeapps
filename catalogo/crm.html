@@ -371,8 +371,8 @@ function renderOffers(){
 }
 function renderExpenses(){
   const root=el('expenseList');if(!expenses.length){root.innerHTML='<div class="empty">Todavía no hay gastos.</div>';return}
-  root.innerHTML='<table class="table"><thead><tr><th>Concepto</th><th>Categoría</th><th>Importe</th><th>Tipo</th><th>Fecha</th><th></th></tr></thead><tbody>'+expenses.map(x=>'<tr><td><strong>'+esc(x.name)+'</strong><small>'+esc(x.notes||'')+'</small></td><td>'+esc(x.category)+'</td><td>'+cents(x.amount_cents)+'</td><td>'+(x.cadence==='monthly'?'Mensual':'Puntual')+'</td><td>'+date(x.expense_date)+'</td><td><button class="btn" data-exp-toggle="'+x.id+'">'+(x.active?'Desactivar':'Activar')+'</button></td></tr>').join('')+'</tbody></table>';
-  root.querySelectorAll('[data-exp-toggle]').forEach(b=>b.onclick=async()=>{const x=expenses.find(y=>y.id===b.dataset.expToggle);if(!x)return;await api('/api/crm/expenses/'+x.id,{method:'PATCH',body:JSON.stringify({active:!x.active})});await load()});
+  root.innerHTML='<table class="table"><thead><tr><th>Concepto</th><th>Categoría</th><th>Importe</th><th>Tipo</th><th>Fecha</th><th></th></tr></thead><tbody>'+expenses.map(x=>'<tr><td><strong>'+esc(x.name)+'</strong><small>'+esc(x.notes||'')+'</small></td><td>'+esc(x.category)+'</td><td>'+cents(x.amount_cents)+'</td><td>'+(x.cadence==='monthly'?'Mensual':'Puntual')+'</td><td>'+date(x.expense_date)+(x.ended_on?'<small>Finalizado: '+date(x.ended_on)+'</small>':'')+'</td><td><button class="btn" data-exp-toggle="'+x.id+'"'+(x.ended_on?' disabled title="Registra un nuevo gasto para iniciar otro periodo"':'')+'>'+(x.ended_on?'Finalizado':x.active?'Desactivar':'Activar')+'</button></td></tr>').join('')+'</tbody></table>';
+  root.querySelectorAll('[data-exp-toggle]').forEach(b=>b.onclick=async()=>{const x=expenses.find(y=>y.id===b.dataset.expToggle);if(!x)return;try{await api('/api/crm/expenses/'+x.id,{method:'PATCH',body:JSON.stringify({active:!x.active})});await load()}catch(err){el('expenseMsg').className='msg';el('expenseMsg').textContent=err.message}});
 }
 
 function el(id){return document.getElementById(id)}function val(id){return el(id)?.value||''}

@@ -34,7 +34,7 @@
     report=data;const a=el('view-analytics');
     el('mTotal').textContent=num(data.combined?.operations);el('mCatalog').textContent=num(data.catalog.totals.operations);
     el('mTn').textContent=num(data.tunegocio?.totals.operations);el('mPaid').textContent=num(data.combined?.paid);
-    el('mPublished').textContent=data.tunegocio?num(Number(data.catalog.totals.active_customers)+Number(data.tunegocio.totals.published)):'No disponible';
+    el('mPublished').textContent=data.tunegocio?num(Number(data.catalog.totals.published)+Number(data.tunegocio.totals.published)):'No disponible';
     // Replace the displayed legacy totals, preserving their DOM for older handlers.
     [...a.children].forEach(x=>{if(!['roadmapAnalytics','designPerformance'].includes(x.id))x.style.display='none';});
     const root=node('roadmapAnalytics',a);a.prepend(root);const t=data.combined,ai=data.tunegocio?.ai;
