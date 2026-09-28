@@ -4,6 +4,7 @@ const path=require('path');
 const crypto=require('crypto');
 const {Pool}=require('pg');
 const subscriptions=require('./subscriptions');
+const discovery=require('./catalog-discovery');
 subscriptions.assertStaging();
 
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
@@ -38,6 +39,7 @@ const CRM_BRIDGE_SECRET=(process.env.NOEAPPS_CRM_BRIDGE_SECRET||'').trim();
 const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace(/\/$/,'');
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
+const catalogDiscovery=discovery.createDiscovery(pool,LIBRARY_ORIGIN);
 let schemaPromise=null;
 let legacyMigrationPromise=null;
 
@@ -205,7 +207,7 @@ async function ensureSchema(){
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_payment_token_uidx ON catalog_requests(payment_token) WHERE payment_token <> '';
-  `).then(async()=>{if(subscriptions.enabled())await subscriptions.migrate(pool)}).catch(error=>{schemaPromise=null;throw error});
+  `).then(async()=>{if(subscriptions.enabled()||discovery.enabled())await subscriptions.migrate(pool)}).catch(error=>{schemaPromise=null;throw error});
   return schemaPromise;
 }
 
@@ -1204,6 +1206,20 @@ http.createServer(async(req,res)=>{
       try{await ensureSchema();res.writeHead(200,{'Content-Type':'text/plain'});return res.end('ok')}catch{res.writeHead(503,{'Content-Type':'text/plain'});return res.end('database unavailable')}
     }
     if(url.pathname==='/catalog-data')return proxy(req,res,LIBRARY_ORIGIN+'/catalog.json','catalog.json');
+    if(['/assets/catalog-search.js','/assets/catalog-search-ui.js','/assets/catalog-search.css'].includes(url.pathname)&&req.method==='GET'){
+      const name={'/assets/catalog-search.js':'search-engine.js','/assets/catalog-search-ui.js':'search-ui.js','/assets/catalog-search.css':'search.css'}[url.pathname];
+      res.writeHead(200,{'Content-Type':name.endsWith('.css')?'text/css; charset=utf-8':'application/javascript; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff'});
+      return res.end(fs.readFileSync(path.join(__dirname,name)));
+    }
+    if(url.pathname==='/api/catalog/discovery'&&req.method==='GET'){
+      if(!discovery.enabled())return json(res,200,{enabled:false});
+      await ensureSchema();return json(res,200,await catalogDiscovery.report());
+    }
+    if(url.pathname==='/api/crm/design-stats'&&req.method==='GET'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      if(!discovery.enabled())return json(res,404,{error:'Función no habilitada.'});
+      await ensureSchema();return json(res,200,await catalogDiscovery.report(true));
+    }
     if(url.pathname.startsWith('/library/')){
       const assetPath=url.pathname.slice('/library/'.length);
       return proxy(req,res,LIBRARY_ORIGIN+'/'+assetPath,assetPath);

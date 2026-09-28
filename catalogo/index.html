@@ -195,9 +195,12 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 @media(max-width:650px){.cat-nav{height:72px}.cat-pill{display:none}.cat-help-btn{height:38px}.cat-hero{padding-top:34px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions a{width:100%}.price-guide{padding:16px}.price-guide-grid{grid-template-columns:1fr 1fr}.price-tier strong{font-size:22px}.value-banner a{width:100%;justify-content:center}}
 
 </style>
+<link rel="stylesheet" href="/assets/catalog-search.css">
 </head>
 <body>
 <div id="app"></div>
+<script src="/assets/catalog-search.js"></script>
+<script src="/assets/catalog-search-ui.js"></script>
 <script>
 const sectors=[
 {slug:"barberia",n:"01",name:"Barbería",tag:"Editorial · Reserva",desc:"Oscura, artesanal y con carácter.",img:"https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1200&q=84"},
@@ -330,6 +333,7 @@ document.title=sector?sector.name+" — NoeApps Demo":"NoeApps — Catálogo web
 setTimeout(()=>document.querySelectorAll(".reveal").forEach((el,i)=>setTimeout(()=>el.classList.add("on"),i*55)),40);
 }
 const libraryState={items:[],visible:36,query:"",category:"",style:"",favoritesOnly:false};
+let discoveryView=null;
 const libraryFavorites=new Set(JSON.parse(localStorage.getItem("noeappsCatalogFavorites")||"[]"));
 const compareIds=new Set();
 
@@ -341,6 +345,7 @@ function catalogAdaptationMode(x){
  return /^(Original NoeApps|MIT(?:\b|\s|\())/i.test(license)?"adapt":"reference";
 }
 function catalogTier(x){
+ if(window.CatalogSearch)return window.CatalogSearch.tier(x);
  const tags=(x.style||[]).map(v=>String(v).toLowerCase());
  const impact=Number(x.impact_score||0);
  if(tags.some(t=>t.includes("3d")||t.includes("experimental")))return {key:"signature",label:"Signature",price:299};
@@ -392,6 +397,7 @@ function sectorBuilderUrl(s){
 }
 function demoSalesCta(s){if(!s)return"";const tier=sectorTier();return '<a class="demo-sales-cta" href="'+sectorBuilderUrl(s)+'"><span><small>Creación</small><br><b>'+euro(tier.price)+'</b></span><span>Quiero una web como esta →</span></a>'}
 function libraryFiltered(){
+ if(discoveryView)return discoveryView.filter(libraryState.items.filter(x=>!libraryState.favoritesOnly||libraryFavorites.has(x.id)));
  const q=libraryState.query.trim().toLowerCase();
  return libraryState.items.filter(x=>{
    const cat=!libraryState.category||x.category===libraryState.category;
@@ -418,6 +424,7 @@ function renderLibrary(reset=false){
  const grid=document.getElementById("libraryGrid");
  if(!grid)return;
  grid.innerHTML=shown.map(libraryCard).join("");
+ if(discoveryView)discoveryView.afterRender();
  document.getElementById("libraryEmpty").classList.toggle("show",items.length===0);
  const more=document.getElementById("libraryMore");
  more.style.display=shown.length>=items.length?"none":"inline-flex";
@@ -626,7 +633,9 @@ async function initLibrary(){
    }
 
    libraryState.items=curated;
-   fillLibraryFilters(); renderImpact(); renderLibrary(true);
+   fillLibraryFilters();
+   if(!activeSelection&&window.CatalogDiscoveryUI)discoveryView=await window.CatalogDiscoveryUI.setup({state:libraryState,render:renderLibrary,escape:libraryEsc});
+   renderImpact(); renderLibrary(true);
    if(activeSelection){
      const spotlight=document.getElementById("impactSpotlight"); if(spotlight)spotlight.hidden=true;
      document.getElementById("copyCurrentSelection")?.addEventListener("click",shareSelection);

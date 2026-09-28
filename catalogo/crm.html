@@ -86,6 +86,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
     <article class="panel"><h3>Consumo IA</h3><div id="aiDetails"></div></article>
   </div>
   <p class="note" style="margin-top:14px">La facturación histórica empieza a consolidarse desde el ledger del CRM v2. No se inventan importes antiguos que Stripe no haya confirmado al nuevo ledger.</p>
+  <article class="panel hidden" id="designPerformance" style="margin-top:20px">
+    <h3>Rendimiento por diseño · Catálogo</h3>
+    <p class="note" id="designStatsNote"></p>
+    <div class="toolbar"><label>Buscar diseño<input class="input" id="designStatsQuery" type="search" placeholder="Nombre o categoría"></label>
+    <label>Ordenar<select class="input" id="designStatsSort"><option value="sales">Más vendidos</option><option value="requests">Más solicitudes</option><option value="conversion">Mayor conversión</option><option value="revenueCents">Mayor facturación</option><option value="name">Nombre</option></select></label></div>
+    <div id="designStatsTable" style="overflow-x:auto"></div>
+    <button class="btn" id="designStatsMore" type="button" hidden>Ver más diseños</button>
+  </article>
 </section>
 
 <section class="page hidden" id="view-sales">
@@ -139,6 +147,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <script>
 let catalogItems=[],tnItems=[],items=[],selected=null,salespeople=[],offers=[],expenses=[],analytics=null;
 let sourceFilter='all',searchTerm='',stripeConfigured=false,siteDomain='noeapps.com',commissionPercent=30;
+let designReport=null,designStatsVisible=50;
+async function loadDesignStats(){
+  const panel=document.getElementById('designPerformance');
+  try{
+    const response=await fetch('/api/crm/design-stats',{cache:'no-store'});
+    if(response.status===404){panel.classList.add('hidden');return;}
+    panel.classList.remove('hidden');
+    if(!response.ok)throw new Error('Estadísticas no disponibles. Actualiza el CRM para reintentar.');
+    designReport=await response.json();
+    if(!designReport.metricsAvailable)throw new Error('Estadísticas no disponibles. No se muestran ceros como si fueran datos confirmados.');
+    document.getElementById('designStatsNote').textContent=(designReport.mode==='test'?'DATOS DE PRUEBA · ':'')+'Ventas: solicitudes con algún cobro positivo confirmado. Las renovaciones suman cobros, no ventas. Conversión: ventas / solicitudes. Facturación: cobros brutos registrados, antes de devoluciones. Sin estimaciones ni reconstrucción del historial anterior al ledger. Actualizado: '+new Date(designReport.generatedAt).toLocaleString('es-ES')+'.';
+    renderDesignStats();
+  }catch(error){panel.classList.remove('hidden');document.getElementById('designStatsNote').textContent=error.message;document.getElementById('designStatsTable').innerHTML='';document.getElementById('designStatsMore').hidden=true;}
+}
+function renderDesignStats(){
+  if(!designReport?.metricsAvailable)return;
+  const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const q=normalize(document.getElementById('designStatsQuery').value),sort=document.getElementById('designStatsSort').value;
+  const rows=designReport.designs.filter(x=>normalize(x.name+' '+x.category+' '+x.id).includes(q));
+  rows.sort((a,b)=>(sort==='name'?String(a.name).localeCompare(String(b.name),'es'):(b[sort]??-1)-(a[sort]??-1))||b.requests-a.requests||a.id.localeCompare(b.id));
+  document.getElementById('designStatsTable').innerHTML='<table class="table"><thead><tr><th>Diseño</th><th>Solicitudes</th><th>Ventas</th><th>Conversión</th><th>Cobros registrados</th></tr></thead><tbody>'+rows.slice(0,designStatsVisible).map(x=>'<tr><td><strong>'+esc(x.name)+'</strong><small>'+esc(x.category)+' · '+esc(x.id)+'</small></td><td>'+x.requests+'</td><td>'+x.sales+'</td><td>'+(x.conversion==null?'Sin solicitudes':(x.conversion*100).toLocaleString('es-ES',{maximumFractionDigits:1})+'%<small>'+x.sales+' de '+x.requests+' solicitudes</small>')+'</td><td>'+cents(x.revenueCents)+'</td></tr>').join('')+'</tbody></table><p class="note">'+Math.min(rows.length,designStatsVisible)+' de '+rows.length+' diseños</p>';
+  document.getElementById('designStatsMore').hidden=rows.length<=designStatsVisible;
+}
 
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const eur=c=>Number(c||0).toLocaleString('es-ES',{style:'currency',currency:'EUR'});
@@ -166,6 +197,7 @@ async function load(){
     salespeople=j.salespeople||[];offers=j.offers||[];expenses=j.expenses||[];analytics=j.analytics||null;
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
+    void loadDesignStats();
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
   }catch{}
 }
@@ -345,6 +377,9 @@ function el(id){return document.getElementById(id)}function val(id){return el(id
 document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=el('loginMsg');m.textContent='';try{await api('/api/crm/login',{method:'POST',body:JSON.stringify({password:val('password')})});el('password').value='';await load()}catch(err){m.textContent=err.message}};
 el('refresh').onclick=load;el('logout').onclick=async()=>{await fetch('/api/crm/logout',{method:'POST'});showLogin()};
 document.querySelectorAll('#nav [data-view]').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav [data-view]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.page').forEach(x=>x.classList.add('hidden'));el('view-'+b.dataset.view).classList.remove('hidden')});
+document.getElementById('designStatsQuery').oninput=()=>{designStatsVisible=50;renderDesignStats()};
+document.getElementById('designStatsSort').onchange=()=>{designStatsVisible=50;renderDesignStats()};
+document.getElementById('designStatsMore').onclick=()=>{designStatsVisible+=50;renderDesignStats()};
 document.querySelectorAll('#filters [data-filter]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.filter;document.querySelectorAll('#filters [data-filter]').forEach(x=>x.classList.toggle('active',x===b));selected=null;renderList();renderDetail()});
 el('search').oninput=e=>{searchTerm=e.target.value;renderList()};
 el('salesForm').onsubmit=async e=>{e.preventDefault();const m=el('salesMsg');m.textContent='';try{await api('/api/crm/salespeople',{method:'POST',body:JSON.stringify({name:val('salesName'),email:val('salesEmail')})});e.target.reset();m.className='msg ok';m.textContent='Comercial añadido.';await load()}catch(err){m.className='msg';m.textContent=err.message}};

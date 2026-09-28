@@ -17,19 +17,21 @@ function assertStaging(env = process.env) {
 }
 
 async function migrate(pool) {
-  const name = '001_subscription_management.sql';
-  const sql = await fs.readFile(path.join(__dirname, 'migrations', name), 'utf8');
-  const checksum = crypto.createHash('sha256').update(sql).digest('hex');
   const db = await pool.connect();
   try {
     await db.query('BEGIN');
     await db.query('SELECT pg_advisory_xact_lock(784090122)');
     await db.query('CREATE TABLE IF NOT EXISTS catalog_migrations(name text PRIMARY KEY, checksum char(64) NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())');
-    const prior = await db.query('SELECT checksum FROM catalog_migrations WHERE name=$1', [name]);
-    if (prior.rows.length && prior.rows[0].checksum !== checksum) throw new Error('Migration checksum mismatch');
-    if (!prior.rows.length) {
-      await db.query(sql);
-      await db.query('INSERT INTO catalog_migrations(name,checksum) VALUES($1,$2)', [name,checksum]);
+    const names=(await fs.readdir(path.join(__dirname,'migrations'))).filter(name=>/^\d{3}_[a-z_]+\.sql$/.test(name)).sort();
+    for(const name of names){
+      const sql=await fs.readFile(path.join(__dirname,'migrations',name),'utf8');
+      const checksum=crypto.createHash('sha256').update(sql).digest('hex');
+      const prior = await db.query('SELECT checksum FROM catalog_migrations WHERE name=$1', [name]);
+      if (prior.rows.length && prior.rows[0].checksum !== checksum) throw new Error('Migration checksum mismatch');
+      if (!prior.rows.length) {
+        await db.query(sql);
+        await db.query('INSERT INTO catalog_migrations(name,checksum) VALUES($1,$2)', [name,checksum]);
+      }
     }
     await db.query('COMMIT');
   } catch (error) { await db.query('ROLLBACK'); throw error; }
