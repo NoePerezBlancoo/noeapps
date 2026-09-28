@@ -249,11 +249,11 @@ function safeSiteOrigin(value){
   }catch{return''}
 }
 function siteIsPaid(row){
-  return !!(row&&(
-    row.paid_at||
-    String(row.stripe_payment_status||'').toLowerCase()==='paid'||
-    ['active','trialing','past_due'].includes(String(row.stripe_subscription_status||'').toLowerCase())
-  ));
+  if(!row)return false;
+  const sub=String(row.stripe_subscription_status||'').toLowerCase();
+  if(['canceled','unpaid','incomplete_expired'].includes(sub))return false;
+  if(row.stripe_subscription_id)return ['active','trialing','past_due'].includes(sub)||String(row.stripe_payment_status||'').toLowerCase()==='paid';
+  return !!(row.paid_at||String(row.stripe_payment_status||'').toLowerCase()==='paid');
 }
 async function makeUniqueSiteSlug(name,excludeId=''){
   let base=normalizeSiteSlug(name);
