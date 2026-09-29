@@ -8,8 +8,12 @@ function problem(status, message) { const error = new Error(message); error.stat
 
 function assertStaging(env = process.env) {
   if (env.CATALOG_ENVIRONMENT !== 'staging') return;
+  const allowedOrigins = new Set([
+    'https://catalogo-staging-v2-production.up.railway.app',
+    'https://catalogo-chatgpt-staging-production.up.railway.app'
+  ]);
   if (!/^(sk|rk|rkcs)_test_/.test(env.STRIPE_SECRET_KEY || '') || env.NEON_DATABASE_URL || env.LEGACY_DATABASE_URL
-    || !env.DATABASE_URL || !/^https:\/\/catalogo-staging-v2-[a-z0-9-]+\.up\.railway\.app$/.test(env.PUBLIC_ORIGIN || '')
+    || !env.DATABASE_URL || !allowedOrigins.has(env.PUBLIC_ORIGIN || '')
     || env.SITE_DOMAIN !== new URL(env.PUBLIC_ORIGIN).hostname
     || (env.TUNEGOCIO_CRM_ORIGIN && env.TUNEGOCIO_CRM_ORIGIN !== 'https://tunegocio-staging-v2-production.up.railway.app')) {
     throw new Error('Staging isolation configuration rejected');
