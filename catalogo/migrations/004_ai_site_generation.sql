@@ -6,7 +6,8 @@ ALTER TABLE catalog_requests
   ADD COLUMN IF NOT EXISTS generation_research_usage jsonb NOT NULL DEFAULT '{}'::jsonb,
   ADD COLUMN IF NOT EXISTS generation_last_error text NOT NULL DEFAULT '',
   ADD COLUMN IF NOT EXISTS latest_generation_id bigint,
-  ADD COLUMN IF NOT EXISTS validated_generation_id bigint;
+  ADD COLUMN IF NOT EXISTS validated_generation_id bigint,
+  ADD COLUMN IF NOT EXISTS published_generation_id bigint;
 
 CREATE TABLE IF NOT EXISTS catalog_site_generations(
   id bigserial PRIMARY KEY,
