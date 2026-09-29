@@ -6,6 +6,7 @@ const {Pool}=require('pg');
 const subscriptions=require('./subscriptions');
 const discovery=require('./catalog-discovery');
 const roadmap=require('./crm-roadmap');
+const aiGenerator=require('./ai-site-generator');
 subscriptions.assertStaging();
 
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
@@ -135,6 +136,32 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS stripe_offer_promotion_code_id text NOT NULL DEFAULT '';
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS first_paid_amount_cents integer;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS commission_cents integer;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS generation_state text NOT NULL DEFAULT 'not_started';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS generation_brief text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS generation_research_usage jsonb NOT NULL DEFAULT '{}'::jsonb;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS generation_last_error text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS latest_generation_id bigint;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS validated_generation_id bigint;
+    CREATE TABLE IF NOT EXISTS catalog_site_generations(
+      id bigserial PRIMARY KEY,
+      request_id uuid NOT NULL REFERENCES catalog_requests(id) ON DELETE CASCADE,
+      version integer NOT NULL,
+      state text NOT NULL DEFAULT 'draft',
+      feedback text NOT NULL DEFAULT '',
+      html text NOT NULL DEFAULT '',
+      model text NOT NULL DEFAULT '',
+      input_tokens bigint NOT NULL DEFAULT 0,
+      cached_input_tokens bigint NOT NULL DEFAULT 0,
+      output_tokens bigint NOT NULL DEFAULT 0,
+      total_tokens bigint NOT NULL DEFAULT 0,
+      search_calls integer NOT NULL DEFAULT 0,
+      response_id text NOT NULL DEFAULT '',
+      error text NOT NULL DEFAULT '',
+      created_at timestamptz NOT NULL DEFAULT now(),
+      validated_at timestamptz,
+      UNIQUE(request_id,version)
+    );
+    CREATE INDEX IF NOT EXISTS catalog_site_generations_request_created_idx ON catalog_site_generations(request_id,created_at DESC);
     CREATE TABLE IF NOT EXISTS stripe_events(
       id text PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now()
@@ -926,6 +953,114 @@ async function handlePublicPayment(res,token){
   const checkout=await createStripeSessionForRow(row);
   res.writeHead(303,{'Location':checkout.url,'Cache-Control':'no-store','X-Robots-Tag':'noindex'});return res.end();
 }
+
+function generatedHtmlHeaders({preview=false}={}){
+  return{
+    'Content-Type':'text/html; charset=utf-8',
+    'Cache-Control':'private, no-store, max-age=0',
+    'X-Content-Type-Options':'nosniff',
+    'X-Frame-Options':'DENY',
+    'Referrer-Policy':'strict-origin-when-cross-origin',
+    'Content-Security-Policy':"default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; font-src https: data:; media-src https:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"+(preview?"; sandbox allow-popups allow-popups-to-escape-sandbox":'')
+  };
+}
+async function requestForAi(id){
+  if(!validUuid(id))throw aiGenerator.problem(400,'Solicitud no válida.');
+  await ensureSchema();
+  const row=(await pool.query('SELECT * FROM catalog_requests WHERE id=$1',[id])).rows[0];
+  if(!row)throw aiGenerator.problem(404,'Solicitud no encontrada.');
+  return row;
+}
+async function researchRequestWithAi(req,res,id){
+  return roadmap.withRequestLock(pool,'ai-generation-global',async()=>{
+    let row=await requestForAi(id);
+    await pool.query("UPDATE catalog_requests SET generation_state='researching',generation_last_error='',updated_at=now() WHERE id=$1",[id]);
+    try{
+      const result=await aiGenerator.researchBusiness(row);
+      const usage={...result.usage,model:result.model,responseId:result.responseId,completedAt:new Date().toISOString()};
+      const updated=(await pool.query("UPDATE catalog_requests SET generation_state='brief_ready',generation_brief=$2,generation_research_usage=$3::jsonb,generation_last_error='',updated_at=now() WHERE id=$1 RETURNING *",[id,result.text,JSON.stringify(usage)])).rows[0];
+      return json(res,200,{ok:true,request:updated,brief:result.text,usage});
+    }catch(error){
+      const message=String(error.publicMessage||'No se pudo analizar el negocio con IA.').slice(0,1000);
+      await pool.query("UPDATE catalog_requests SET generation_state='failed',generation_last_error=$2,updated_at=now() WHERE id=$1",[id,message]).catch(()=>{});
+      throw error;
+    }
+  });
+}
+async function generateRequestWithAi(req,res,id){
+  const data=await bodyJson(req,9000);
+  const feedback=text(data.feedback,4000);
+  return roadmap.withRequestLock(pool,'ai-generation-global',async()=>{
+    let row=await requestForAi(id);
+    if(!row.generation_brief)return json(res,409,{error:'Primero pulsa Analizar negocio para preparar el briefing.'});
+    const latest=row.latest_generation_id?(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[row.latest_generation_id,id])).rows[0]:null;
+    const previousHtml=feedback&&latest?latest.html:'';
+    await pool.query("UPDATE catalog_requests SET generation_state='generating',generation_last_error='',updated_at=now() WHERE id=$1",[id]);
+    try{
+      const generated=await aiGenerator.generateSite(row,{brief:row.generation_brief,feedback,previousHtml});
+      const next=(await pool.query('SELECT COALESCE(MAX(version),0)+1 AS version FROM catalog_site_generations WHERE request_id=$1',[id])).rows[0].version;
+      const inserted=(await pool.query(`INSERT INTO catalog_site_generations(
+        request_id,version,state,feedback,html,model,input_tokens,cached_input_tokens,output_tokens,total_tokens,search_calls,response_id
+      ) VALUES($1,$2,'draft',$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,[
+        id,Number(next),feedback,generated.text,generated.model,generated.usage.inputTokens,generated.usage.cachedInputTokens,
+        generated.usage.outputTokens,generated.usage.totalTokens,generated.usage.searchCalls,generated.responseId
+      ])).rows[0];
+      row=(await pool.query("UPDATE catalog_requests SET latest_generation_id=$2,generation_state='review',generation_last_error='',updated_at=now() WHERE id=$1 RETURNING *",[id,inserted.id])).rows[0];
+      return json(res,200,{ok:true,request:row,generation:{id:inserted.id,version:inserted.version,state:inserted.state,model:inserted.model,inputTokens:Number(inserted.input_tokens),outputTokens:Number(inserted.output_tokens),createdAt:inserted.created_at},reviewUrl:'/api/crm/requests/'+id+'/ai/preview?generationId='+inserted.id});
+    }catch(error){
+      const message=String(error.publicMessage||'No se pudo generar la web con IA.').slice(0,1000);
+      await pool.query("UPDATE catalog_requests SET generation_state='failed',generation_last_error=$2,updated_at=now() WHERE id=$1",[id,message]).catch(()=>{});
+      throw error;
+    }
+  });
+}
+async function serveAiPreview(req,res,id,url){
+  const row=await requestForAi(id);
+  const requested=String(url.searchParams.get('generationId')||row.latest_generation_id||'');
+  if(!/^\d+$/.test(requested))return json(res,404,{error:'Todavía no hay un borrador generado.'});
+  const generation=(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[requested,id])).rows[0];
+  if(!generation)return json(res,404,{error:'Versión no encontrada.'});
+  res.writeHead(200,{...generatedHtmlHeaders({preview:true}),'X-Robots-Tag':'noindex, nofollow, noarchive','X-NoeApps-Generation':String(generation.version)});
+  return res.end(generation.html);
+}
+async function validateAiGeneration(req,res,id){
+  const data=await bodyJson(req,3000);
+  const generationId=String(data.generationId||'');
+  if(!/^\d+$/.test(generationId))return json(res,400,{error:'Versión no válida.'});
+  return roadmap.withRequestLock(pool,id,async()=>{
+    await requestForAi(id);
+    const generation=(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[generationId,id])).rows[0];
+    if(!generation)return json(res,404,{error:'Versión no encontrada.'});
+    await pool.query("UPDATE catalog_site_generations SET state=CASE WHEN id=$2 THEN 'validated' WHEN state='validated' THEN 'superseded' ELSE state END,validated_at=CASE WHEN id=$2 THEN now() ELSE validated_at END WHERE request_id=$1",[id,generation.id]);
+    const row=(await pool.query("UPDATE catalog_requests SET validated_generation_id=$2,latest_generation_id=$2,generation_state='validated',generation_last_error='',updated_at=now() WHERE id=$1 RETURNING *",[id,generation.id])).rows[0];
+    return json(res,200,{ok:true,request:row,generation:{id:generation.id,version:generation.version,state:'validated'}});
+  });
+}
+async function publishValidatedGeneration(req,res,id){
+  return roadmap.withRequestLock(pool,id,async()=>{
+    let row=await requestForAi(id);
+    if(!row.validated_generation_id)return json(res,409,{error:'Primero revisa y valida una versión de la web.'});
+    const generation=(await pool.query("SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2 AND state='validated'",[row.validated_generation_id,id])).rows[0];
+    if(!generation)return json(res,409,{error:'La versión validada ya no está disponible.'});
+    if(!aiGenerator.salesWhatsapp())return json(res,503,{error:'Falta configurar el WhatsApp comercial antes de publicar.'});
+    const slug=row.site_slug||await makeUniqueSiteSlug(row.business_name,row.id);
+    const paid=siteIsPaid(row),publicUrl=sitePublicUrl(slug);
+    row=(await pool.query(`UPDATE catalog_requests SET
+      site_slug=$2,site_origin_url='',site_status=$3,preview_published_at=COALESCE(preview_published_at,now()),
+      preview_expires_at=$4,preview_url=$5,status=$6,generation_state='published',updated_at=now()
+      WHERE id=$1 RETURNING *`,[id,slug,paid?'active':'preview',paid?null:new Date(Date.now()+10*24*60*60*1000),publicUrl,paid?'published':'preview_ready'])).rows[0];
+    return json(res,200,{ok:true,publicUrl,request:row,generation:{id:generation.id,version:generation.version}});
+  });
+}
+async function generatedSiteForRequest(row,pathname){
+  if(!row.validated_generation_id)return null;
+  if(pathname!=='/'&&pathname!=='/index.html')return{notFound:true};
+  const generation=(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[row.validated_generation_id,row.id])).rows[0];
+  if(!generation)return null;
+  const html=row.site_status==='preview'?aiGenerator.injectLeadGate(generation.html,row.business_name):generation.html;
+  return{html,version:generation.version};
+}
+
 async function publishSite(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   const data=await bodyJson(req,8000);
@@ -960,8 +1095,19 @@ async function proxyCustomerSite(req,res,slug,pathname,search){
   row=await refreshSiteState(row);
   if(row.site_status==='expired')return simpleSitePage(res,410,'Vista previa caducada','Esta vista previa estuvo disponible durante 10 días y ha caducado al no activarse.');
   if(row.site_status==='suspended')return simpleSitePage(res,402,'Web temporalmente desactivada','Esta web no está activa en este momento.');
-  if(!['preview','active'].includes(row.site_status)||!row.site_origin_url)return simpleSitePage(res,503,'Web en preparación','La web todavía se está preparando.');
+  if(!['preview','active'].includes(row.site_status))return simpleSitePage(res,503,'Web en preparación','La web todavía se está preparando.');
   if(req.method!=='GET'&&req.method!=='HEAD')return json(res,405,{error:'Method not allowed'},{'Allow':'GET, HEAD'});
+  const generated=await generatedSiteForRequest(row,pathname||'/');
+  if(generated?.notFound)return simpleSitePage(res,404,'Página no encontrada','Esta demo es una web de una sola página.');
+  if(generated){
+    const headers={...generatedHtmlHeaders({preview:row.site_status==='preview'})};
+    if(row.site_status==='preview')headers['X-Robots-Tag']='noindex, nofollow, noarchive';
+    headers['X-NoeApps-Generation']=String(generated.version);
+    res.writeHead(200,headers);
+    if(req.method==='HEAD')return res.end();
+    return res.end(generated.html);
+  }
+  if(!row.site_origin_url)return simpleSitePage(res,503,'Web en preparación','La web todavía se está preparando.');
   let target;
   try{
     const base=row.site_origin_url.endsWith('/')?row.site_origin_url:row.site_origin_url+'/';
@@ -1379,7 +1525,11 @@ http.createServer(async(req,res)=>{
         stripeConfigured:!!STRIPE_SECRET_KEY,
         taxEnabled:STRIPE_AUTOMATIC_TAX,
         stripeAccountId:STRIPE_ACCOUNT_ID,
-        siteDomain:SITE_DOMAIN
+        siteDomain:SITE_DOMAIN,
+        aiGenerationEnabled:aiGenerator.enabled(),
+        aiConfigured:aiGenerator.configured(),
+        aiResearchModel:aiGenerator.researchModel(),
+        aiBuildModel:aiGenerator.buildModel()
       });
     }
     if(url.pathname==='/api/crm/expenses'&&req.method==='POST'){
@@ -1430,6 +1580,31 @@ http.createServer(async(req,res)=>{
       const result=await response.json();
       return json(res,response.status,result);
     }
+    const aiResearchMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/research$/i);
+    if(aiResearchMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await researchRequestWithAi(req,res,aiResearchMatch[1]);
+    }
+    const aiGenerateMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/generate$/i);
+    if(aiGenerateMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await generateRequestWithAi(req,res,aiGenerateMatch[1]);
+    }
+    const aiPreviewMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/preview$/i);
+    if(aiPreviewMatch&&req.method==='GET'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await serveAiPreview(req,res,aiPreviewMatch[1],url);
+    }
+    const aiValidateMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/validate$/i);
+    if(aiValidateMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await validateAiGeneration(req,res,aiValidateMatch[1]);
+    }
+    const aiPublishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/publish$/i);
+    if(aiPublishMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await publishValidatedGeneration(req,res,aiPublishMatch[1]);
+    }
     const publishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/site\/publish$/i);
     if(publishMatch&&req.method==='POST'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
@@ -1464,6 +1639,7 @@ http.createServer(async(req,res)=>{
 }).listen(port,'0.0.0.0',()=>{
   console.log('NoeApps catalog listening on '+port);
   console.log('Stripe backend key mode: '+(STRIPE_SECRET_KEY.startsWith('sk_live_')?'sk_live':STRIPE_SECRET_KEY.startsWith('sk_test_')?'sk_test':STRIPE_SECRET_KEY.startsWith('rk_live_')?'rk_live':STRIPE_SECRET_KEY.startsWith('rk_test_')?'rk_test':STRIPE_SECRET_KEY.startsWith('rkcs_test_')?'sandbox_test':STRIPE_SECRET_KEY.startsWith('pk_live_')?'pk_live':STRIPE_SECRET_KEY.startsWith('pk_test_')?'pk_test':'unknown'));
+  console.log('Catalog AI generation: '+(aiGenerator.configured()?'configured':aiGenerator.enabled()?'enabled_without_key':'disabled')+' · '+aiGenerator.researchModel()+' / '+aiGenerator.buildModel());
   migrateLegacyData().catch(()=>{});
   expireOverduePreviews().catch(()=>{});
   setInterval(()=>expireOverduePreviews().catch(error=>console.error('Preview expiry sweep failed',error&&error.message?error.message:error)),60*60*1000).unref();
