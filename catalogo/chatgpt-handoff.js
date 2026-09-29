@@ -83,11 +83,11 @@ function createHandoff({pool,ensureSchema,demoOrigin,sitePublicUrl,siteIsPaid}){
       publishedVersion:row.chatgpt_published_version==null?null:Number(row.chatgpt_published_version),
       publicUrl:row.preview_url||'',
       handoff:{
-        repository:'NoePerezBlancoo/noeapps-web-catalog',
+        repository:'NoePerezBlancoo/noeapps',
         branch:'main',
-        basePath:'chatgpt-demos/'+basePath(row),
-        manifestPath:'chatgpt-demos/'+basePath(row)+'/manifest.json',
-        versionPathTemplate:'chatgpt-demos/'+basePath(row)+'/v{version}/index.html',
+        basePath:'catalogo-demos/'+basePath(row),
+        manifestPath:'catalogo-demos/'+basePath(row)+'/manifest.json',
+        versionPathTemplate:'catalogo-demos/'+basePath(row)+'/v{version}/index.html',
         manifestSchema:{
           schema:1,
           requestId:row.id,
