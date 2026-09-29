@@ -149,6 +149,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <script>
 let catalogItems=[],tnItems=[],items=[],selected=null,salespeople=[],offers=[],expenses=[],analytics=null;
 let sourceFilter='all',searchTerm='',stripeConfigured=false,siteDomain='noeapps.com',commissionPercent=30;
+let aiGenerationEnabled=false,aiConfigured=false,aiResearchModel='',aiBuildModel='';
 let designReport=null,designStatsVisible=50;
 async function loadDesignStats(){
   const panel=document.getElementById('designPerformance');
@@ -205,6 +206,7 @@ async function loadData(checkIncidents){
     items=[...catalogItems,...tnItems].sort((a,b)=>new Date(b.updatedAt||b.updated_at||b.createdAt||b.created_at||0)-new Date(a.updatedAt||a.updated_at||a.createdAt||a.created_at||0));
     salespeople=j.salespeople||[];offers=j.offers||[];expenses=j.expenses||[];analytics=j.analytics||null;
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
+    aiGenerationEnabled=!!j.aiGenerationEnabled;aiConfigured=!!j.aiConfigured;aiResearchModel=j.aiResearchModel||'';aiBuildModel=j.aiBuildModel||'';
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
     if(j.roadmapEnabled&&!window.refreshCRMExtras)throw new Error('No se ha cargado el panel avanzado. Recarga la página');
@@ -315,13 +317,77 @@ function catalogTotals(x){
   const offerM=Number(x.offer_percent_off)>0?Math.round(monthly*(100-Number(x.offer_percent_off))/100):m;
   return{creation:c,monthly:m,offerMonthly:offerM,first:c+offerM};
 }
+
+function aiGenerationPanel(x){
+  const labels={not_started:'Sin iniciar',researching:'Analizando',brief_ready:'Briefing listo',generating:'Generando',review:'Pendiente de revisión',validated:'Validada',published:'Publicada',failed:'Error'};
+  const state=x.generation_state||'not_started',busy=['researching','generating'].includes(state);
+  const unavailable=!aiGenerationEnabled||!aiConfigured;
+  const research=x.generation_research_usage&&typeof x.generation_research_usage==='object'?x.generation_research_usage:{};
+  const researchMeta=research.model?esc(research.model)+' · '+Number(research.inputTokens||0).toLocaleString('es-ES')+' in / '+Number(research.outputTokens||0).toLocaleString('es-ES')+' out · '+Number(research.searchCalls||0)+' búsquedas':'Todavía sin análisis';
+  const latest=x.latest_generation_id?Number(x.latest_generation_id):0,validated=x.validated_generation_id?Number(x.validated_generation_id):0,published=x.published_generation_id?Number(x.published_generation_id):0;
+  const reviewUrl=latest?'/api/crm/requests/'+encodeURIComponent(x.id)+'/ai/preview?generationId='+latest:'';
+  const configText=unavailable?(aiGenerationEnabled?'Falta OPENAI_API_KEY en staging.':'Generación IA desactivada.'):'IA lista · '+esc(aiResearchModel)+' → '+esc(aiBuildModel);
+  return '<article class="panel" style="margin-top:14px;border-color:'+(state==='failed'?'#6b3338':'#313b48')+'">'+
+    '<div class="sectionHead" style="margin-bottom:12px"><div><div class="eyebrow">GENERACIÓN WEB CON IA</div><h3 style="margin:6px 0 0">Borrador → revisión de Noé → validación → publicación</h3></div><span class="tag '+(state==='validated'||state==='published'?'good':state==='failed'?'warn':'')+'">'+esc(labels[state]||state)+'</span></div>'+
+    '<p class="note">'+configText+'<br>'+researchMeta+'</p>'+
+    (x.generation_last_error?'<div class="msg">'+esc(x.generation_last_error)+'</div>':'')+
+    '<div class="actions" style="margin-top:12px">'+
+      '<button class="btn" id="aiAnalyze" '+(unavailable||busy?'disabled':'')+'>1 · Analizar negocio</button>'+
+      '<button class="btn primary" id="aiGenerate" '+(unavailable||busy||!x.generation_brief?'disabled':'')+'>2 · Generar borrador</button>'+
+      (reviewUrl?'<a class="btn" id="aiOpenDraft" target="_blank" rel="noopener" href="'+esc(reviewUrl)+'">Abrir borrador ↗</a>':'')+
+    '</div>'+
+    (x.generation_brief?'<label class="field" style="margin-top:12px"><span>Briefing recogido por IA</span><textarea readonly rows="7">'+esc(x.generation_brief)+'</textarea></label>':'<p class="note" style="margin-top:12px">Primero analiza el negocio. La IA usará los datos de la solicitud y, cuando sea útil, búsqueda web.</p>')+
+    (latest?'<label class="field" style="margin-top:12px"><span>Cambios para la siguiente versión</span><textarea id="aiFeedback" rows="4" maxlength="4000" placeholder="Ej.: más visual, menos texto, hero con más impacto, usa tonos negros y dorados…"></textarea></label>':'')+
+    (latest?'<div class="actions" style="margin-top:10px"><button class="btn" id="aiRegenerate" '+(unavailable||busy?'disabled':'')+'>Regenerar con cambios</button><button class="btn primary" id="aiValidate" '+(state!=='review'?'disabled':'')+'>✓ Validar esta versión</button><button class="btn" id="aiPublish" '+(!(validated&&state!=='review')?'disabled':'')+'>Publicar demo</button></div>':'')+
+    (validated?'<p class="note">Validada: versión ID '+validated+(published?' · Publicada: ID '+published:' · Aún no publicada')+'. La web pública solo cambia al pulsar “Publicar demo”.</p>':'')+
+    '<div id="aiGenerationMsg" class="msg"></div>'+
+  '</article>';
+}
+async function runAiAction(buttonId,message,task){
+  const m=el('aiGenerationMsg'),b=el(buttonId);if(m){m.className='msg';m.textContent=message;}if(b)b.disabled=true;
+  try{const result=await task();if(m){m.className='msg ok';m.textContent='Listo.';}return result}
+  catch(e){if(m){m.className='msg';m.textContent=e.message;}throw e}
+  finally{if(b)b.disabled=false}
+}
+async function analyzeCatalogAi(){
+  await runAiAction('aiAnalyze','Analizando negocio y fuentes públicas…',()=>api('/api/crm/requests/'+selected.id+'/ai/research',{method:'POST',body:'{}'}));
+  await load();
+}
+async function generateCatalogAi(regenerate=false){
+  const feedback=regenerate?val('aiFeedback'):'';
+  const popup=window.open('about:blank','_blank');
+  try{
+    const j=await runAiAction(regenerate?'aiRegenerate':'aiGenerate',regenerate?'Generando una nueva versión con tus cambios…':'Generando el primer borrador…',()=>api('/api/crm/requests/'+selected.id+'/ai/generate',{method:'POST',body:JSON.stringify({feedback})}));
+    if(popup&&j.reviewUrl)popup.location=j.reviewUrl;else if(popup)popup.close();
+    await load();
+  }catch(e){if(popup)popup.close();throw e}
+}
+async function validateCatalogAi(){
+  if(!selected.latest_generation_id)return;
+  await runAiAction('aiValidate','Validando esta versión. Todavía no se publicará…',()=>api('/api/crm/requests/'+selected.id+'/ai/validate',{method:'POST',body:JSON.stringify({generationId:selected.latest_generation_id})}));
+  await load();
+}
+async function publishCatalogAi(){
+  const j=await runAiAction('aiPublish','Publicando la versión validada…',()=>api('/api/crm/requests/'+selected.id+'/ai/publish',{method:'POST',body:'{}'}));
+  if(j.publicUrl&&navigator.clipboard)await navigator.clipboard.writeText(j.publicUrl).catch(()=>{});
+  await load();
+  const m=el('detailMsg');if(m){m.className='msg ok';m.textContent='Demo publicada'+(j.publicUrl?' y URL copiada: '+j.publicUrl:'');}
+}
+function bindCatalogAi(){
+  if(el('aiAnalyze'))el('aiAnalyze').onclick=analyzeCatalogAi;
+  if(el('aiGenerate'))el('aiGenerate').onclick=()=>generateCatalogAi(false);
+  if(el('aiRegenerate'))el('aiRegenerate').onclick=()=>generateCatalogAi(true);
+  if(el('aiValidate'))el('aiValidate').onclick=validateCatalogAi;
+  if(el('aiPublish'))el('aiPublish').onclick=publishCatalogAi;
+}
+
 function renderCatalogDetail(){
   const x=selected,t=catalogTotals(x),wa=String(x.whatsapp||'').replace(/\D/g,''),publicUrl=x.site_slug?'https://'+x.site_slug+'.'+siteDomain+'/':'',pageUrl=x.preview_url||publicUrl||x.catalog_preview_url||'';
   const whatsappText=encodeURIComponent('Hola '+x.contact_name+', ya tenemos preparada tu web.\n\n'+(pageUrl?'Puedes verla aquí:\n'+pageUrl+'\n\n':'')+(x.payment_url?'Cuando quieras activarla, puedes hacer el pago y la suscripción aquí:\n'+x.payment_url:''));
   el('detail').innerHTML=
     '<div class="sub"><span class="source catalog">Catálogo</span> Solicitud '+esc(String(x.id).slice(0,8).toUpperCase())+'</div><h2>'+esc(x.business_name)+'</h2><div class="sub">'+esc(x.design_name)+' · '+esc(x.category||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente')+'</span><span class="tag '+(x.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(x.stripe_payment_status||'sin cobrar')+'</span><span class="tag '+(['active','trialing'].includes(x.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(x.stripe_subscription_status||'—')+'</span><span class="tag '+(x.site_status==='active'?'good':'')+'">Web: '+esc(x.site_status||'draft')+'</span></div>'+
-    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+aiGenerationPanel(x)+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="catSalesperson" '+(x.first_paid_amount_cents!=null&&x.salesperson_id?'disabled':'')+'>'+salespersonOptions(x.salesperson_id)+'</select></label><label class="field"><span>Oferta mensual</span><select id="catOffer" '+(x.first_paid_amount_cents!=null?'disabled':'')+'>'+offerOptions('catalog',x.offer_id)+'</select></label></div>'+
     '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+x.offer_percent_off+'% durante '+x.offer_duration_months+' mes(es)':'')+'</small></div>'+
     '<div class="grid2"><label class="field"><span>Precio creación (€)</span><input id="creationPrice" type="number" min="0" max="10000" step="1" value="'+esc(x.creation_price||0)+'"></label><label class="field"><span>Cuota mensual (€)</span><input id="monthlyPrice" type="number" min="1" max="1000" step=".01" value="'+(Number(x.monthly_price_cents||1990)/100).toFixed(2)+'"></label></div>'+
@@ -333,7 +399,7 @@ function renderCatalogDetail(){
   document.getElementById('catSave').onclick=()=>saveCatalog(true);
   document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
-  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();
+  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();bindCatalogAi();
 }
 async function saveCatalog(reload=true){
   const m=document.getElementById('detailMsg');if(m)m.textContent='';
