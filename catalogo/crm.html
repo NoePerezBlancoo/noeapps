@@ -150,6 +150,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 let catalogItems=[],tnItems=[],items=[],selected=null,salespeople=[],offers=[],expenses=[],analytics=null;
 let sourceFilter='all',searchTerm='',stripeConfigured=false,siteDomain='noeapps.com',commissionPercent=30;
 let aiGenerationEnabled=false,aiConfigured=false,aiResearchModel='',aiBuildModel='';
+let chatgptHandoffEnabled=false,chatgptHandoffConfigured=false,chatgptDemoOrigin='';
 let designReport=null,designStatsVisible=50;
 async function loadDesignStats(){
   const panel=document.getElementById('designPerformance');
@@ -207,6 +208,7 @@ async function loadData(checkIncidents){
     salespeople=j.salespeople||[];offers=j.offers||[];expenses=j.expenses||[];analytics=j.analytics||null;
     stripeConfigured=!!j.stripeConfigured;siteDomain=j.siteDomain||'noeapps.com';commissionPercent=Number(j.commissionPercent||30);
     aiGenerationEnabled=!!j.aiGenerationEnabled;aiConfigured=!!j.aiConfigured;aiResearchModel=j.aiResearchModel||'';aiBuildModel=j.aiBuildModel||'';
+    chatgptHandoffEnabled=!!j.chatgptHandoffEnabled;chatgptHandoffConfigured=!!j.chatgptHandoffConfigured;chatgptDemoOrigin=j.chatgptDemoOrigin||'';
     showApp();renderMetrics();renderList();renderAnalytics();renderSales();renderOffers();renderExpenses();
     if(selected){selected=items.find(x=>x.id===selected.id&&x.source===selected.source)||null;renderDetail()}
     if(j.roadmapEnabled&&!window.refreshCRMExtras)throw new Error('No se ha cargado el panel avanzado. Recarga la página');
@@ -318,7 +320,69 @@ function catalogTotals(x){
   return{creation:c,monthly:m,offerMonthly:offerM,first:c+offerM};
 }
 
+function chatgptHandoffPanel(x){
+  if(!chatgptHandoffEnabled)return '';
+  const labels={not_ready:'Sin preparar',ready:'Lista para ChatGPT',review:'Pendiente de revisión',validated:'Validada',published:'Publicada'};
+  const state=x.chatgpt_state||'not_ready';
+  const latest=Number(x.chatgpt_latest_version||0),validated=x.chatgpt_validated_version==null?0:Number(x.chatgpt_validated_version),published=x.chatgpt_published_version==null?0:Number(x.chatgpt_published_version);
+  const configured=chatgptHandoffConfigured&&chatgptDemoOrigin;
+  const base=(configured&&x.chatgpt_review_token)?chatgptDemoOrigin.replace(/\/$/,'')+'/requests/'+encodeURIComponent(x.id)+'/'+encodeURIComponent(x.chatgpt_review_token):'';
+  const reviewUrl=base&&latest?base+'/v'+latest+'/':'';
+  const validatedUrl=base&&validated?base+'/v'+validated+'/':'';
+  const publicUrl=x.preview_url||'';
+  const prompt='Haz la siguiente solicitud de Catálogo. Quiero una web personalizada y guarda el borrador para que yo la revise.';
+  return '<article class="panel" style="margin-top:14px;border-color:#3a3669">'+
+    '<div class="sectionHead" style="margin-bottom:12px"><div><div class="eyebrow">CHATGPT · CONVERSACIÓN</div><h3 style="margin:6px 0 0">ChatGPT genera · tú revisas · tú validas · tú publicas</h3></div><span class="tag '+(state==='validated'||state==='published'?'good':state==='review'?'warn':'')+'">'+esc(labels[state]||state)+'</span></div>'+
+    '<p class="note">'+(configured?'Conector preparado. No usa OPENAI_API_KEY ni consume API: el trabajo creativo se hace en tu conversación de ChatGPT.':'El puente de ChatGPT todavía no está configurado en este entorno.')+'</p>'+
+    (x.chatgpt_last_error?'<div class="msg">'+esc(x.chatgpt_last_error)+'</div>':'')+
+    '<div class="actions" style="margin-top:12px">'+
+      (state==='not_ready'?'<button class="btn primary" id="chatgptPrepare" '+(!configured?'disabled':'')+'>Preparar para ChatGPT</button>':'')+
+      (state!=='not_ready'?'<button class="btn" id="chatgptCopyPrompt">Copiar instrucción para ChatGPT</button><button class="btn" id="chatgptSync">Comprobar borrador</button>':'')+
+      (reviewUrl?'<a class="btn" target="_blank" rel="noopener" href="'+esc(reviewUrl)+'">Abrir V'+latest+' ↗</a>':'')+
+      (state==='review'&&latest?'<button class="btn primary" id="chatgptValidate">✓ Validar V'+latest+'</button>':'')+
+      (state==='validated'&&validated?'<button class="btn primary" id="chatgptPublish">Publicar demo</button>':'')+
+      (publicUrl?'<a class="btn" target="_blank" rel="noopener" href="'+esc(publicUrl)+'">Abrir pública ↗</a>':'')+
+    '</div>'+
+    (state!=='not_ready'?'<div class="box" style="margin-top:12px"><span>Qué escribir en ChatGPT</span><p>'+esc(prompt)+(latest?'\n\nPara cambios: “Revisa la V'+latest+' de '+x.business_name+' y hazla más visual…”':'')+'</p></div>':'')+
+    (latest?'<p class="note">Última versión detectada: V'+latest+(validated?' · Validada: V'+validated:'')+(published?' · Publicada: V'+published:'')+'.'+(validatedUrl&&state==='validated'?' Lista para publicar.':'')+'</p>':'')+
+    '<div id="chatgptHandoffMsg" class="msg"></div>'+
+  '</article>';
+}
+async function handoffAction(id,message,call){
+  const m=el('chatgptHandoffMsg'),b=el(id);if(m){m.className='msg';m.textContent=message;}if(b)b.disabled=true;
+  try{const result=await call();if(m){m.className='msg ok';m.textContent='Listo.';}return result}
+  catch(e){if(m){m.className='msg';m.textContent=e.message;}throw e}
+  finally{if(b)b.disabled=false}
+}
+async function prepareChatgptHandoff(){
+  await handoffAction('chatgptPrepare','Preparando la solicitud para ChatGPT…',()=>api('/api/crm/requests/'+selected.id+'/chatgpt/prepare',{method:'POST',body:'{}'}));
+  await load();
+}
+async function syncChatgptHandoff(){
+  try{await handoffAction('chatgptSync','Buscando la última versión generada…',()=>api('/api/crm/requests/'+selected.id+'/chatgpt/sync',{method:'POST',body:'{}'}));await load();}
+  catch(e){/* message is already rendered */}
+}
+async function validateChatgptHandoff(){
+  const version=Number(selected.chatgpt_latest_version||0);if(!version)return;
+  await handoffAction('chatgptValidate','Validando V'+version+' sin publicarla…',()=>api('/api/crm/requests/'+selected.id+'/chatgpt/validate',{method:'POST',body:JSON.stringify({version})}));
+  await load();
+}
+async function publishChatgptHandoff(){
+  const j=await handoffAction('chatgptPublish','Publicando la versión validada…',()=>api('/api/crm/requests/'+selected.id+'/chatgpt/publish',{method:'POST',body:'{}'}));
+  if(j.publicUrl&&navigator.clipboard)await navigator.clipboard.writeText(j.publicUrl).catch(()=>{});
+  await load();
+  const m=el('detailMsg');if(m){m.className='msg ok';m.textContent='Demo publicada'+(j.publicUrl?' y URL copiada: '+j.publicUrl:'');}
+}
+function bindChatgptHandoff(){
+  if(el('chatgptPrepare'))el('chatgptPrepare').onclick=prepareChatgptHandoff;
+  if(el('chatgptSync'))el('chatgptSync').onclick=syncChatgptHandoff;
+  if(el('chatgptValidate'))el('chatgptValidate').onclick=validateChatgptHandoff;
+  if(el('chatgptPublish'))el('chatgptPublish').onclick=publishChatgptHandoff;
+  if(el('chatgptCopyPrompt'))el('chatgptCopyPrompt').onclick=async()=>{const prompt='Haz la siguiente solicitud de Catálogo. Quiero una web personalizada y guarda el borrador para que yo la revise.';try{await navigator.clipboard.writeText(prompt);el('chatgptHandoffMsg').className='msg ok';el('chatgptHandoffMsg').textContent='Instrucción copiada.'}catch{el('chatgptHandoffMsg').textContent=prompt}};
+}
+
 function aiGenerationPanel(x){
+  if(!aiGenerationEnabled)return '';
   const labels={not_started:'Sin iniciar',researching:'Analizando',brief_ready:'Briefing listo',generating:'Generando',review:'Pendiente de revisión',validated:'Validada',published:'Publicada',failed:'Error'};
   const state=x.generation_state||'not_started',busy=['researching','generating'].includes(state);
   const unavailable=!aiGenerationEnabled||!aiConfigured;
@@ -387,7 +451,7 @@ function renderCatalogDetail(){
   el('detail').innerHTML=
     '<div class="sub"><span class="source catalog">Catálogo</span> Solicitud '+esc(String(x.id).slice(0,8).toUpperCase())+'</div><h2>'+esc(x.business_name)+'</h2><div class="sub">'+esc(x.design_name)+' · '+esc(x.category||'')+'</div>'+
     '<div class="statusline"><span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente')+'</span><span class="tag '+(x.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(x.stripe_payment_status||'sin cobrar')+'</span><span class="tag '+(['active','trialing'].includes(x.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(x.stripe_subscription_status||'—')+'</span><span class="tag '+(x.site_status==='active'?'good':'')+'">Web: '+esc(x.site_status||'draft')+'</span></div>'+
-    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+aiGenerationPanel(x)+
+    subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+chatgptHandoffPanel(x)+aiGenerationPanel(x)+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="catSalesperson" '+(x.first_paid_amount_cents!=null&&x.salesperson_id?'disabled':'')+'>'+salespersonOptions(x.salesperson_id)+'</select></label><label class="field"><span>Oferta mensual</span><select id="catOffer" '+(x.first_paid_amount_cents!=null?'disabled':'')+'>'+offerOptions('catalog',x.offer_id)+'</select></label></div>'+
     '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+x.offer_percent_off+'% durante '+x.offer_duration_months+' mes(es)':'')+'</small></div>'+
     '<div class="grid2"><label class="field"><span>Precio creación (€)</span><input id="creationPrice" type="number" min="0" max="10000" step="1" value="'+esc(x.creation_price||0)+'"></label><label class="field"><span>Cuota mensual (€)</span><input id="monthlyPrice" type="number" min="1" max="1000" step=".01" value="'+(Number(x.monthly_price_cents||1990)/100).toFixed(2)+'"></label></div>'+
@@ -399,7 +463,7 @@ function renderCatalogDetail(){
   document.getElementById('catSave').onclick=()=>saveCatalog(true);
   document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
-  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();bindCatalogAi();
+  if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();bindChatgptHandoff();bindCatalogAi();
 }
 async function saveCatalog(reload=true){
   const m=document.getElementById('detailMsg');if(m)m.textContent='';
