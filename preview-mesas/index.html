@@ -3,180 +3,228 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fff8fb">
+<meta name="theme-color" content="#fffaf8">
 <title>Mesas Dulces Ourense · Carolina Arévalo</title>
-<meta name="description" content="Decoración de eventos, mesas dulces y globos en Ourense.">
+<meta name="description" content="Decoración de eventos, mesas dulces y globos en Ourense. Diseños personalizados para celebraciones únicas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Italiana&family=Sacramento&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#2e2330;--muted:#756a76;--rose:#f5dbe5;--rose2:#f9eaf0;--blush:#fff8fb;
-  --wine:#6f294a;--plum:#4d2340;--gold:#c69a58;--line:rgba(77,35,64,.12);--white:#fff;
-  --shadow:0 30px 80px rgba(96,43,72,.16);--r:28px;
+  --ink:#2e2730;--muted:#766d74;--rose:#d98598;--rose2:#f4dfe3;--mint:#a9cbbb;--mint2:#e4f0ea;
+  --gold:#c8a36b;--cream:#fffaf8;--card:#fff;--line:#eadfdf;--green:#3f7e61;--shadow:0 22px 60px rgba(79,45,57,.12);
 }
-*{box-sizing:border-box} html{scroll-behavior:smooth}
-body{margin:0;background:var(--blush);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;background-image:radial-gradient(circle at 10% 20%,rgba(255,255,255,.9) 0 1px,transparent 1.5px),radial-gradient(circle at 80% 15%,rgba(111,41,74,.08) 0 1px,transparent 1.5px);background-size:30px 30px,42px 42px;z-index:-1}
-a{color:inherit;text-decoration:none}
-.wrap{width:min(1180px,calc(100% - 34px));margin:auto}
-nav{height:86px;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;z-index:20}
-.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.13em;font-size:.82rem}
-.brandMark{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#f2bccc,#fff);box-shadow:inset 0 0 0 1px rgba(111,41,74,.1),0 8px 25px rgba(111,41,74,.12)}
-.brandMark:before{content:"";width:18px;height:18px;border:2px solid var(--wine);border-radius:50% 50% 48% 52%;box-shadow:8px -5px 0 -3px #c992a7,-7px -4px 0 -3px #e9b8ca}
-.navlinks{display:flex;align-items:center;gap:28px;color:#655865;font-weight:700;font-size:.92rem}
-.pill{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:13px 19px;font-weight:850;border:1px solid var(--line);background:rgba(255,255,255,.66);backdrop-filter:blur(16px);transition:.25s}
-.pill:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(89,45,69,.12)}
-.pill.primary{background:var(--wine);color:white;border-color:var(--wine)}
-.hero{min-height:calc(100vh - 86px);display:grid;grid-template-columns:1.02fr .98fr;gap:42px;align-items:center;padding:32px 0 78px}
-.eyebrow{display:inline-flex;gap:10px;align-items:center;text-transform:uppercase;font-weight:900;letter-spacing:.16em;color:var(--wine);font-size:.76rem}
-.eyebrow:before{content:"";width:28px;height:1px;background:var(--wine)}
-h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(4.1rem,8.2vw,7.8rem);line-height:.83;letter-spacing:-.065em;margin:22px 0 28px;font-weight:500}
-h1 em{display:block;color:var(--wine);font-weight:400}
-.lead{max-width:620px;font-size:1.16rem;line-height:1.7;color:var(--muted)}
-.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
-.micro{display:flex;gap:22px;flex-wrap:wrap;margin-top:34px;color:#6d616d;font-size:.9rem;font-weight:700}
-.micro span{display:flex;align-items:center;gap:8px}.dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 5px rgba(198,154,88,.12)}
-.scene{height:650px;border-radius:42px;position:relative;overflow:hidden;background:linear-gradient(155deg,#fdebf1,#f9dce6 55%,#f4cddd);box-shadow:var(--shadow);isolation:isolate}
-.scene:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 50%,rgba(84,35,64,.08));z-index:8;pointer-events:none}
-.arch{position:absolute;left:15%;right:15%;bottom:110px;height:365px;background:linear-gradient(180deg,#fffefe,#f7f0f2);border-radius:190px 190px 28px 28px;box-shadow:0 28px 60px rgba(82,37,59,.12);z-index:1}
-.arch:before{content:"CELEBRA";position:absolute;top:105px;left:50%;transform:translateX(-50%);font-family:Georgia,serif;letter-spacing:.22em;color:#8b5570;font-size:.74rem}
-.table{position:absolute;z-index:6;left:24%;right:24%;bottom:82px;height:145px;background:linear-gradient(180deg,#fff,#f8f0f3);border-radius:18px 18px 52px 52px;box-shadow:0 22px 50px rgba(82,37,59,.2)}
-.table:before{content:"";position:absolute;left:-24px;right:-24px;top:-20px;height:31px;border-radius:50%;background:#fff;box-shadow:0 7px 22px rgba(82,37,59,.12)}
-.cake{position:absolute;left:50%;bottom:198px;transform:translateX(-50%);width:76px;height:92px;background:linear-gradient(#fff,#fff6f8);z-index:7;border-radius:9px 9px 15px 15px;box-shadow:0 12px 22px rgba(86,39,63,.14)}
-.cake:before{content:"";position:absolute;left:8px;right:8px;top:34px;height:2px;background:#c89b59;box-shadow:0 18px 0 #c89b59}
-.cake:after{content:"✦";position:absolute;top:-31px;left:28px;color:#b78647;font-size:20px}
-.sweets{position:absolute;left:22%;right:22%;bottom:158px;height:75px;z-index:7}
-.sweets i{position:absolute;bottom:0;width:28px;height:34px;border-radius:9px 9px 5px 5px;background:#f0a9bd;box-shadow:0 8px 12px rgba(91,38,65,.12)}
-.sweets i:before{content:"";position:absolute;top:-13px;left:5px;width:18px;height:18px;border-radius:50%;background:#fff}
-.sweets i:nth-child(1){left:4%;transform:rotate(-5deg)}.sweets i:nth-child(2){left:21%;height:42px;background:#e9c68f}.sweets i:nth-child(3){right:20%;height:40px;background:#d79db5}.sweets i:nth-child(4){right:2%;height:32px;background:#f7dbe3}
-.balloon{position:absolute;width:78px;height:96px;border-radius:50% 50% 48% 52%;filter:drop-shadow(0 10px 16px rgba(84,35,64,.13));z-index:5;animation:float 5s ease-in-out infinite}
-.balloon:after{content:"";position:absolute;left:50%;bottom:-8px;width:8px;height:10px;background:inherit;clip-path:polygon(50% 0,100% 100%,0 100%)}
-.b1{left:2%;top:58px;background:#fff}.b2{left:12%;top:120px;background:#e7a6bc;animation-delay:-1s}.b3{left:4%;top:210px;background:#dcb5cd;animation-delay:-2s}.b4{right:1%;top:55px;background:#f7e2b9}.b5{right:12%;top:142px;background:#fff;animation-delay:-1.7s}.b6{right:3%;top:236px;background:#d898b1;animation-delay:-2.5s}.b7{right:18%;top:54px;background:#e7c6d3;transform:scale(.78)}.b8{left:20%;top:35px;background:#f4d4df;transform:scale(.72)}
-@keyframes float{50%{transform:translateY(-9px) rotate(1deg)}}
-.ribbon{position:absolute;left:34px;right:34px;top:34px;display:flex;justify-content:space-between;align-items:center;z-index:12}
-.ribbon .tag{background:rgba(255,255,255,.74);backdrop-filter:blur(12px);padding:10px 13px;border-radius:999px;font-weight:850;font-size:.78rem;box-shadow:0 8px 20px rgba(88,39,63,.08)}
-.ribbon .insta{font-weight:900;color:#71405a;font-size:.8rem}
-section{padding:98px 0}
-.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:34px}
-.sectionHead h2{font-family:Georgia,serif;font-size:clamp(2.7rem,5vw,5rem);line-height:.95;margin:0;letter-spacing:-.04em;font-weight:500}
-.sectionHead p{max-width:480px;color:var(--muted);line-height:1.65;margin:0}
-.services{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.card{min-height:260px;border:1px solid var(--line);background:rgba(255,255,255,.58);backdrop-filter:blur(14px);border-radius:26px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;transition:.3s}
-.card:hover{transform:translateY(-6px);box-shadow:0 18px 50px rgba(84,39,61,.1);background:#fff}
-.icon{width:50px;height:50px;border-radius:16px;background:var(--rose2);display:grid;place-items:center;font-size:22px}
-.card h3{font-family:Georgia,serif;font-size:1.55rem;margin:20px 0 8px}.card p{margin:0;color:var(--muted);line-height:1.55;font-size:.94rem}
-.gallery{display:grid;grid-template-columns:1.3fr .85fr .85fr;gap:16px;height:560px}
-.shot{position:relative;border-radius:30px;overflow:hidden;box-shadow:0 18px 50px rgba(83,36,60,.12);background:#f5dce5}
-.shot .caption{position:absolute;left:20px;right:20px;bottom:20px;background:rgba(255,255,255,.78);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.7);border-radius:19px;padding:15px 16px;z-index:10}
-.caption strong{display:block;font-size:.95rem}.caption small{color:#776873}
-.miniScene{position:absolute;inset:0;overflow:hidden;background:linear-gradient(145deg,#f7dbe5,#f5e7ec)}
-.miniScene:before,.miniScene:after{content:"";position:absolute;border-radius:50%}
-.pink .miniScene:before{width:280px;height:340px;background:#fff;left:50%;top:16%;transform:translateX(-50%);border-radius:160px 160px 25px 25px;box-shadow:0 20px 45px rgba(80,34,58,.12)}
-.pink .miniScene:after{width:150px;height:82px;background:white;left:50%;bottom:16%;transform:translateX(-50%);border-radius:14px 14px 50px 50px;box-shadow:0 14px 24px rgba(70,30,50,.15)}
-.blue .miniScene{background:linear-gradient(160deg,#f5f0eb,#eadccf)}
-.blue .miniScene:before{width:175px;height:175px;background:radial-gradient(circle at 35% 35%,#fff 0 24%,#274d80 25% 42%,#e4b450 43% 58%,#18345a 59%);right:-30px;bottom:80px;box-shadow:0 18px 35px rgba(30,45,80,.16)}
-.blue .miniScene:after{width:78px;height:280px;background:#eee4dc;left:28%;bottom:0;border-radius:45px 45px 0 0}
-.cream .miniScene{background:linear-gradient(160deg,#fff7ee,#f2e1d4)}
-.cream .miniScene:before{width:220px;height:330px;background:#fff;left:50%;top:8%;transform:translateX(-50%);border-radius:120px 120px 15px 15px;box-shadow:0 20px 40px rgba(79,42,42,.1)}
-.cream .miniScene:after{width:210px;height:210px;background:radial-gradient(circle at 30% 28%,#f4c7d6 0 18%,transparent 19%),radial-gradient(circle at 63% 25%,#fff 0 17%,transparent 18%),radial-gradient(circle at 76% 55%,#d79db5 0 19%,transparent 20%),radial-gradient(circle at 40% 67%,#f4deb1 0 18%,transparent 19%),radial-gradient(circle at 63% 80%,#fff 0 18%,transparent 19%);right:-55px;top:55px}
-.about{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
-.portrait{min-height:520px;background:linear-gradient(145deg,#f2c5d4,#f9e6ed);border-radius:38px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
-.portrait:before{content:"CA";position:absolute;inset:auto 0 -55px;text-align:center;font:700 18rem/.8 Georgia,serif;color:rgba(255,255,255,.45);letter-spacing:-.08em}
-.person{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);width:260px;height:360px;border-radius:140px 140px 30px 30px;background:linear-gradient(180deg,#fff4f7,#6f294a 44%,#4d233f);box-shadow:0 20px 50px rgba(83,37,61,.22)}
-.person:before{content:"";position:absolute;width:118px;height:118px;border-radius:50%;left:71px;top:-60px;background:linear-gradient(145deg,#c4818f,#f6c9d4 48%,#e5ae9f 49% 70%,#382a2d 71%);box-shadow:0 8px 20px rgba(55,30,40,.18)}
-.person:after{content:"";position:absolute;width:130px;height:90px;border-radius:60% 60% 30% 30%;left:65px;top:-73px;border-top:26px solid #3c2c31;transform:rotate(-4deg)}
-.aboutText h2{font-family:Georgia,serif;font-size:clamp(3rem,5.5vw,5.8rem);line-height:.92;letter-spacing:-.055em;font-weight:500;margin:14px 0 24px}
-.aboutText p{color:var(--muted);font-size:1.08rem;line-height:1.75}
-.quote{border-left:2px solid var(--gold);padding-left:20px;margin:28px 0;color:#594b56;font-family:Georgia,serif;font-size:1.24rem;line-height:1.5}
-.final{margin-bottom:34px;background:linear-gradient(135deg,#5a2949,#7c365e);color:white;border-radius:38px;padding:65px;display:flex;align-items:center;justify-content:space-between;gap:40px;position:relative;overflow:hidden}
-.final:before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.06);right:-80px;top:-120px;box-shadow:-160px 180px 0 rgba(255,255,255,.04)}
-.final h2{position:relative;font-family:Georgia,serif;font-size:clamp(2.6rem,5vw,5rem);line-height:.95;max-width:700px;margin:0;font-weight:500;letter-spacing:-.04em}
-.final .pill{position:relative;background:white;color:var(--wine);border:none;white-space:nowrap}
-footer{padding:26px 0 48px;display:flex;justify-content:space-between;gap:20px;color:#806f7a;font-size:.88rem}
-.wa{position:fixed;right:18px;bottom:18px;z-index:50;background:#2f8c61;color:white;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:900;box-shadow:0 14px 35px rgba(20,90,60,.28);border:4px solid rgba(255,255,255,.88)}
-.reveal{opacity:0;transform:translateY(18px);transition:.75s cubic-bezier(.2,.8,.2,1)}.reveal.on{opacity:1;transform:none}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;width:100%;height:100%;object-fit:cover}
+.shell{width:min(1180px,calc(100% - 34px));margin:auto}
+.topbar{position:sticky;top:0;z-index:80;background:rgba(255,250,248,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(234,223,223,.8)}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.logo{display:flex;flex-direction:column;line-height:.9}
+.logo b{font-family:"Sacramento",cursive;font-size:2rem;font-weight:400;white-space:nowrap}
+.logo small{letter-spacing:.32em;font-size:.54rem;color:#8b7e84;margin-left:5px;margin-top:7px}
+.links{display:flex;align-items:center;gap:25px;font-size:.9rem;color:#645b60;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:14px 21px;border:1px solid var(--line);font-weight:700;background:white;transition:.25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(74,44,55,.12)}
+.btn.primary{background:linear-gradient(135deg,#df8fa1,#cb788d);color:white;border:none}
+.btn.green{background:var(--green);color:#fff;border:none}
+.hero{display:grid;grid-template-columns:.9fr 1.1fr;min-height:690px;background:#fff;border-bottom:1px solid var(--line)}
+.heroCopy{padding:82px max(40px,calc((100vw - 1180px)/2)) 70px max(30px,calc((100vw - 1180px)/2));display:flex;flex-direction:column;justify-content:center;position:relative}
+.heroCopy:before{content:"";position:absolute;width:260px;height:260px;background:radial-gradient(circle,#f4dde2 0,transparent 68%);left:-90px;top:-70px;opacity:.8}
+.kicker{text-transform:uppercase;letter-spacing:.22em;font-size:.72rem;font-weight:700;color:#705f67;position:relative}
+h1,h2,h3{font-family:"Italiana",serif;font-weight:400}
+h1{font-size:clamp(3.4rem,6vw,6.1rem);line-height:.91;letter-spacing:-.045em;margin:22px 0 25px;position:relative}
+.heroCopy p{font-size:1.08rem;line-height:1.68;color:var(--muted);max-width:560px;margin:0}
+.heroActions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.heroFacts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px;max-width:600px}
+.fact{display:flex;gap:10px;align-items:flex-start;font-size:.78rem;color:#665b60}
+.fact i{font-style:normal;color:var(--rose);font-size:1.18rem}
+.heroPhoto{position:relative;min-height:690px;overflow:hidden}
+.heroPhoto img{object-position:center center;transition:transform 8s ease}
+.heroPhoto:hover img{transform:scale(1.035)}
+.heroPhoto:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,250,248,.16),transparent 30%),linear-gradient(0deg,rgba(48,33,39,.18),transparent 34%)}
+.photoNote{position:absolute;left:28px;bottom:28px;z-index:3;background:rgba(255,255,255,.8);backdrop-filter:blur(16px);padding:13px 16px;border-radius:18px;font-size:.82rem;font-weight:700;box-shadow:0 8px 26px rgba(42,27,33,.12)}
+section{padding:92px 0}
+.centerHead{text-align:center;max-width:760px;margin:0 auto 38px}
+.eyebrow{text-transform:uppercase;letter-spacing:.22em;color:#8a7880;font-size:.68rem;font-weight:700}
+.centerHead h2{font-size:clamp(2.7rem,5vw,4.8rem);line-height:1;margin:10px 0 13px}
+.centerHead p{margin:0;color:var(--muted);line-height:1.65}
+.services{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.service{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:25px;padding:27px 24px;text-align:center;box-shadow:0 10px 32px rgba(80,50,60,.05);transition:.25s}
+.service:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.ico{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;font-size:1.35rem}
+.service:nth-child(1) .ico{background:#f8e2e6}.service:nth-child(2) .ico{background:#e5f0ea}.service:nth-child(3) .ico{background:#f2e8d9}.service:nth-child(4) .ico{background:#e7eef6}
+.service h3{font-size:1.45rem;margin:0 0 9px}.service p{margin:0;color:var(--muted);line-height:1.55;font-size:.9rem}
+.gallerySection{background:#fff}
+.gallery{display:grid;grid-template-columns:1.25fr .85fr .85fr;grid-template-rows:310px 260px;gap:14px}
+.g{position:relative;border-radius:24px;overflow:hidden;background:#eee;box-shadow:0 12px 35px rgba(63,43,51,.1)}
+.g:first-child{grid-row:1/3}.g:nth-child(4){grid-column:2/4}
+.g img{transition:.45s}.g:hover img{transform:scale(1.035)}
+.g:after{content:"";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(transparent,rgba(38,28,32,.56))}
+.cap{position:absolute;left:18px;bottom:17px;z-index:2;color:#fff}.cap strong{display:block;font-size:.95rem}.cap span{font-size:.76rem;opacity:.86}
+.about{display:grid;grid-template-columns:.95fr 1.05fr;gap:62px;align-items:center}
+.aboutPics{display:grid;grid-template-columns:1fr .62fr;gap:12px;height:570px}
+.aboutPics figure{margin:0;border-radius:29px;overflow:hidden;box-shadow:var(--shadow)}
+.aboutPics figure:nth-child(2){height:75%;align-self:end}
+.aboutText h2{font-size:clamp(3rem,5vw,5.1rem);line-height:.94;letter-spacing:-.04em;margin:12px 0 22px}
+.aboutText p{font-size:1.04rem;line-height:1.76;color:var(--muted)}
+.script{font-family:"Sacramento",cursive;color:var(--rose);font-size:2.05rem;margin-top:20px}
+.badges{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px}
+.badge{padding:13px 15px;border-radius:16px;background:#fff;border:1px solid var(--line);font-size:.82rem;color:#655b60}
+.course{background:linear-gradient(135deg,#f7e7eb,#eef5f0);border-radius:34px;padding:28px;display:grid;grid-template-columns:.78fr 1.22fr;gap:34px;align-items:center;overflow:hidden}
+.coursePhoto{height:500px;border-radius:25px;overflow:hidden}
+.courseText{padding-right:34px}.courseText h2{font-size:clamp(2.8rem,5vw,5rem);line-height:.95;margin:10px 0 20px}.courseText p{color:var(--muted);line-height:1.7}
+.cta{background:linear-gradient(115deg,#f2dfdf,#e5f0ea);border-radius:36px;padding:62px 54px;display:flex;justify-content:space-between;align-items:center;gap:34px;position:relative;overflow:hidden}
+.cta:before,.cta:after{content:"";position:absolute;border-radius:50%;opacity:.6}
+.cta:before{width:190px;height:190px;background:#d8b4a6;left:-85px;bottom:-85px}.cta:after{width:210px;height:210px;background:#d7eadf;right:-70px;top:-95px}
+.cta h2{font-size:clamp(2.5rem,4.5vw,4.5rem);line-height:.98;margin:0;max-width:740px;position:relative;z-index:1}.cta .btn{position:relative;z-index:1;white-space:nowrap}
+footer{padding:36px 0 48px}.foot{display:flex;justify-content:space-between;align-items:center;gap:24px;border-top:1px solid var(--line);padding-top:30px;color:#776d72;font-size:.82rem}
+.social{display:flex;gap:14px;font-weight:700}
+.floatWA{position:fixed;right:18px;bottom:18px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#318764;color:#fff;font-weight:900;z-index:90;box-shadow:0 14px 36px rgba(39,107,79,.28);border:4px solid rgba(255,255,255,.9)}
+.reveal{opacity:0;transform:translateY(20px);transition:.7s cubic-bezier(.2,.8,.2,1)}.reveal.on{opacity:1;transform:none}
 @media(max-width:980px){
-  .navlinks a:not(.pill){display:none}.hero{grid-template-columns:1fr;min-height:auto;padding-top:45px}.scene{height:590px}.services{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:1.15fr .85fr;height:auto}.shot{min-height:430px}.shot:last-child{grid-column:1/-1;min-height:320px}.about{grid-template-columns:1fr}.portrait{min-height:430px}.final{padding:46px;align-items:flex-start;flex-direction:column}
+  .links a:not(.btn){display:none}
+  .hero{grid-template-columns:1fr;min-height:auto}.heroCopy{padding:64px 28px 46px}.heroPhoto{min-height:560px}
+  .services{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:360px 300px 300px}.g:first-child{grid-row:1/2;grid-column:1/3}.g:nth-child(4){grid-column:1/3}
+  .about{grid-template-columns:1fr}.course{grid-template-columns:1fr}.courseText{padding:15px 10px 20px}.coursePhoto{height:430px}.cta{align-items:flex-start;flex-direction:column}
 }
 @media(max-width:620px){
-  .wrap{width:min(100% - 22px,1180px)}nav{height:72px}.brand span:last-child{font-size:.72rem}.navlinks{gap:8px}.navlinks .pill{padding:10px 13px;font-size:.8rem}
-  .hero{gap:26px;padding:28px 0 58px}h1{font-size:clamp(3.5rem,18vw,5.2rem)}.lead{font-size:1rem}.scene{height:510px;border-radius:29px}
-  .arch{left:11%;right:11%;height:300px;bottom:95px}.table{left:18%;right:18%;bottom:70px}.cake{bottom:186px}.sweets{bottom:148px}
-  section{padding:70px 0}.sectionHead{align-items:start;flex-direction:column}.services{grid-template-columns:1fr}.card{min-height:210px}.gallery{grid-template-columns:1fr}.shot,.shot:last-child{min-height:390px;grid-column:auto}
-  .about{gap:34px}.portrait{min-height:390px}.final{border-radius:28px;padding:34px 26px}footer{flex-direction:column}.wa{width:54px;height:54px}
+  .shell{width:min(100% - 22px,1180px)}nav{height:70px}.logo b{font-size:1.62rem}.logo small{font-size:.46rem}.links{gap:8px}.links .btn{font-size:.75rem;padding:10px 13px}
+  .heroCopy{padding:48px 20px 38px}h1{font-size:3.7rem}.heroCopy p{font-size:.98rem}.heroFacts{grid-template-columns:1fr;gap:8px;margin-top:25px}.heroPhoto{min-height:430px}.photoNote{left:16px;bottom:16px}
+  section{padding:70px 0}.services{grid-template-columns:1fr}.gallery{display:grid;grid-template-columns:1fr;grid-template-rows:repeat(4,340px)}.g:first-child,.g:nth-child(4){grid-column:auto;grid-row:auto}
+  .about{gap:32px}.aboutPics{height:430px}.aboutText h2{font-size:3.25rem}.badges{grid-template-columns:1fr}
+  .course{padding:16px;border-radius:25px}.coursePhoto{height:360px}.courseText h2{font-size:3rem}.cta{padding:38px 26px;border-radius:26px}.foot{align-items:flex-start;flex-direction:column}.social{flex-wrap:wrap}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-<nav>
-  <a class="brand" href="#"><span class="brandMark"></span><span>MESAS DULCES OURENSE</span></a>
-  <div class="navlinks"><a href="#servicios">Servicios</a><a href="#trabajos">Trabajos</a><a class="pill primary" href="https://wa.me/34697375020" target="_blank" rel="noreferrer">Pedir presupuesto</a></div>
-</nav>
+<div class="topbar">
+  <div class="shell">
+    <nav>
+      <a class="logo" href="#inicio"><b>Mesas Dulces Ourense ♡</b><small>EVENTOS QUE DEJAN HUELLA</small></a>
+      <div class="links">
+        <a href="#servicios">Servicios</a><a href="#galeria">Galería</a><a href="#sobre-mi">Sobre mí</a><a href="#cursos">Cursos</a>
+        <a class="btn primary" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20pedir%20presupuesto%20para%20un%20evento." target="_blank" rel="noreferrer">◉ Pedir presupuesto</a>
+      </div>
+    </nav>
+  </div>
+</div>
 
-<main>
-<section class="hero">
-  <div>
-    <div class="eyebrow">Diseño de eventos · Ourense</div>
-    <h1>Tu celebración,<em>hecha escena.</em></h1>
-    <p class="lead">Mesas dulces, decoración con globos y montajes personalizados para eventos sociales y corporativos. Una propuesta diseñada para que cada rincón tenga intención, color y personalidad.</p>
-    <div class="actions">
-      <a class="pill primary" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20pedir%20presupuesto%20para%20un%20evento." target="_blank" rel="noreferrer">Hablar con Carolina ↗</a>
-      <a class="pill" href="#trabajos">Ver inspiración</a>
+<main id="inicio">
+  <section class="hero">
+    <div class="heroCopy">
+      <div class="kicker">Ideas · globos · mesas dulces · eventos</div>
+      <h1>Decoración con globos y mesas dulces que hacen inolvidable tu evento.</h1>
+      <p>Diseños personalizados para bautizos, cumpleaños, comuniones, bodas y celebraciones especiales en Ourense y Galicia.</p>
+      <div class="heroActions">
+        <a class="btn primary" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20pedir%20presupuesto%20para%20un%20evento." target="_blank" rel="noreferrer">◉ Pedir presupuesto</a>
+        <a class="btn" href="#galeria">Ver trabajos</a>
+      </div>
+      <div class="heroFacts">
+        <div class="fact"><i>♡</i><span>Diseños<br>personalizados</span></div>
+        <div class="fact"><i>✦</i><span>Color, volumen<br>y detalle</span></div>
+        <div class="fact"><i>⌖</i><span>Ourense,<br>Galicia</span></div>
+      </div>
     </div>
-    <div class="micro"><span><i class="dot"></i>Mesas dulces</span><span><i class="dot"></i>Globos</span><span><i class="dot"></i>Eventos corporativos</span></div>
-  </div>
-
-  <div class="scene" aria-label="Composición decorativa inspirada en mesas dulces y globos">
-    <div class="ribbon"><span class="tag">Diseño personalizado</span><span class="insta">@mesasdulcesourense</span></div>
-    <div class="arch"></div>
-    <div class="balloon b1"></div><div class="balloon b2"></div><div class="balloon b3"></div><div class="balloon b4"></div><div class="balloon b5"></div><div class="balloon b6"></div><div class="balloon b7"></div><div class="balloon b8"></div>
-    <div class="cake"></div><div class="sweets"><i></i><i></i><i></i><i></i></div><div class="table"></div>
-  </div>
-</section>
-
-<section id="servicios">
-  <div class="sectionHead reveal"><h2>Decoración que<br>se recuerda.</h2><p>La estética parte del evento, no de una plantilla. Se adapta el color, el montaje y los detalles a la celebración y al espacio.</p></div>
-  <div class="services">
-    <article class="card reveal"><div class="icon">✦</div><div><h3>Mesas dulces</h3><p>Composiciones temáticas y personalizadas para cumpleaños, comuniones, bodas y celebraciones especiales.</p></div></article>
-    <article class="card reveal"><div class="icon">◯</div><div><h3>Globos & columnas</h3><p>Arcos, columnas y estructuras de globos combinadas con color, volumen y una puesta en escena cuidada.</p></div></article>
-    <article class="card reveal"><div class="icon">♡</div><div><h3>Eventos sociales</h3><p>Montajes para momentos que merecen una escenografía propia, desde una mesa protagonista a una decoración completa.</p></div></article>
-    <article class="card reveal"><div class="icon">◇</div><div><h3>Corporativos</h3><p>Decoración visual para marcas, aperturas, presentaciones y celebraciones de empresa con una imagen coherente.</p></div></article>
-  </div>
-</section>
-
-<section id="trabajos">
-  <div class="sectionHead reveal"><h2>Una estética.<br>Mil ocasiones.</h2><p>Inspiración basada en el lenguaje visual de Carolina: tonos pastel, blancos, dorados, composiciones limpias y globos como elemento escultórico.</p></div>
-  <div class="gallery">
-    <article class="shot pink reveal"><div class="miniScene"></div><div class="caption"><strong>Mesa dulce personalizada</strong><small>Pastel · Blanco · Detalle floral</small></div></article>
-    <article class="shot blue reveal"><div class="miniScene"></div><div class="caption"><strong>Columnas con globos</strong><small>Azul · Dorado · Volumen</small></div></article>
-    <article class="shot cream reveal"><div class="miniScene"></div><div class="caption"><strong>Eventos a medida</strong><small>Arcos · Fondos · Composición</small></div></article>
-  </div>
-</section>
-
-<section>
-  <div class="about">
-    <div class="portrait reveal"><div class="person"></div></div>
-    <div class="aboutText reveal">
-      <div class="eyebrow">Carolina Arévalo</div>
-      <h2>Diseño profesional con una firma personal.</h2>
-      <p>Carolina trabaja la decoración con globos y los eventos como una composición completa: concepto, gama cromática, elementos decorativos y montaje final.</p>
-      <div class="quote">“Tú celebra. Yo diseño el ambiente que lo hace inolvidable.”</div>
-      <p>Además de eventos sociales y corporativos, su actividad incluye formación en decoración con globos y emprendimiento.</p>
-      <div class="actions"><a class="pill" href="https://www.instagram.com/mesasdulcesourense/" target="_blank" rel="noreferrer">Ver Instagram ↗</a></div>
+    <div class="heroPhoto">
+      <img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220328-wa0004_1_200978-166281712723097.jpeg" alt="Mesa dulce y decoración con globos de Mesas Dulces Ourense">
+      <div class="photoNote">Decoración creada para celebrar a lo grande ✦</div>
     </div>
-  </div>
-</section>
+  </section>
 
-<section class="final reveal">
-  <h2>Cuéntame qué celebras. Empezamos por una idea.</h2>
-  <a class="pill" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20información%20para%20decorar%20un%20evento." target="_blank" rel="noreferrer">Pedir presupuesto por WhatsApp ↗</a>
-</section>
+  <section id="servicios">
+    <div class="shell">
+      <div class="centerHead reveal">
+        <div class="eyebrow">Nuestros servicios</div>
+        <h2>Todo lo que necesitas para un evento inolvidable</h2>
+        <p>Creatividad, puesta en escena y una propuesta adaptada al tipo de celebración, espacio y estilo que buscas.</p>
+      </div>
+      <div class="services">
+        <article class="service reveal"><div class="ico">🎂</div><h3>Mesas dulces</h3><p>Rincones temáticos con repostería, chucherías, mobiliario y detalles coordinados.</p></article>
+        <article class="service reveal"><div class="ico">🎈</div><h3>Decoración con globos</h3><p>Arcos orgánicos, flores modeladas, columnas, fondos y composiciones de gran formato.</p></article>
+        <article class="service reveal"><div class="ico">✨</div><h3>Eventos personalizados</h3><p>Bautizos, comuniones, cumpleaños, bodas y montajes para celebraciones especiales.</p></article>
+        <article class="service reveal"><div class="ico">🎓</div><h3>Cursos y formación</h3><p>Formación presencial en decoración con globos y emprendimiento creativo.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallerySection" id="galeria">
+    <div class="shell">
+      <div class="centerHead reveal">
+        <div class="eyebrow">Galería de inspiración</div>
+        <h2>Eventos reales, emociones verdaderas</h2>
+        <p>Una selección de montajes con estilos muy distintos: dulce, elegante, infantil, romántico y totalmente personalizado.</p>
+      </div>
+      <div class="gallery">
+        <figure class="g reveal"><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-5172_1_200978-166281714035886.jpeg" alt="Decoración pastel con globos"><figcaption class="cap"><strong>Color que llena el espacio</strong><span>Globos · candy bar · montaje integral</span></figcaption></figure>
+        <figure class="g reveal"><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220806-211517_1_200978-166281711117593.jpeg" alt="Primera comunión en tonos rosa"><figcaption class="cap"><strong>Primera Comunión</strong><span>Rosa · blanco · dorado</span></figcaption></figure>
+        <figure class="g reveal"><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220702-130247_1_200978-166281712145462.jpeg" alt="Mesa dulce bautizo"><figcaption class="cap"><strong>Mesas dulces</strong><span>Detalle · repostería · mobiliario</span></figcaption></figure>
+        <figure class="g reveal"><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220628-wa0152_1_200978-166281712293122.jpeg" alt="Celebración infantil con globos"><figcaption class="cap"><strong>Diseño temático</strong><span>Un concepto visual de principio a fin</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="sobre-mi">
+    <div class="shell">
+      <div class="about">
+        <div class="aboutPics reveal">
+          <figure><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220326-202721_1_200978-166281712665502.jpeg" alt="Carolina Arévalo en un montaje de Mesas Dulces Ourense"></figure>
+          <figure><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220725-220509-184_1_200978-166281711749748.jpeg" alt="Decoración de comunión con globos rosas"></figure>
+        </div>
+        <div class="aboutText reveal">
+          <div class="eyebrow">Hola, soy Carolina Arévalo</div>
+          <h2>Decoración con una firma personal.</h2>
+          <p>Detrás de Mesas Dulces Ourense hay una forma muy concreta de trabajar: escuchar la idea, convertirla en una paleta de color y construir una escena que haga que la celebración se sienta especial desde el primer vistazo.</p>
+          <p>Globos, mesas dulces, mobiliario y pequeños detalles se combinan para que cada montaje tenga personalidad propia.</p>
+          <div class="script">“La magia está en los detalles” ♡</div>
+          <div class="badges">
+            <div class="badge">♡ Pasión por el detalle</div><div class="badge">✦ Diseños a medida</div>
+            <div class="badge">⌖ Ourense · Galicia</div><div class="badge">🎓 Formación creativa</div>
+          </div>
+          <div class="heroActions"><a class="btn" href="https://www.instagram.com/mesasdulcesourense/" target="_blank" rel="noreferrer">Ver Instagram ↗</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cursos">
+    <div class="shell">
+      <div class="course reveal">
+        <div class="coursePhoto"><img src="https://cdn0.bodas.net/vendor/00978/3_2/960/jpg/img-20220328-wa0004_1_200978-166281712723097.jpeg" alt="Decoración profesional con globos"></div>
+        <div class="courseText">
+          <div class="eyebrow">Cursos y formación</div>
+          <h2>Aprende a crear decoraciones que se venden solas.</h2>
+          <p>Una línea de formación pensada para quienes quieren iniciarse o profesionalizarse en decoración con globos, composición visual y emprendimiento.</p>
+          <div class="heroActions"><a class="btn primary" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20información%20sobre%20los%20cursos%20de%20decoración." target="_blank" rel="noreferrer">Consultar próximos cursos</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shell">
+      <div class="cta reveal">
+        <h2>¿Listo para hacer realidad tu evento?</h2>
+        <a class="btn green" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20contarte%20mi%20idea%20para%20un%20evento." target="_blank" rel="noreferrer">◉ Escríbeme por WhatsApp</a>
+      </div>
+    </div>
+  </section>
 </main>
 
-<footer><span>Mesas Dulces Ourense · Carolina Arévalo</span><span>Eventos sociales · Corporativos · Formación</span></footer>
-</div>
-<a class="wa" href="https://wa.me/34697375020" target="_blank" rel="noreferrer" aria-label="WhatsApp">W</a>
+<footer>
+  <div class="shell foot">
+    <div class="logo"><b>Mesas Dulces Ourense ♡</b><small>EVENTOS QUE DEJAN HUELLA</small></div>
+    <div class="social"><a href="#servicios">Servicios</a><a href="#galeria">Galería</a><a href="#sobre-mi">Sobre mí</a><a href="https://www.instagram.com/mesasdulcesourense/" target="_blank" rel="noreferrer">Instagram</a></div>
+    <div>Ourense · Galicia</div>
+  </div>
+</footer>
+<a class="floatWA" href="https://wa.me/34697375020?text=Hola%20Carolina,%20quiero%20información." target="_blank" rel="noreferrer" aria-label="WhatsApp">W</a>
+
 <script>
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')}),{threshold:.13});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 </script>
-</body></html>
+</body>
+</html>
