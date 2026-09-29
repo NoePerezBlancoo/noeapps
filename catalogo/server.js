@@ -1149,9 +1149,15 @@ async function proxyCustomerSite(req,res,slug,pathname,search){
     if(row.site_status==='preview')responseHeaders['X-Robots-Tag']='noindex, nofollow, noarchive';
     if(upstream.headers.get('etag'))responseHeaders['ETag']=upstream.headers.get('etag');
     if(upstream.headers.get('last-modified'))responseHeaders['Last-Modified']=upstream.headers.get('last-modified');
+    let responseBody=null;
+    if(req.method!=='HEAD')responseBody=Buffer.from(await upstream.arrayBuffer());
+    if(req.method!=='HEAD'&&row.site_status==='preview'&&row.chatgpt_published_version&&/^text\/html\b/i.test(responseHeaders['Content-Type'])){
+      try{responseBody=Buffer.from(aiGenerator.injectLeadGate(responseBody.toString('utf8'),row.business_name),'utf8');}
+      catch(error){console.error('Commercial demo gate failed',slug,error&&error.message?error.message:error);return simpleSitePage(res,503,'Demo en preparación','No se pudo preparar la vista comercial.');}
+    }
     res.writeHead(upstream.status,responseHeaders);
     if(req.method==='HEAD')return res.end();
-    return res.end(Buffer.from(await upstream.arrayBuffer()));
+    return res.end(responseBody);
   }catch(error){
     console.error('Customer site proxy failed',slug,error&&error.message?error.message:error);
     return simpleSitePage(res,502,'Web no disponible','La web no está disponible temporalmente.');
