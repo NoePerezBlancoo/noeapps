@@ -7,6 +7,7 @@ const subscriptions=require('./subscriptions');
 const discovery=require('./catalog-discovery');
 const roadmap=require('./crm-roadmap');
 const aiGenerator=require('./ai-site-generator');
+const chatgptHandoffModule=require('./chatgpt-handoff');
 subscriptions.assertStaging();
 
 const html=fs.readFileSync(path.join(__dirname,'index.html'));
@@ -39,10 +40,13 @@ const SITE_DOMAIN=(process.env.SITE_DOMAIN||'noeapps.com').trim().toLowerCase();
 const SALESPERSON_COMMISSION_PERCENT=30;
 const CRM_BRIDGE_SECRET=(process.env.NOEAPPS_CRM_BRIDGE_SECRET||'').trim();
 const TUNEGOCIO_CRM_ORIGIN=(process.env.TUNEGOCIO_CRM_ORIGIN||'').trim().replace(/\/$/,'');
+const CHATGPT_DEMO_ORIGIN=(process.env.CHATGPT_DEMO_ORIGIN||'').trim().replace(/\/$/,'');
+const CATALOG_SALES_WHATSAPP=(process.env.CATALOG_SALES_WHATSAPP||'').replace(/\D/g,'');
 const pool=DATABASE_URL?new Pool({connectionString:DATABASE_URL,max:3,connectionTimeoutMillis:5000,idleTimeoutMillis:20000}):null;
 const legacyPool=LEGACY_DATABASE_URL&&LEGACY_DATABASE_URL!==DATABASE_URL?new Pool({connectionString:LEGACY_DATABASE_URL,max:1,connectionTimeoutMillis:5000,idleTimeoutMillis:10000}):null;
 const catalogDiscovery=discovery.createDiscovery(pool,LIBRARY_ORIGIN);
 const crmRoadmap=roadmap.createRoadmap({pool,ensureSchema,bridgeOrigin:TUNEGOCIO_CRM_ORIGIN,bridgeSecret:CRM_BRIDGE_SECRET,publicOrigin:PUBLIC_ORIGIN});
+const chatgptHandoff=chatgptHandoffModule.createHandoff({pool,ensureSchema,demoOrigin:CHATGPT_DEMO_ORIGIN,sitePublicUrl,siteIsPaid});
 let schemaPromise=null;
 let legacyMigrationPromise=null;
 
@@ -143,6 +147,16 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS latest_generation_id bigint;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS validated_generation_id bigint;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS published_generation_id bigint;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_state text NOT NULL DEFAULT 'not_ready';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_review_token text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_latest_version integer NOT NULL DEFAULT 0;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_validated_version integer;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_published_version integer;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_manifest_url text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_prepared_at timestamptz;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_sync_at timestamptz;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_error text NOT NULL DEFAULT '';
+    CREATE INDEX IF NOT EXISTS catalog_requests_chatgpt_state_idx ON catalog_requests(chatgpt_state, COALESCE(chatgpt_prepared_at, updated_at));
     CREATE TABLE IF NOT EXISTS catalog_site_generations(
       id bigserial PRIMARY KEY,
       request_id uuid NOT NULL REFERENCES catalog_requests(id) ON DELETE CASCADE,
@@ -1390,6 +1404,10 @@ async function updateRequestUnlocked(req,res,id){
 http.createServer(async(req,res)=>{
   try{
     const url=new URL(req.url,'http://localhost');
+    if(url.pathname==='/mcp'){
+      if(!chatgptHandoff.enabled())return json(res,404,{error:'Función no habilitada.'});
+      return await chatgptHandoff.handleMcp(req,res);
+    }
     if(roadmap.enabled()&&url.pathname.startsWith('/api/crm/')&&!['GET','HEAD'].includes(req.method)){
       if(req.headers.origin!==PUBLIC_ORIGIN||!/^application\/json(?:;|$)/i.test(req.headers['content-type']||'')||!['same-origin','none',undefined].includes(req.headers['sec-fetch-site']))return json(res,403,{error:'Abre esta acción desde el CRM.'});
       if(!['/api/crm/login','/api/crm/logout'].includes(url.pathname)){
@@ -1530,7 +1548,10 @@ http.createServer(async(req,res)=>{
         aiGenerationEnabled:aiGenerator.enabled(),
         aiConfigured:aiGenerator.configured(),
         aiResearchModel:aiGenerator.researchModel(),
-        aiBuildModel:aiGenerator.buildModel()
+        aiBuildModel:aiGenerator.buildModel(),
+        chatgptHandoffEnabled:chatgptHandoff.enabled(),
+        chatgptHandoffConfigured:chatgptHandoff.configured(),
+        chatgptDemoOrigin:CHATGPT_DEMO_ORIGIN
       });
     }
     if(url.pathname==='/api/crm/expenses'&&req.method==='POST'){
@@ -1580,6 +1601,27 @@ http.createServer(async(req,res)=>{
       const response=await fetch(TUNEGOCIO_CRM_ORIGIN+'/api/internal/crm-subscription',{method:'POST',headers:{Authorization:'Bearer '+CRM_BRIDGE_SECRET,'Content-Type':'application/json'},body:JSON.stringify({orderId:remote.orderId,action:data.action}),signal:AbortSignal.timeout(45000)});
       const result=await response.json();
       return json(res,response.status,result);
+    }
+    const chatgptPrepareMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/chatgpt\/prepare$/i);
+    if(chatgptPrepareMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return json(res,200,await chatgptHandoff.prepare(chatgptPrepareMatch[1]));
+    }
+    const chatgptSyncMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/chatgpt\/sync$/i);
+    if(chatgptSyncMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return json(res,200,await chatgptHandoff.sync(chatgptSyncMatch[1]));
+    }
+    const chatgptValidateConversationMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/chatgpt\/validate$/i);
+    if(chatgptValidateConversationMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      const data=await bodyJson(req,2048);
+      return json(res,200,await chatgptHandoff.validateVersion(chatgptValidateConversationMatch[1],data.version));
+    }
+    const chatgptPublishMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/chatgpt\/publish$/i);
+    if(chatgptPublishMatch&&req.method==='POST'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return json(res,200,await chatgptHandoff.publish(chatgptPublishMatch[1]));
     }
     const aiResearchMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/ai\/research$/i);
     if(aiResearchMatch&&req.method==='POST'){
