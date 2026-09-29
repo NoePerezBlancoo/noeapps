@@ -142,6 +142,7 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS generation_last_error text NOT NULL DEFAULT '';
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS latest_generation_id bigint;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS validated_generation_id bigint;
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS published_generation_id bigint;
     CREATE TABLE IF NOT EXISTS catalog_site_generations(
       id bigserial PRIMARY KEY,
       request_id uuid NOT NULL REFERENCES catalog_requests(id) ON DELETE CASCADE,
@@ -1046,16 +1047,16 @@ async function publishValidatedGeneration(req,res,id){
     const slug=row.site_slug||await makeUniqueSiteSlug(row.business_name,row.id);
     const paid=siteIsPaid(row),publicUrl=sitePublicUrl(slug);
     row=(await pool.query(`UPDATE catalog_requests SET
-      site_slug=$2,site_origin_url='',site_status=$3,preview_published_at=COALESCE(preview_published_at,now()),
+      site_slug=$2,site_origin_url='',published_generation_id=validated_generation_id,site_status=$3,preview_published_at=COALESCE(preview_published_at,now()),
       preview_expires_at=$4,preview_url=$5,status=$6,generation_state='published',updated_at=now()
       WHERE id=$1 RETURNING *`,[id,slug,paid?'active':'preview',paid?null:new Date(Date.now()+10*24*60*60*1000),publicUrl,paid?'published':'preview_ready'])).rows[0];
     return json(res,200,{ok:true,publicUrl,request:row,generation:{id:generation.id,version:generation.version}});
   });
 }
 async function generatedSiteForRequest(row,pathname){
-  if(!row.validated_generation_id)return null;
+  if(!row.published_generation_id)return null;
   if(pathname!=='/'&&pathname!=='/index.html')return{notFound:true};
-  const generation=(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[row.validated_generation_id,row.id])).rows[0];
+  const generation=(await pool.query('SELECT * FROM catalog_site_generations WHERE id=$1 AND request_id=$2',[row.published_generation_id,row.id])).rows[0];
   if(!generation)return null;
   const html=row.site_status==='preview'?aiGenerator.injectLeadGate(generation.html,row.business_name):generation.html;
   return{html,version:generation.version};
