@@ -6,9 +6,9 @@ Este repositorio es la **fuente de código/backup independiente** de la web. Per
 
 ## Versión actual
 
-**NoeApps 2.3.0** — incorporación de Catálogo NoeApps como proyecto público el 28 de septiembre de 2026.
+**NoeApps 2.4.0** — incorporación de ESP Data Observatory como proyecto público el 30 de septiembre de 2026.
 
-La versión 2.3 incorpora **Catálogo NoeApps**, enlazado a `catalogo.noeapps.com`, como nuevo proyecto público. El catálogo pasa a 20 entradas: 4 aplicaciones, 6 herramientas, 3 integraciones Atlassian y 7 proyectos.\n\nLa versión 2.2 recupera las 17 fichas del catálogo anterior y añade TuNegocio y TuTest: auditoría web gratuita, pasiva y sin registro, con página propia, acceso directo, soporte y metadatos.
+La versión 2.4 incorpora **ESP**, un dashboard de datos públicos sobre población, criminalidad, nacionalidad, edad, territorio y violencia en España, enlazado a su despliegue independiente. El catálogo pasa a 21 entradas.\n\nLa versión 2.3 incorpora **Catálogo NoeApps**, enlazado a `catalogo.noeapps.com`, como nuevo proyecto público. El catálogo pasa a 20 entradas: 4 aplicaciones, 6 herramientas, 3 integraciones Atlassian y 7 proyectos.\n\nLa versión 2.2 recupera las 17 fichas del catálogo anterior y añade TuNegocio y TuTest: auditoría web gratuita, pasiva y sin registro, con página propia, acceso directo, soporte y metadatos.
 
 La versión 2.1 incorpora **TuNegocio** como nuevo producto destacado de NoeApps, amplía la portada para representar una cartera más amplia que la línea Atlassian, añade su ficha pública, soporte, sitemap y validación de integridad.
 
@@ -52,7 +52,7 @@ Producción continúa en **ChatGPT Sites** con el dominio `noeapps.com`. GitHub 
 | BrokenLinkGuard | [NoePerezBlancoo/BrokenLinkGuard](https://github.com/NoePerezBlancoo/BrokenLinkGuard) |
 | LeaverGuard | [NoePerezBlancoo/LeaverGuard](https://github.com/NoePerezBlancoo/LeaverGuard) |
 | ForgeOps | [NoePerezBlancoo/ForgeOps](https://github.com/NoePerezBlancoo/ForgeOps) |
-| Fivaki | [NoePerezBlancoo/Fitnex](https://github.com/NoePerezBlancoo/Fitnex) |
+| Fivaki | [NoePerezBlancoo/Fitnex](https://github.com/NoePerezBlancoo/Fitnex) |\n| ESP | [NoePerezBlancoo/ESP](https://github.com/NoePerezBlancoo/ESP) |
 
 El código de los productos no se duplica dentro de este repositorio; cada uno conserva su repositorio, historial y despliegue independiente.
 
