@@ -126,6 +126,16 @@ export const showcase = {
     steps:['Abre el catálogo público.','Explora los modelos y precios disponibles.','Continúa con la solicitud desde la opción que te interese.'],flow:['Explorar','Comparar','Solicitar'],
     faq:[['¿El catálogo se puede visitar ahora?','Sí. El catálogo está disponible públicamente en catalogo.noeapps.com.'],['¿Puedo ver precios antes de solicitar una web?','Sí. La finalidad del catálogo es que puedas revisar propuestas y precios antes de continuar con una solicitud.'],['¿La solicitud se hace desde NoeApps?','El botón «Ver catálogo» abre el catálogo público, desde donde puedes continuar con el proceso disponible.']]
   },
+  esp: {
+    alt:'Vista conceptual del observatorio ESP con mapa de España, gráficos y paneles de datos.',caption:'ESP · Criminalidad, población y violencia en España.',concept:false,
+    short:['Datos oficiales','Comparación demográfica','Actualización manual'],heading:'Una lectura más clara de datos sensibles.',
+    benefits:[['Compara con contexto','Relaciona población y registros por nacionalidad para evitar interpretar volúmenes absolutos como si fueran tasas.'],['Explora perfiles','Revisa edad, sexo, tipología penal y distribución territorial desde un mismo dashboard.'],['Mantén las magnitudes separadas','Distingue actuaciones policiales, denuncias y condenas y muestra notas metodológicas junto a los indicadores.']],
+    audience:'Personas interesadas en analizar estadísticas públicas de criminalidad, población y violencia en España con contexto y definiciones visibles.',
+    example:'Seleccionas un año, una nacionalidad o una tipología penal y comparas la evolución, el peso poblacional, los registros y la distribución territorial sin volver a consultar las fuentes hasta que pulses actualizar.',
+    steps:['Abre el dashboard con el último snapshot guardado.','Filtra por nacionalidad, edad, sexo, delito o territorio.','Pulsa «Actualizar datos» cuando quieras volver a consultar las fuentes oficiales.'],flow:['Snapshot','Comparar','Interpretar'],
+    faq:[['¿Consulta las fuentes cada vez que entro?','No. Las consultas externas se realizan solo al pulsar «Actualizar datos».'],['¿Detención y condena significan lo mismo?','No. El dashboard mantiene separadas las actuaciones policiales y las condenas firmes.'],['¿Nacionalidad equivale a inmigración?','No. Se muestra la variable publicada por cada fuente y se explica esa diferencia en la metodología.']]
+  },
+
   'itflow-manager': {
     image:'it-support.png',alt:'Ilustración de un puesto de soporte IT con servidores, cableado y bandejas de trabajo.',caption:'Ilustración conceptual sobre soporte y mantenimiento IT.',concept:true,
     short:['Procesos de soporte','Mantenimiento de sistemas','Aplicación de gestión'],heading:'Un caso de portfolio sobre la organización del soporte.',
