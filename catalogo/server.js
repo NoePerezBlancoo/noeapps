@@ -147,7 +147,9 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_prepared_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_sync_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_error text NOT NULL DEFAULT '';
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS crm_state text NOT NULL DEFAULT 'active' CHECK (crm_state IN ('active','paused','deleted'));
     CREATE INDEX IF NOT EXISTS catalog_requests_chatgpt_state_idx ON catalog_requests(chatgpt_state, COALESCE(chatgpt_prepared_at, updated_at));
+    CREATE INDEX IF NOT EXISTS catalog_requests_crm_state_idx ON catalog_requests(crm_state, updated_at DESC);
     CREATE TABLE IF NOT EXISTS stripe_events(
       id text PRIMARY KEY,
       created_at timestamptz NOT NULL DEFAULT now()
@@ -218,6 +220,8 @@ async function ensureSchema(){
     ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS offer_duration_months integer NOT NULL DEFAULT 0;
     ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS first_paid_amount_cents integer;
     ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS commission_cents integer;
+    ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS crm_state text NOT NULL DEFAULT 'active' CHECK (crm_state IN ('active','paused','deleted'));
+    CREATE INDEX IF NOT EXISTS crm_operations_state_idx ON crm_operations(crm_state, updated_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
@@ -580,6 +584,7 @@ async function fetchTunegocioOperations(){
         ...item,
         source:'tunegocio',
         manualStatus:String(saved.manual_status||'auto'),
+        crmState:String(saved.crm_state||'active'),
         salesperson:String(saved.salesperson_name||saved.salesperson||''),
         salespersonId,
         salespersonEmail:String(saved.salesperson_email||''),
@@ -668,6 +673,34 @@ async function updateTunegocioOperationUnlocked(req,res,id){
   );
   if(roadmap.enabled()&&offerChanged&&offer)await pool.query("INSERT INTO crm_campaign_assignments(campaign_id,source,entity_id) VALUES($1,'tunegocio',$2) ON CONFLICT DO NOTHING",[offer.id,id]);
   return json(res,200,{ok:true,operation:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
+}
+const CRM_LIFECYCLE_ACTIONS=new Map([['pause','paused'],['resume','active'],['delete','deleted'],['restore','active']]);
+async function updateCatalogLifecycle(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
+  const data=await bodyJson(req,2048),action=text(data.action,20);
+  const nextState=CRM_LIFECYCLE_ACTIONS.get(action);
+  if(!nextState)return json(res,400,{error:'Acción no válida.'});
+  await ensureSchema();
+  const current=(await pool.query('SELECT id,crm_state FROM catalog_requests WHERE id=$1 LIMIT 1',[id])).rows[0];
+  if(!current)return json(res,404,{error:'Solicitud no encontrada.'});
+  if(current.crm_state==='deleted'&&!['restore'].includes(action))return json(res,409,{error:'La solicitud está en la papelera. Restáurala antes de cambiar su estado.'});
+  const updated=(await pool.query('UPDATE catalog_requests SET crm_state=$2,updated_at=now() WHERE id=$1 RETURNING *',[id,nextState])).rows[0];
+  return json(res,200,{ok:true,crmState:nextState,request:updated});
+}
+async function updateTunegocioLifecycle(req,res,id){
+  if(!validUuid(id))return json(res,400,{error:'Proyecto no válido.'});
+  const data=await bodyJson(req,2048),action=text(data.action,20);
+  const nextState=CRM_LIFECYCLE_ACTIONS.get(action);
+  if(!nextState)return json(res,400,{error:'Acción no válida.'});
+  await ensureSchema();
+  const current=(await pool.query("SELECT crm_state FROM crm_operations WHERE source='tunegocio' AND external_id=$1 LIMIT 1",[id])).rows[0];
+  if(String(current?.crm_state||'active')==='deleted'&&action!=='restore')return json(res,409,{error:'El proyecto está en la papelera. Restáuralo antes de cambiar su estado.'});
+  const operation=(await pool.query(
+    `INSERT INTO crm_operations(source,external_id,crm_state)
+     VALUES('tunegocio',$1,$2)
+     ON CONFLICT(source,external_id) DO UPDATE SET crm_state=EXCLUDED.crm_state,updated_at=now()
+     RETURNING *`,[id,nextState])).rows[0];
+  return json(res,200,{ok:true,crmState:nextState,operation});
 }
 function cookies(req){
   return Object.fromEntries((req.headers.cookie||'').split(';').map(x=>x.trim().split('=').map(decodeURIComponent)).filter(x=>x.length===2));
@@ -1390,7 +1423,7 @@ http.createServer(async(req,res)=>{
       await ensureSiteSlugs(result.rows);
       const analytics=await combinedAnalytics(tunegocio);
       return json(res,200,{
-        requests:result.rows.map(row=>({...row,subscriptionControlsEnabled:subscriptions.enabled()})),
+        requests:result.rows.map(row=>({...row,crmState:String(row.crm_state||'active'),subscriptionControlsEnabled:subscriptions.enabled()})),
         tunegocio:tunegocio.projects,
         tunegocioAvailable:tunegocio.available,
         roadmapEnabled:roadmap.enabled(),
@@ -1435,6 +1468,8 @@ http.createServer(async(req,res)=>{
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       return await updateOffer(req,res,offerMatch[1]);
     }
+    const tunegocioLifecycleMatch=url.pathname.match(/^\/api\/crm\/tunegocio\/([0-9a-f-]{36})\/lifecycle$/i);
+    if(tunegocioLifecycleMatch&&req.method==='PATCH')return await updateTunegocioLifecycle(req,res,tunegocioLifecycleMatch[1]);
     const tunegocioMatch=url.pathname.match(/^\/api\/crm\/tunegocio\/([0-9a-f-]{36})$/i);
     if(tunegocioMatch&&req.method==='PATCH'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
@@ -1493,6 +1528,8 @@ http.createServer(async(req,res)=>{
       if(subscriptions.enabled()&&req.headers.origin!==PUBLIC_ORIGIN)return json(res,403,{error:'Abre esta acción desde el CRM.'});
       return await createCustomerPortal(res,portalMatch[1]);
     }
+    const requestLifecycleMatch=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})\/lifecycle$/i);
+    if(requestLifecycleMatch&&req.method==='PATCH')return await updateCatalogLifecycle(req,res,requestLifecycleMatch[1]);
     const match=url.pathname.match(/^\/api\/crm\/requests\/([0-9a-f-]{36})$/i);
     if(match&&req.method==='PATCH'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
