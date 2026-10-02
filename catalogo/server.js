@@ -148,6 +148,7 @@ async function ensureSchema(){
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_sync_at timestamptz;
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS chatgpt_last_error text NOT NULL DEFAULT '';
     ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS crm_state text NOT NULL DEFAULT 'active' CHECK (crm_state IN ('active','paused','deleted'));
+    ALTER TABLE catalog_requests ADD COLUMN IF NOT EXISTS crm_resume_site_status text NOT NULL DEFAULT '';
     CREATE INDEX IF NOT EXISTS catalog_requests_chatgpt_state_idx ON catalog_requests(chatgpt_state, COALESCE(chatgpt_prepared_at, updated_at));
     CREATE INDEX IF NOT EXISTS catalog_requests_crm_state_idx ON catalog_requests(crm_state, updated_at DESC);
     CREATE TABLE IF NOT EXISTS stripe_events(
@@ -222,6 +223,17 @@ async function ensureSchema(){
     ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS commission_cents integer;
     ALTER TABLE crm_operations ADD COLUMN IF NOT EXISTS crm_state text NOT NULL DEFAULT 'active' CHECK (crm_state IN ('active','paused','deleted'));
     CREATE INDEX IF NOT EXISTS crm_operations_state_idx ON crm_operations(crm_state, updated_at DESC);
+    CREATE TABLE IF NOT EXISTS crm_lifecycle_events(
+      id uuid PRIMARY KEY,
+      source text NOT NULL CHECK (source IN ('catalog','tunegocio')),
+      entity_id uuid NOT NULL,
+      action text NOT NULL,
+      before_state text NOT NULL DEFAULT '',
+      after_state text NOT NULL DEFAULT '',
+      details jsonb NOT NULL DEFAULT '{}'::jsonb,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS crm_lifecycle_events_entity_idx ON crm_lifecycle_events(source,entity_id,created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_created_idx ON catalog_requests(created_at DESC);
     CREATE INDEX IF NOT EXISTS catalog_requests_status_idx ON catalog_requests(status);
     CREATE UNIQUE INDEX IF NOT EXISTS catalog_requests_site_slug_uidx ON catalog_requests(site_slug) WHERE site_slug <> '';
@@ -675,16 +687,55 @@ async function updateTunegocioOperationUnlocked(req,res,id){
   return json(res,200,{ok:true,operation:result.rows[0],commissionPercent:SALESPERSON_COMMISSION_PERCENT});
 }
 const CRM_LIFECYCLE_ACTIONS=new Map([['pause','paused'],['resume','active'],['delete','deleted'],['restore','active']]);
+async function recordLifecycleEvent(source,id,action,beforeState,afterState,details={}){
+  await pool.query('INSERT INTO crm_lifecycle_events(id,source,entity_id,action,before_state,after_state,details) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)',
+    [crypto.randomUUID(),source,id,action,String(beforeState||''),String(afterState||''),JSON.stringify(details||{})]);
+}
+async function lifecycleHistory(res,source,id){
+  if(!['catalog','tunegocio'].includes(source)||!validUuid(id))return json(res,400,{error:'Operación no válida.'});
+  await ensureSchema();
+  const q=await pool.query('SELECT id,source,entity_id,action,before_state,after_state,details,created_at FROM crm_lifecycle_events WHERE source=$1 AND entity_id=$2 ORDER BY created_at DESC LIMIT 100',[source,id]);
+  return json(res,200,{events:q.rows});
+}
+async function syncTunegocioLifecycle(projectId,action){
+  const origin=safeTunegocioOrigin();
+  if(!origin||CRM_BRIDGE_SECRET.length<32)throw Object.assign(new Error('bridge_not_configured'),{status:503,publicMessage:'TuNegocio no está disponible para aplicar esta acción.'});
+  const response=await fetch(origin+'/api/internal/crm-lifecycle',{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+CRM_BRIDGE_SECRET,'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({projectId,action}),
+    signal:AbortSignal.timeout(12000)
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw Object.assign(new Error(String(data.error||'tunegocio_lifecycle_failed')),{status:response.status>=500?503:response.status,publicMessage:String(data.error||'No se pudo aplicar la acción en TuNegocio.')});
+  return data;
+}
 async function updateCatalogLifecycle(req,res,id){
   if(!validUuid(id))return json(res,400,{error:'Solicitud no válida.'});
   const data=await bodyJson(req,2048),action=text(data.action,20);
   const nextState=CRM_LIFECYCLE_ACTIONS.get(action);
   if(!nextState)return json(res,400,{error:'Acción no válida.'});
   await ensureSchema();
-  const current=(await pool.query('SELECT id,crm_state FROM catalog_requests WHERE id=$1 LIMIT 1',[id])).rows[0];
+  const current=(await pool.query('SELECT * FROM catalog_requests WHERE id=$1 LIMIT 1',[id])).rows[0];
   if(!current)return json(res,404,{error:'Solicitud no encontrada.'});
   if(current.crm_state==='deleted'&&!['restore'].includes(action))return json(res,409,{error:'La solicitud está en la papelera. Restáurala antes de cambiar su estado.'});
-  const updated=(await pool.query('UPDATE catalog_requests SET crm_state=$2,updated_at=now() WHERE id=$1 RETURNING *',[id,nextState])).rows[0];
+  let updated;
+  if(action==='pause'||action==='delete'){
+    updated=(await pool.query(`UPDATE catalog_requests SET crm_state=$2,
+      crm_resume_site_status=CASE WHEN crm_resume_site_status='' AND site_status IN ('active','preview') THEN site_status ELSE crm_resume_site_status END,
+      site_status=CASE WHEN site_status IN ('active','preview') THEN 'suspended' ELSE site_status END,updated_at=now()
+      WHERE id=$1 RETURNING *`,[id,nextState])).rows[0];
+  }else{
+    updated=(await pool.query(`UPDATE catalog_requests SET crm_state=$2,
+      site_status=CASE
+        WHEN crm_resume_site_status='active' AND (subscription_paid_until IS NULL OR subscription_paid_until>now() OR stripe_subscription_status IN ('active','trialing','past_due')) THEN 'active'
+        WHEN crm_resume_site_status='preview' AND (preview_expires_at IS NULL OR preview_expires_at>now()) THEN 'preview'
+        ELSE site_status
+      END,
+      crm_resume_site_status='',updated_at=now()
+      WHERE id=$1 RETURNING *`,[id,nextState])).rows[0];
+  }
+  await recordLifecycleEvent('catalog',id,action,current.crm_state||'active',nextState,{siteStatusBefore:current.site_status||'',siteStatusAfter:updated.site_status||'',publicTrafficBlocked:updated.site_status==='suspended'});
   return json(res,200,{ok:true,crmState:nextState,request:updated});
 }
 async function updateTunegocioLifecycle(req,res,id){
@@ -694,13 +745,16 @@ async function updateTunegocioLifecycle(req,res,id){
   if(!nextState)return json(res,400,{error:'Acción no válida.'});
   await ensureSchema();
   const current=(await pool.query("SELECT crm_state FROM crm_operations WHERE source='tunegocio' AND external_id=$1 LIMIT 1",[id])).rows[0];
-  if(String(current?.crm_state||'active')==='deleted'&&action!=='restore')return json(res,409,{error:'El proyecto está en la papelera. Restáuralo antes de cambiar su estado.'});
+  const beforeState=String(current?.crm_state||'active');
+  if(beforeState==='deleted'&&action!=='restore')return json(res,409,{error:'El proyecto está en la papelera. Restáuralo antes de cambiar su estado.'});
+  const remote=await syncTunegocioLifecycle(id,action);
   const operation=(await pool.query(
     `INSERT INTO crm_operations(source,external_id,crm_state)
      VALUES('tunegocio',$1,$2)
      ON CONFLICT(source,external_id) DO UPDATE SET crm_state=EXCLUDED.crm_state,updated_at=now()
      RETURNING *`,[id,nextState])).rows[0];
-  return json(res,200,{ok:true,crmState:nextState,operation});
+  await recordLifecycleEvent('tunegocio',id,action,beforeState,nextState,{publicTrafficBlocked:remote.publicTrafficBlocked===true,sharedRailwayService:true});
+  return json(res,200,{ok:true,crmState:nextState,operation,remote});
 }
 function cookies(req){
   return Object.fromEntries((req.headers.cookie||'').split(';').map(x=>x.trim().split('=').map(decodeURIComponent)).filter(x=>x.length===2));
@@ -1467,6 +1521,10 @@ http.createServer(async(req,res)=>{
     if(offerMatch&&req.method==='PATCH'){
       if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
       return await updateOffer(req,res,offerMatch[1]);
+    }
+    if(url.pathname==='/api/crm/lifecycle'&&req.method==='GET'){
+      if(!validSession(req))return json(res,401,{error:'Acceso no autorizado.'});
+      return await lifecycleHistory(res,text(url.searchParams.get('source'),20),text(url.searchParams.get('id'),40));
     }
     const tunegocioLifecycleMatch=url.pathname.match(/^\/api\/crm\/tunegocio\/([0-9a-f-]{36})\/lifecycle$/i);
     if(tunegocioLifecycleMatch&&req.method==='PATCH')return await updateTunegocioLifecycle(req,res,tunegocioLifecycleMatch[1]);
