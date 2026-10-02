@@ -596,7 +596,7 @@ async function fetchTunegocioOperations(){
         ...item,
         source:'tunegocio',
         manualStatus:String(saved.manual_status||'auto'),
-        crmState:String(saved.crm_state||'active'),
+        crmState:String(item.deleted?'deleted':item.paused?'paused':saved.crm_state||'active'),
         salesperson:String(saved.salesperson_name||saved.salesperson||''),
         salespersonId,
         salespersonEmail:String(saved.salesperson_email||''),
