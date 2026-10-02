@@ -273,19 +273,30 @@ function renderLifecycleControls(){
   if(!selected)return;
   const state=lifecycleState(selected),root=document.getElementById('detail'),panel=document.createElement('article');
   panel.className='panel lifecyclePanel';
+  const shared=selected.source==='tunegocio';
   panel.innerHTML='<div class="sectionHead" style="margin-bottom:8px"><div><div class="eyebrow">GESTIÓN CRM</div><h3 style="margin:5px 0 0">'+(state==='deleted'?'En papelera':state==='paused'?'Operación pausada':'Operación activa')+'</h3></div><span class="tag '+(state==='active'?'good':'warn')+'">'+esc(state==='active'?'Activa':state==='paused'?'Pausada':'Papelera')+'</span></div>'+
-    '<p class="note">'+(state==='deleted'?'Se ha retirado de la vista principal. Restaurarla no modifica la web ni la facturación.':'Pausar o eliminar aquí solo organiza el CRM: no cancela Stripe, no despublica la web y no borra el histórico financiero.')+'</p>'+
-    '<div class="actions">'+(state==='deleted'?'<button class="btn primary" id="crmRestore">Restaurar</button>':'<button class="btn" id="crmPause">'+(state==='paused'?'Reanudar':'Pausar')+'</button><button class="btn danger" id="crmDelete">Eliminar del CRM</button>')+'</div><div id="lifecycleMsg" class="msg"></div>';
+    '<p class="note">'+(state==='deleted'?'Se ha retirado de la vista principal y la web queda bloqueada. Restaurar conserva el histórico.':state==='paused'?'La web pública está bloqueada. '+(shared?'TuNegocio usa infraestructura Railway compartida, por lo que no se apaga un servicio exclusivo.':'Si su origen Railway es un servicio dedicado con Serverless, quedará sin cómputo tras el periodo de inactividad.'):'Pausar bloquea la web pública sin borrar pagos ni datos. '+(shared?'Este proyecto comparte el servicio de TuNegocio.':'Los servicios Railway compatibles pueden dormir cuando quedan sin tráfico.'))+'</p>'+
+    '<div class="actions">'+(state==='deleted'?'<button class="btn primary" id="crmRestore">Restaurar</button>':'<button class="btn" id="crmPause">'+(state==='paused'?'Reanudar':'Pausar')+'</button><button class="btn danger" id="crmDelete">Mover a Papelera</button>')+'</div><div id="lifecycleMsg" class="msg"></div>'+
+    '<details style="margin-top:12px" open><summary class="sub" style="cursor:pointer">Trazabilidad</summary><div id="lifecycleHistory" class="note" style="margin-top:9px">Cargando historial…</div></details>';
   root.appendChild(panel);
   if(el('crmRestore'))el('crmRestore').onclick=()=>changeLifecycle('restore');
   if(el('crmPause'))el('crmPause').onclick=()=>changeLifecycle(state==='paused'?'resume':'pause');
   if(el('crmDelete'))el('crmDelete').onclick=()=>changeLifecycle('delete');
+  loadLifecycleHistory();
+}
+async function loadLifecycleHistory(){
+  const root=el('lifecycleHistory'),item=selected;if(!root||!item)return;
+  try{
+    const data=await api('/api/crm/lifecycle?source='+encodeURIComponent(item.source)+'&id='+encodeURIComponent(item.id));
+    if(selected?.id!==item.id||selected?.source!==item.source)return;
+    root.innerHTML=(data.events||[]).length?(data.events||[]).map(e=>'<div style="padding:7px 0;border-bottom:1px solid #222a33"><strong style="color:#c9d3df">'+esc({pause:'Pausado',resume:'Reanudado',delete:'Movido a Papelera',restore:'Restaurado'}[e.action]||e.action)+'</strong> · '+new Date(e.created_at).toLocaleString('es-ES')+'<br><span>'+esc(e.before_state)+' → '+esc(e.after_state)+(e.details?.publicTrafficBlocked?' · web bloqueada':'')+'</span></div>').join(''):'Sin cambios de ciclo de vida registrados.';
+  }catch(error){root.textContent='No se pudo cargar la trazabilidad: '+error.message}
 }
 async function changeLifecycle(action){
   if(!selected)return;
-  if(action==='delete'&&!window.confirm('¿Eliminar esta operación del CRM? Se moverá a Papelera. La web, Stripe y el histórico financiero no se borrarán.'))return;
+  if(action==='delete'&&!window.confirm('¿Mover esta operación a Papelera? La web pública quedará bloqueada. Stripe y el histórico financiero se conservan.'))return;
   const source=selected.source,id=selected.id,m=el('lifecycleMsg');
-  if(m)m.textContent=action==='delete'?'Moviendo a Papelera…':action==='pause'?'Pausando…':action==='resume'?'Reanudando…':'Restaurando…';
+  if(m)m.textContent=action==='delete'?'Moviendo a Papelera y bloqueando la web…':action==='pause'?'Pausando y bloqueando la web…':action==='resume'?'Reanudando la web…':'Restaurando…';
   try{
     const route='/api/crm/'+(source==='tunegocio'?'tunegocio':'requests')+'/'+id+'/lifecycle';
     const result=await api(route,{method:'PATCH',body:JSON.stringify({action})});
