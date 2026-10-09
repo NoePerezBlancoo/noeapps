@@ -41,6 +41,21 @@
     {aliases:['3d','inmersivo','inmersiva'],values:['3d']}
   ].map(style=>({...style,aliases:withPlurals(style.aliases)}));
   const stopWords=new Set('una un de del el la los las para con y web webs pagina paginas quiero necesito como'.split(' '));
+  // A single misplaced, missing or extra letter is common in searches from a phone.
+  function oneEdit(a,b){
+    if(a===b)return true;
+    if(Math.abs(a.length-b.length)>1)return false;
+    let i=0,j=0,edits=0;
+    while(i<a.length&&j<b.length){
+      if(a[i]===b[j]){i++;j++;continue}
+      if(a.length===b.length&&a[i]===b[j+1]&&a[i+1]===b[j]){if(++edits>1)return false;i+=2;j+=2;continue}
+      if(++edits>1)return false;
+      if(a.length>=b.length)i++;
+      if(b.length>=a.length)j++;
+    }
+    return edits+(i<a.length||j<b.length?1:0)<=1;
+  }
+  const close=(a,b)=>a.length>=5&&b.length>=5&&oneEdit(a,b);
   function tier(item){
     const tags=(item.style||[]).map(normalize),impact=Number(item.impact_score||0);
     if(tags.some(t=>t.includes('3d')||t.includes('experimental')))return {key:'signature',label:'Signature',price:299};
@@ -54,17 +69,19 @@
   }
   function queryScore(item,query){
     const doc=describe(item),tokens=[...new Set(normalize(query).split(' ').filter(x=>x&&!stopWords.has(x)))].slice(0,16);
-    let score=0;const reasons=[];
+    let score=0;const reasons=[],words=doc.text.split(' ');
     for(const token of tokens){
-      const matches=businesses.filter(b=>b.aliases.includes(token));
-      const style=styles.find(s=>s.aliases.includes(token));
+      const matches=businesses.filter(b=>b.aliases.includes(token)||b.aliases.some(alias=>close(token,alias)));
+      const style=styles.find(s=>s.aliases.includes(token)||s.aliases.some(alias=>close(token,alias)));
       const business=matches.find(b=>b.id===doc.business);
       const styleMatch=style&&(style.values.some(s=>doc.style.includes(s))||(style.categories||[]).includes(item.category));
-      const literal=doc.text.split(' ').some(word=>word===token||(token.length>=4&&word.startsWith(token)));
-      if(!literal&&!business&&!styleMatch)return null;
-      score+=literal?12:business?8:5;
+      const literal=words.some(word=>word===token||(token.length>=4&&word.startsWith(token)));
+      const approximate=!literal&&words.some(word=>close(token,word));
+      if(!literal&&!business&&!styleMatch&&!approximate)return null;
+      score+=literal?12:business?8:styleMatch?5:2;
       if(business)reasons.push(business.label);
       else if(styleMatch)reasons.push('Estilo '+token);
+      else if(approximate)reasons.push('Coincidencia aproximada');
     }
     return {score,reasons:[...new Set(reasons)]};
   }
@@ -76,7 +93,8 @@
     for(const item of items){
       const doc=describe(item),price=tier(item).price;
       if((options.category&&item.category!==options.category)||(options.style&&!(item.style||[]).includes(options.style))
-        ||(options.sector&&doc.sector!==options.sector)||(options.business&&doc.business!==options.business)||price<min||price>max)continue;
+        ||(options.sector&&doc.sector!==options.sector)||(options.business&&doc.business!==options.business)
+        ||(options.format&&item.format!==options.format)||price<min||price>max)continue;
       const match=queryScore(item,options.query||'');if(match===null)continue;
       scored.push({item,...match});
     }
