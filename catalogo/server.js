@@ -817,8 +817,10 @@ async function stripePost(endpoint,params,idempotencyKey=''){
   const response=await fetch('https://api.stripe.com/v1'+endpoint,{method:'POST',headers,body:form});
   const data=await response.json().catch(()=>({}));
   if(!response.ok){
-    const e=new Error(data&&data.error&&data.error.message?data.error.message:'stripe_error');
-    e.status=502;e.publicMessage='Stripe: '+(data&&data.error&&data.error.message?data.error.message:'no se pudo crear el cobro.');
+    const code=String(data?.error?.code||data?.error?.type||'unknown').replace(/[^a-z0-9_]/gi,'').slice(0,80);
+    console.error('Stripe request failed',response.status,code);
+    const e=new Error('stripe_request_failed');
+    e.status=502;e.publicMessage='Stripe no pudo preparar el cobro. Revisa la configuración o inténtalo de nuevo.';
     throw e;
   }
   return data;
