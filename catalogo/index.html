@@ -634,7 +634,7 @@ async function initLibrary(){
 
    libraryState.items=curated;
    fillLibraryFilters();
-   if(!activeSelection&&window.CatalogDiscoveryUI)discoveryView=await window.CatalogDiscoveryUI.setup({state:libraryState,render:renderLibrary,escape:libraryEsc});
+   if(!activeSelection&&window.CatalogDiscoveryUI)discoveryView=await window.CatalogDiscoveryUI.setup({state:libraryState,favorites:libraryFavorites,render:renderLibrary,escape:libraryEsc});
    renderImpact(); renderLibrary(true);
    if(activeSelection){
      const spotlight=document.getElementById("impactSpotlight"); if(spotlight)spotlight.hidden=true;

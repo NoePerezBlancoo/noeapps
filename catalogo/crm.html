@@ -112,18 +112,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 </section>
 
 <section class="page hidden" id="view-offers">
-  <div class="sectionHead"><div><span class="eyebrow">CAMPAÑAS</span><h2>Ofertas</h2><p>Crea descuentos temporales reales en Stripe y asígnalos por web.</p></div></div>
+  <div class="sectionHead"><div><span class="eyebrow">CAMPAÑAS</span><h2>Ofertas</h2><p>Crea descuentos temporales reales en Stripe y asígnalos a cada solicitud desde su ficha. La promoción se aplica al crear el enlace de pago.</p></div></div>
   <article class="panel" style="margin-bottom:12px">
     <h3>Nueva oferta</h3>
     <form id="offerForm" class="formRow">
-      <label class="field"><span>Nombre</span><input class="input" id="offerName" placeholder="Ej. Lanzamiento 50%" required></label>
-      <label class="field"><span>Aplicar a</span><select class="input" id="offerSource"><option value="both">Ambos</option><option value="catalog">Catálogo</option><option value="tunegocio">TuNegocio</option></select></label>
+      <label class="field"><span>Nombre</span><input class="input" id="offerName" placeholder="Ej. 50% durante 3 meses" required></label>
+      <label class="field"><span>Aplicar a</span><select class="input" id="offerSource"><option value="catalog">Catálogo</option><option value="both">Ambos</option><option value="tunegocio">TuNegocio</option></select></label>
       <label class="field"><span>Descuento %</span><input class="input" id="offerPercent" type="number" min="1" max="100" value="50" required></label>
-      <label class="field"><span>Meses</span><input class="input" id="offerMonths" type="number" min="1" max="24" value="4" required></label>
+      <label class="field"><span>Meses</span><input class="input" id="offerMonths" type="number" min="1" max="24" value="3" required></label>
       <label class="field"><span>Inicio opcional</span><input class="input" id="offerStart" type="date"></label>
       <label class="field"><span>Fin opcional</span><input class="input" id="offerEnd" type="date"></label>
       <div></div><button class="btn primary" type="submit">Crear oferta</button>
-    </form><div id="offerMsg" class="msg"></div>
+    </form><p id="offerPricePreview" class="note" aria-live="polite"></p><div id="offerMsg" class="msg"></div>
   </article>
   <article class="panel"><h3>Campañas configuradas</h3><div id="offerList"></div></article>
 </section>
@@ -453,14 +453,27 @@ function renderCatalogDetail(){
     '<div class="statusline"><span class="tag '+(stripeConfigured?'good':'warn')+'">Stripe '+(stripeConfigured?'conectado':'pendiente')+'</span><span class="tag '+(x.stripe_payment_status==='paid'?'good':'')+'">Pago: '+esc(x.stripe_payment_status||'sin cobrar')+'</span><span class="tag '+(['active','trialing'].includes(x.stripe_subscription_status)?'good':'')+'">Suscripción: '+esc(x.stripe_subscription_status||'—')+'</span><span class="tag '+(x.site_status==='active'?'good':'')+'">Web: '+esc(x.site_status||'draft')+'</span></div>'+
     subscriptionPanel(x)+'<div class="grid2"><div class="box"><span>Contacto</span><p>'+esc(x.contact_name)+'\n'+esc(x.whatsapp)+'\n'+esc(x.email||'')+'</p></div><div class="box"><span>Negocio</span><p>'+esc(x.city||'')+'\n'+esc(x.source_url||'')+'</p></div><div class="box"><span>Diseño</span><p>'+esc(x.design_name)+'\n'+esc(x.tier||'')+'</p></div><div class="box"><span>Notas cliente</span><p>'+esc(x.notes||'—')+'</p></div></div>'+chatgptHandoffPanel(x)+aiGenerationPanel(x)+
     '<div class="grid2"><label class="field"><span>Comercial</span><select id="catSalesperson" '+(x.first_paid_amount_cents!=null&&x.salesperson_id?'disabled':'')+'>'+salespersonOptions(x.salesperson_id)+'</select></label><label class="field"><span>Oferta mensual</span><select id="catOffer" '+(x.first_paid_amount_cents!=null?'disabled':'')+'>'+offerOptions('catalog',x.offer_id)+'</select></label></div>'+
-    '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+x.offer_percent_off+'% durante '+x.offer_duration_months+' mes(es)':'')+'</small></div>'+
+    '<div class="summary"><strong>'+(x.first_paid_amount_cents!=null?'Primer cobro real: '+cents(x.first_paid_amount_cents):'Primer cobro previsto: '+cents(t.first))+'</strong><small>Comisión: '+(x.salesperson_id&&x.first_paid_amount_cents!=null?cents(x.commission_cents)+' ('+commissionPercent+'%)':'—')+(x.offer_name?' · '+esc(x.offer_name)+' · '+cents(t.offerMonthly)+'/mes durante '+x.offer_duration_months+' mes(es); después '+cents(t.monthly)+'/mes':'')+'</small></div>'+
     '<div class="grid2"><label class="field"><span>Precio creación (€)</span><input id="creationPrice" type="number" min="0" max="10000" step="1" value="'+esc(x.creation_price||0)+'"></label><label class="field"><span>Cuota mensual (€)</span><input id="monthlyPrice" type="number" min="1" max="1000" step=".01" value="'+(Number(x.monthly_price_cents||1990)/100).toFixed(2)+'"></label></div>'+
+    '<p id="catOfferPreview" class="note" aria-live="polite"></p>'+
     '<details style="margin-top:12px"><summary class="sub" style="cursor:pointer">Ajuste puntual / descuento manual</summary><div class="grid2"><label class="field"><span>Código</span><input id="discountCode" value="'+esc(x.discount_code||'')+'"></label><label class="field"><span>Tipo</span><select id="discountType"><option value="none" '+(x.discount_type==='none'?'selected':'')+'>Sin descuento</option><option value="percent" '+(x.discount_type==='percent'?'selected':'')+'>Porcentaje</option><option value="fixed" '+(x.discount_type==='fixed'?'selected':'')+'>Importe fijo</option></select></label><label class="field"><span>Valor</span><input id="discountValue" type="number" min="0" step=".01" value="'+esc(discountValueDisplay(x))+'"></label><label class="field"><span>Aplicar a</span><select id="discountScope"><option value="creation" '+(x.discount_scope==='creation'?'selected':'')+'>Creación</option><option value="monthly" '+(x.discount_scope==='monthly'?'selected':'')+'>Mensual</option><option value="both" '+(x.discount_scope==='both'?'selected':'')+'>Ambos</option></select></label></div><p class="note">Si hay una oferta multi-mes asignada, esta prevalece sobre el descuento manual de la cuota mensual.</p></details>'+
     '<div class="grid2"><label class="field"><span>Subdominio</span><input id="siteSlug" value="'+esc(x.site_slug||'')+'"></label><label class="field"><span>Origen privado</span><input id="siteOriginUrl" value="'+esc(x.site_origin_url||'')+'"></label></div>'+
     '<label class="field"><span>Estado</span><select id="catStatus">'+['new','preparing','preview_ready','sent','paid','published','expired','closed'].map(s=>'<option '+(x.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label>'+
     '<label class="field"><span>Notas internas</span><textarea id="catNotes">'+esc(x.admin_notes||'')+'</textarea></label>'+
     '<div class="actions"><button class="btn primary" id="catSave">Guardar</button><button class="btn" id="publishSite">Publicar preview 10 días</button><button class="btn" id="stripeCheckout" '+(!stripeConfigured?'disabled':'')+'>Crear enlace Stripe</button>'+(x.stripe_customer_id?'<button class="btn" id="portal">Portal cliente</button>':'')+(x.preview_url?'<a target="_blank" href="'+esc(x.preview_url)+'">Abrir web ↗</a>':'')+(x.catalog_preview_url?'<a target="_blank" href="'+esc(x.catalog_preview_url)+'">Diseño original ↗</a>':'')+(wa&&x.payment_url&&pageUrl?'<a target="_blank" href="https://wa.me/'+wa+'?text='+whatsappText+'">WhatsApp ↗</a>':'')+'</div><div id="detailMsg" class="msg"></div>';
   document.getElementById('catSave').onclick=()=>saveCatalog(true);
+  function updateCatalogOfferPreview(){
+    const offerId=val('catOffer'),offer=offers.find(o=>o.id===offerId),base=Math.round(Number(val('monthlyPrice'))*100);
+    const target=el('catOfferPreview');
+    if(!Number.isSafeInteger(base)||base<100){target.textContent='Introduce una cuota mensual válida para ver el precio.';return}
+    if(!offer){target.textContent='Sin promoción: '+cents(base)+'/mes al activar.';return}
+    const percent=offerId===x.offer_id?Number(x.offer_percent_off):Number(offer.percent_off);
+    const months=offerId===x.offer_id?Number(x.offer_duration_months):Number(offer.duration_months);
+    target.textContent='Promoción '+offer.name+': '+cents(Math.round(base*(100-percent)/100))+'/mes durante '+months+' '+(months===1?'mes':'meses')+'; desde el mes '+(months+1)+', '+cents(base)+'/mes. Antes de impuestos, si corresponden. Guarda la ficha antes de compartir el enlace de pago.';
+  }
+  el('catOffer').addEventListener('change',updateCatalogOfferPreview);
+  el('monthlyPrice').addEventListener('input',updateCatalogOfferPreview);
+  updateCatalogOfferPreview();
   document.getElementById('publishSite').onclick=publishSite;
   document.getElementById('stripeCheckout').onclick=createCheckout;
   if(document.getElementById('portal'))document.getElementById('portal').onclick=openPortal;bindSubscriptionActions();bindChatgptHandoff();bindCatalogAi();
@@ -506,7 +519,7 @@ function renderSales(){
 }
 function renderOffers(){
   const root=el('offerList');if(!offers.length){root.innerHTML='<div class="empty">Todavía no hay ofertas.</div>';return}
-  root.innerHTML='<table class="table"><thead><tr><th>Oferta</th><th>Producto</th><th>Descuento</th><th>Duración</th><th>Vigencia</th><th></th></tr></thead><tbody>'+offers.map(o=>'<tr><td><strong>'+esc(o.name)+'</strong><small>'+(o.active?'Activa':'Inactiva')+'</small></td><td>'+({both:'Ambos',catalog:'Catálogo',tunegocio:'TuNegocio'}[o.source]||esc(o.source))+'</td><td>'+o.percent_off+'%</td><td>'+o.duration_months+' mes(es)</td><td>'+date(o.starts_at)+' → '+date(o.ends_at)+'</td><td><button class="btn" data-offer-toggle="'+o.id+'">'+(o.active?'Desactivar':'Activar')+'</button></td></tr>').join('')+'</tbody></table>';
+  root.innerHTML='<table class="table"><thead><tr><th>Oferta</th><th>Producto</th><th>Descuento</th><th>Duración</th><th>Vigencia</th><th></th></tr></thead><tbody>'+offers.map(o=>'<tr><td><strong>'+esc(o.name)+'</strong><small>'+(o.active?'Activa':'Inactiva')+'</small></td><td>'+({both:'Ambos',catalog:'Catálogo',tunegocio:'TuNegocio'}[o.source]||esc(o.source))+'</td><td>'+o.percent_off+'%</td><td>'+o.duration_months+' mes(es)'+(o.source!=='tunegocio'?'<small>'+cents(Math.round(1990*(100-o.percent_off)/100))+'/mes; después '+cents(1990)+'/mes*</small>':'')+'</td><td>'+date(o.starts_at)+' → '+date(o.ends_at)+'</td><td><button class="btn" data-offer-toggle="'+o.id+'">'+(o.active?'Desactivar':'Activar')+'</button></td></tr>').join('')+'</tbody></table>'+(offers.some(o=>o.source!=='tunegocio')?'<p class="note">* Ejemplo con la cuota habitual del Catálogo (19,90 €/mes). En cada ficha se calcula con su cuota configurada. Precio antes de impuestos, si corresponden.</p>':'');
   root.querySelectorAll('[data-offer-toggle]').forEach(b=>b.onclick=async()=>{const o=offers.find(x=>x.id===b.dataset.offerToggle);if(!o)return;await api('/api/crm/offers/'+o.id,{method:'PATCH',body:JSON.stringify({active:!o.active})});await load()});
 }
 function renderExpenses(){
@@ -525,7 +538,16 @@ document.getElementById('designStatsMore').onclick=()=>{designStatsVisible+=50;r
 document.querySelectorAll('#filters [data-filter]').forEach(b=>b.onclick=()=>{sourceFilter=b.dataset.filter;document.querySelectorAll('#filters [data-filter]').forEach(x=>x.classList.toggle('active',x===b));selected=null;renderList();renderDetail()});
 el('search').oninput=e=>{searchTerm=e.target.value;renderList()};
 el('salesForm').onsubmit=async e=>{e.preventDefault();const m=el('salesMsg');m.textContent='';try{await api('/api/crm/salespeople',{method:'POST',body:JSON.stringify({name:val('salesName'),email:val('salesEmail')})});e.target.reset();m.className='msg ok';m.textContent='Comercial añadido.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
-el('offerForm').onsubmit=async e=>{e.preventDefault();const m=el('offerMsg');m.textContent='';try{await api('/api/crm/offers',{method:'POST',body:JSON.stringify({name:val('offerName'),source:val('offerSource'),percentOff:Number(val('offerPercent')),durationMonths:Number(val('offerMonths')),startsAt:val('offerStart')||null,endsAt:val('offerEnd')||null})});e.target.reset();el('offerPercent').value='50';el('offerMonths').value='4';m.className='msg ok';m.textContent='Oferta creada.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
+function updateOfferPricePreview(){
+  const percent=Number(val('offerPercent')),months=Number(val('offerMonths'));
+  const preview=el('offerPricePreview');
+  preview.textContent=Number.isInteger(percent)&&percent>=1&&percent<=100&&Number.isInteger(months)&&months>=1&&months<=24
+    ?'Catálogo, cuota habitual 19,90 €/mes: '+cents(Math.round(1990*(100-percent)/100))+'/mes durante '+months+' '+(months===1?'mes':'meses')+'; después '+cents(1990)+'/mes. Antes de impuestos, si corresponden.'
+    :'Introduce un porcentaje y una duración válidos para ver el precio.';
+}
+['offerPercent','offerMonths'].forEach(id=>el(id).addEventListener('input',updateOfferPricePreview));
+updateOfferPricePreview();
+el('offerForm').onsubmit=async e=>{e.preventDefault();const m=el('offerMsg');m.textContent='';try{await api('/api/crm/offers',{method:'POST',body:JSON.stringify({name:val('offerName'),source:val('offerSource'),percentOff:Number(val('offerPercent')),durationMonths:Number(val('offerMonths')),startsAt:val('offerStart')||null,endsAt:val('offerEnd')||null})});e.target.reset();updateOfferPricePreview();m.className='msg ok';m.textContent='Oferta creada. Asígnala desde la ficha de una solicitud antes de generar el enlace de pago.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
 el('expenseForm').onsubmit=async e=>{e.preventDefault();const m=el('expenseMsg');m.textContent='';try{await api('/api/crm/expenses',{method:'POST',body:JSON.stringify({name:val('expenseName'),category:val('expenseCategory'),amountCents:Math.round(Number(val('expenseAmount'))*100),cadence:val('expenseCadence'),expenseDate:val('expenseDate')||null,notes:val('expenseNotes')})});e.target.reset();m.className='msg ok';m.textContent='Gasto registrado.';await load()}catch(err){m.className='msg';m.textContent=err.message}};
 </script>
 <script src="/assets/crm-roadmap.js"></script>
