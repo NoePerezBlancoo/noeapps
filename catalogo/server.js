@@ -1231,9 +1231,10 @@ async function createRequest(req,res){
   const selection=data.selection&&typeof data.selection==='object'?data.selection:{};
   const contactName=text(customer.name,120),businessName=text(customer.businessName,160),whatsapp=text(customer.whatsapp,80),email=text(customer.email,180),city=text(customer.city,120),sourceUrl=safeUrl(customer.sourceUrl,600),notes=text(customer.notes,1800);
   const designId=text(selection.id||selection.designId,160),designName=text(selection.name||selection.designName,160)||'Diseño NoeApps',category=text(selection.category,120),tier=text(selection.tier,80),creationPrice=Number(selection.price),catalogPreview=safeUrl(selection.preview,1600),thumbnail=safeUrl(selection.thumbnail,1600);
-  if(!contactName||!businessName||!whatsapp)return json(res,400,{error:'Completa tu nombre, negocio y WhatsApp.'});
-  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email.'});
-  if(!/^[+()0-9 .-]{6,80}$/.test(whatsapp))return json(res,400,{error:'Revisa el WhatsApp.'});
+  if(!contactName||!businessName||!whatsapp||!email)return json(res,400,{error:'Completa tu nombre, negocio, móvil / WhatsApp y email.'});
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email.'});
+  const whatsappDigits=whatsapp.replace(/\D/g,'');
+  if(!/^\+?[0-9 ().-]+$/.test(whatsapp)||whatsappDigits.length<9||whatsappDigits.length>15||/^0/.test(whatsappDigits))return json(res,400,{error:'Indica un móvil / WhatsApp válido (9 a 15 dígitos, con prefijo internacional si corresponde).'});
   if(!designId||![39,79,149,299].includes(creationPrice))return json(res,400,{error:'No hemos podido identificar correctamente el diseño. Vuelve al catálogo.'});
   await ensureSchema();
   const id=crypto.randomUUID();
