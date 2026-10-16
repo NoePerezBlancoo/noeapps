@@ -194,6 +194,21 @@ radial-gradient(900px 600px at 90% 0%,rgba(0,219,255,.13),transparent 58%),
 @media(max-width:900px){.price-guide-grid{grid-template-columns:repeat(2,1fr)}.price-guide-head,.value-banner{align-items:flex-start;flex-direction:column}}
 @media(max-width:650px){.cat-nav{height:72px}.cat-pill{display:none}.cat-help-btn{height:38px}.cat-hero{padding-top:34px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions a{width:100%}.price-guide{padding:16px}.price-guide-grid{grid-template-columns:1fr 1fr}.price-tier strong{font-size:22px}.value-banner a{width:100%;justify-content:center}}
 
+/* La oportunidad y los diseños aparecen al entrar */
+.launch-strip{display:flex;justify-content:center;align-items:center;gap:14px;min-height:43px;padding:9px 20px;background:linear-gradient(90deg,#a992ff,#81d9ff);color:#0a1020;text-align:center;font:800 11px/1.3 Inter}
+.launch-strip span{font-weight:950;letter-spacing:.11em}.launch-strip strong{font-weight:750}.launch-strip a{text-decoration:underline;text-underline-offset:3px}
+.cat-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:center;gap:clamp(30px,5vw,80px);padding:45px 0 65px}
+.cat-hero-copy{min-width:0}.cat-hero .cat-kicker{margin-bottom:20px;color:#9eaaf2}.cat-hero h1{max-width:700px;font-size:clamp(55px,6vw,90px);line-height:.95}.cat-hero h1 span{display:inline-block;padding:5px 0;background:linear-gradient(90deg,#a695ff,#76daff);-webkit-background-clip:text;background-clip:text}.cat-hero p{max-width:580px;margin-top:23px;font-size:clamp(15px,1.35vw,18px)}
+.cat-hero .hero-actions{margin-top:25px}.cat-hero .hero-actions a{min-height:52px;font-size:12px}.cat-hero .hero-primary{background:linear-gradient(135deg,#a992ff,#569cff);color:#091023}.cat-hero .hero-secondary{border-color:#48506c}.cat-hero .hero-micro{margin-top:17px;color:#b3bccc;font-size:11px}
+.hero-proof{display:flex;flex-wrap:wrap;gap:8px;margin-top:25px}.hero-proof span{border:1px solid #30364b;border-radius:999px;padding:9px 12px;background:#121722;color:#c3ccd9;font:750 10px Inter}
+.hero-showcase{position:relative;height:440px;min-width:0;isolation:isolate}.hero-showcase:before{content:"";position:absolute;z-index:-1;inset:16% 8%;border-radius:50%;background:radial-gradient(circle,rgba(109,110,255,.35),transparent 69%);filter:blur(28px)}.hero-showcase-label{position:absolute;top:4px;left:2%;color:#b7c1d5;font:900 10px Inter;letter-spacing:.19em}
+.hero-showcase-card{position:absolute;display:block;overflow:hidden;border:1px solid rgba(255,255,255,.23);border-radius:16px;background:#1b1f2c;box-shadow:0 25px 60px rgba(0,0,0,.43);transition:transform .22s,border-color .22s}.hero-showcase-card:hover{transform:translateY(-5px);border-color:#9f9fff}.hero-showcase-card img{display:block;width:100%;height:100%;object-fit:cover}.hero-showcase-card>span{position:absolute;right:10px;bottom:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.24);border-radius:8px;background:rgba(12,15,22,.83);color:#fff;font:800 10px Inter;backdrop-filter:blur(9px)}.hero-showcase-card--main{top:34px;left:0;width:90%;aspect-ratio:1.64}.hero-showcase-card--small{right:0;bottom:55px;width:61%;aspect-ratio:1.62}
+.hero-opportunity{position:absolute;left:2%;bottom:5px;max-width:255px;padding:12px 15px;border:1px solid rgba(169,146,255,.45);border-radius:13px;background:#16152a;box-shadow:0 20px 40px rgba(0,0,0,.3)}.hero-opportunity strong,.hero-opportunity span{display:block}.hero-opportunity strong{font:900 15px Manrope;color:#eeeaff}.hero-opportunity span{margin-top:4px;color:#afb9cb;font:700 10px/1.35 Inter}
+#precios,#destacados,#biblioteca,#como-funciona{scroll-margin-top:20px}
+@media(max-width:960px){.cat-hero{gap:22px}.cat-hero h1{font-size:clamp(48px,6vw,68px)}.hero-showcase{height:360px}.hero-showcase-card--small{bottom:48px}}
+@media(max-width:760px){.launch-strip{gap:7px;flex-wrap:wrap;padding:9px 12px;font-size:10px}.launch-strip a{display:none}.cat-hero{grid-template-columns:1fr;gap:23px;padding:34px 0 40px}.cat-hero h1{font-size:clamp(46px,9vw,70px)}.cat-hero p{font-size:15px}.hero-proof{margin-top:18px}.hero-showcase{width:min(100%,560px);height:340px;margin:auto}.hero-showcase-card--main{top:29px}.hero-showcase-card--small{bottom:47px}.hero-opportunity{bottom:0}}
+@media(max-width:430px){.launch-strip strong{display:none}.cat-hero h1{font-size:45px}.cat-hero .hero-actions{gap:8px}.cat-hero .hero-actions a{min-height:46px}.hero-proof span{font-size:9px;padding:7px 9px}.hero-showcase{height:280px}.hero-showcase-card--main{top:28px}.hero-showcase-card--small{bottom:48px}.hero-opportunity{padding:8px 10px;max-width:210px}.hero-opportunity strong{font-size:12px}.hero-opportunity span{font-size:9px}}
+
 </style>
 <link rel="stylesheet" href="/assets/catalog-search.css">
 </head>
@@ -233,19 +248,27 @@ function featuredNoeAppsCard(x){
  return '<article class="featured-card"><div class="featured-bg" style="background-image:url(\''+libraryEsc(libraryUrl(x.thumbnail))+'\')"></div><div class="featured-top"><span class="featured-cat">'+libraryEsc(x.category)+'</span><span class="featured-price">Creación '+libraryEsc(euro(tier.price))+'</span></div><div class="featured-copy"><small>NoeApps Original · nivel '+libraryEsc(tier.label)+'</small><h3>'+libraryEsc(x.commercial_name)+'</h3><p>'+libraryEsc(x.desc)+'</p><div class="offer-note">Tu marca + textos + fotos + móvil + contacto + 1 revisión + preview privada. Al activar: 19,90 €/mes.</div><div class="featured-actions"><a class="featured-demo" href="'+libraryEsc(href)+'" target="_blank" rel="noopener">Ver demo ↗</a><a class="featured-buy" href="'+libraryEsc(catalogBuilderUrl(x))+'">Quiero una web como esta →</a></div></div></article>';
 }
 function catalog(){
-return `<main class="catalog"><div class="shell">
+return `<main class="catalog"><div class="launch-strip"><span>✦ OPORTUNIDAD NOEAPPS</span><strong>Solicita sin pagar · Revisa tu web antes de activarla</strong><a href="#como-funciona">Así funciona ↗</a></div><div class="shell">
 <nav class="cat-nav"><div class="brand"><span class="brand-mark">N</span>NoeApps</div><div class="cat-nav-actions"><span class="cat-pill">10 recomendadas · <b id="totalCatalogCount">571</b> ideas disponibles</span><a class="cat-help-btn" href="#destacados">Ver recomendadas ↓</a></div></nav>
 
 <section class="cat-hero reveal">
-  <div class="cat-kicker">Webs para pequeños negocios · precios claros</div>
-  <h1>Que te vean.<br><span>Que te elijan.</span></h1>
-  <p>Elige un diseño que encaje con tu negocio y lo adaptamos con tu marca, textos, fotos y contacto. Tú revisas una preview privada antes de publicar.</p>
-  <div class="hero-actions"><a class="hero-primary" href="#destacados">Ver las 10 recomendadas ↓</a><a class="hero-secondary" href="#biblioteca">Explorar por sector</a></div>
-  <div class="hero-micro"><i></i><span>Sin complicarte: eliges → envías tus datos → revisas → publicamos.</span></div>
-  <div class="cat-meta"><span>Creación desde 39 €</span><span>19,90 €/mes al activar</span><span>Móvil incluido</span><span>Preview privada</span><span>1 revisión incluida</span><span>Entrega habitual 3–7 días</span></div>
+  <div class="cat-hero-copy">
+    <div class="cat-kicker">Webs para pequeños negocios · precios claros</div>
+    <h1>Tu próxima web empieza aquí.<br><span>Desde 39 €.</span></h1>
+    <p>Elige un diseño que te guste y lo adaptamos a tu negocio. Solicítalo sin pagar; revisa una preview privada antes de decidir si la activas.</p>
+    <div class="hero-actions"><a class="hero-primary" href="#precios">Ver precios ↗</a><a class="hero-secondary" href="#destacados">Explorar demos ↓</a></div>
+    <div class="hero-micro"><i></i><span>Creación desde 39 € · 19,90 €/mes solo al activar.</span></div>
+    <div class="hero-proof"><span>✓ Adaptada a tu marca</span><span>✓ Móvil incluido</span><span>✓ 1 revisión incluida</span></div>
+  </div>
+  <div class="hero-showcase" aria-label="Ejemplos de webs NoeApps">
+    <span class="hero-showcase-label">MIRA LO QUE PODEMOS HACER TUYO</span>
+    <a class="hero-showcase-card hero-showcase-card--main" href="/library/templates/noeapps-restaurant-ember/index.html" target="_blank" rel="noopener" aria-label="Ver demo Ember para restaurantes"><img src="/library/thumbnails/noeapps-restaurant-ember.jpg" alt="Ejemplo de web Ember para restaurantes" fetchpriority="high"><span>Restaurantes ↗</span></a>
+    <a class="hero-showcase-card hero-showcase-card--small" href="/library/templates/noeapps-beauty-muse/index.html" target="_blank" rel="noopener" aria-label="Ver demo Muse Skin para belleza"><img src="/library/thumbnails/noeapps-beauty-muse.jpg" alt="Ejemplo de web Muse Skin para belleza" loading="lazy"><span>Belleza ↗</span></a>
+    <div class="hero-opportunity"><strong>0 € al solicitar</strong><span>Primero ves tu preview. Pagas si decides activar tu web.</span></div>
+  </div>
 </section>
 
-<section class="trust-strip reveal">
+<section class="trust-strip reveal" id="como-funciona">
   <div><strong>1 · Elige</strong><span>Empieza por 10 recomendadas</span></div>
   <div><strong>2 · Personalizamos</strong><span>Tu marca, textos, fotos y contacto</span></div>
   <div><strong>3 · Revisas</strong><span>Preview privada antes de publicar</span></div>
@@ -253,7 +276,7 @@ return `<main class="catalog"><div class="shell">
   <div><strong>5 · Publicamos</strong><span>Cuando das el visto bueno</span></div>
 </section>
 
-<section class="price-guide reveal">
+<section class="price-guide reveal" id="precios">
   <div class="price-guide-head"><div><div class="cat-kicker">Cuatro precios de creación · sin misterio</div><h2>Eliges la web.<br>Sabes lo que cuesta.</h2></div><p>El precio que ves en cada diseño corresponde a crear y adaptar esa web a tu negocio. Cuando decidas activarla, el servicio es el mismo para todas: 19,90 €/mes.</p></div>
   <div class="price-guide-grid">
     <article class="price-tier"><small>Esencial · desde</small><strong>39 €</strong><span>Presencia limpia, clara y profesional.</span></article>
