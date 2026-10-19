@@ -886,6 +886,9 @@ async function createStripeSessionForRow(row){
   });
 }
 async function createStripeSessionForRowUnlocked(row){
+  if(row.design_id==='custom-quote'&&(Number(row.creation_price)<=0||!['preview_ready','sent','paid','published'].includes(String(row.status||'')))){
+    const e=new Error('quote_not_approved');e.status=409;e.publicMessage='La solicitud necesita un presupuesto aceptado antes de preparar un pago.';throw e;
+  }
   const hasOffer=Number(row.offer_percent_off)>0&&Number(row.offer_duration_months)>0;
   if(hasOffer)row=await ensureCatalogOfferPromotion(row);
   const creationBase=Math.max(0,Math.round(Number(row.creation_price)*100));
@@ -1291,17 +1294,19 @@ async function createRequest(req,res){
   const customer=data.customer&&typeof data.customer==='object'?data.customer:{};
   const selection=data.selection&&typeof data.selection==='object'?data.selection:{};
   const contactName=text(customer.name,120),businessName=text(customer.businessName,160),whatsapp=text(customer.whatsapp,80),email=text(customer.email,180),city=text(customer.city,120),sourceUrl=safeUrl(customer.sourceUrl,600),notes=text(customer.notes,1800);
-  const designId=text(selection.id||selection.designId,160),designName=text(selection.name||selection.designName,160)||'Diseño NoeApps',category=text(selection.category,120),tier=text(selection.tier,80),creationPrice=Number(selection.price),catalogPreview=safeUrl(selection.preview,1600),thumbnail=safeUrl(selection.thumbnail,1600);
-  if(!contactName||!businessName||!whatsapp)return json(res,400,{error:'Completa tu nombre, negocio y WhatsApp.'});
-  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email.'});
+  const customQuote=data.requestType==='quote';
+  const designId=customQuote?'custom-quote':text(selection.id||selection.designId,160),designName=customQuote?'Presupuesto personalizado':text(selection.name||selection.designName,160)||'Diseño NoeApps',category=customQuote?'A medida':text(selection.category,120),tier=customQuote?'':text(selection.tier,80),creationPrice=customQuote?0:Number(selection.price),catalogPreview=customQuote?'':safeUrl(selection.preview,1600),thumbnail=customQuote?'':safeUrl(selection.thumbnail,1600);
+  if(!contactName||!businessName||!whatsapp||!email)return json(res,400,{error:'Completa tu nombre, negocio, WhatsApp y email.'});
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json(res,400,{error:'Revisa el email.'});
+  if(customQuote&&notes.length<15)return json(res,400,{error:'Describe brevemente qué tipo de web necesitas (al menos 15 caracteres).'});
   if(!/^[+()0-9 .-]{6,80}$/.test(whatsapp))return json(res,400,{error:'Revisa el WhatsApp.'});
-  if(!designId||![39,79,149,299].includes(creationPrice))return json(res,400,{error:'No hemos podido identificar correctamente el diseño. Vuelve al catálogo.'});
+  if(!customQuote&&(!designId||![39,79,149,299].includes(creationPrice)))return json(res,400,{error:'No hemos podido identificar correctamente el diseño. Vuelve al catálogo.'});
   await ensureSchema();
   const id=crypto.randomUUID();
   const siteSlug=await makeUniqueSiteSlug(businessName);
   await pool.query(`INSERT INTO catalog_requests(id,contact_name,business_name,whatsapp,email,city,source_url,notes,design_id,design_name,category,tier,creation_price,catalog_preview_url,thumbnail_url,site_slug)
     VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,[id,contactName,businessName,whatsapp,email,city,sourceUrl,notes,designId,designName,category,tier,creationPrice,catalogPreview,thumbnail,siteSlug]);
-  return json(res,201,{ok:true,id,siteSlug,siteUrl:sitePublicUrl(siteSlug)});
+  return json(res,201,customQuote?{ok:true,id,requestType:'quote'}:{ok:true,id,siteSlug,siteUrl:sitePublicUrl(siteSlug)});
 }
 async function listRequests(res){
   await ensureSchema();
