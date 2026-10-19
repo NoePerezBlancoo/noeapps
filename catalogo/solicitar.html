@@ -18,7 +18,7 @@
 <div class="intro"><h3>Lo esencial.</h3><p>No necesitas preparar un briefing perfecto. Con tus datos básicos podemos empezar.</p><div class="note"><b>No pagas ahora.</b><br>Primero recibes la web terminada para revisarla.</div></div>
 <form class="form" id="requestForm">
 <div class="two"><label><span>Tu nombre *</span><input name="name" required maxlength="120"></label><label><span>Negocio *</span><input name="businessName" required maxlength="160"></label></div>
-<div class="two"><label><span>WhatsApp *</span><input name="whatsapp" required maxlength="80" type="tel" value="+34 " inputmode="tel" autocomplete="tel"></label><label><span>Email</span><input name="email" maxlength="180" type="email"></label></div>
+<div class="two"><label><span>WhatsApp *</span><input name="whatsapp" required maxlength="80" type="tel" value="+34 " inputmode="tel" autocomplete="tel"></label><label><span>Email *</span><input name="email" required maxlength="180" type="email" autocomplete="email"></label></div>
 <div class="two"><label><span>Ciudad / zona</span><input name="city" maxlength="120"></label><label><span>Web o red social</span><input name="sourceUrl" maxlength="600"></label></div>
 <label><span>¿Qué quieres que aparezca?</span><textarea name="notes" maxlength="1800" placeholder="Servicios, horarios, información importante, cambios sobre el diseño…"></textarea></label>
 <div class="summary"><div><span>Creación</span><b id="summaryPrice">—</b></div><div><span>Mantenimiento al activar</span><b>19,90 €/mes</b></div></div>
@@ -42,16 +42,29 @@ const design={
  tier:(p.get('catalogTier')||'').slice(0,80),
  price:Number(p.get('catalogPrice')||0)||0
 };
-document.getElementById('designName').textContent=design.name;
-document.getElementById('tier').textContent=(design.tier||'Diseño elegido')+(design.category?' · '+design.category:'');
-const price=design.price?design.price.toLocaleString('es-ES')+' €':'A confirmar';
+const quoteMode=!design.id;
+if(quoteMode){
+ document.querySelector('.hero h1').innerHTML='Cuéntanos tu proyecto.<br><em>Te preparamos un presupuesto.</em>';
+ document.querySelector('.hero > div > p:last-child').textContent='Dinos qué necesita tu negocio. Te contactaremos para concretar una propuesta personalizada, sin compromiso ni pago previo.';
+ document.querySelector('.hero > div > p:first-child').textContent='SOLICITUD DE PRESUPUESTO · SIN PAGO';
+ document.querySelector('.design p:last-of-type').textContent='Las condiciones y cualquier mantenimiento se acordarán contigo previamente.';
+ document.querySelector('.design p:first-of-type').textContent='Pendiente de valoración';
+ document.querySelector('.summary div:last-child').style.display='none';
+ document.querySelector('.note').innerHTML='<b>Presupuesto sin compromiso.</b><br>No se realiza ningún cargo ni se genera un enlace de pago al enviar.';
+ const notes=document.querySelector('textarea[name="notes"]');notes.required=true;notes.minLength=15;notes.placeholder='Explica los servicios, funciones o tipo de web que quieres (mínimo 15 caracteres)…';
+ document.querySelector('.done p').textContent='Hemos registrado tu solicitud de presupuesto. Nos pondremos en contacto contigo para concretar la propuesta. No se realiza ningún cobro.';
+ document.querySelector('.submit').textContent='Solicitar presupuesto →';
+}
+document.getElementById('designName').textContent=quoteMode?'Web a medida':design.name;
+document.getElementById('tier').textContent=quoteMode?'Presupuesto personalizado':(design.tier||'Diseño elegido')+(design.category?' · '+design.category:'');
+const price=quoteMode?'A presupuestar':(design.price?design.price.toLocaleString('es-ES')+' €':'A confirmar');
 document.getElementById('price').textContent=price;document.getElementById('summaryPrice').textContent=price;
 const demo=document.getElementById('demo'); if(design.preview){demo.href=design.preview}else demo.style.display='none';
 document.getElementById('requestForm').addEventListener('submit',async e=>{
  e.preventDefault();const btn=e.currentTarget.querySelector('button');const msg=document.getElementById('msg');btn.disabled=true;btn.textContent='Enviando…';msg.textContent='';
  const f=new FormData(e.currentTarget);const customer={name:f.get('name'),businessName:f.get('businessName'),whatsapp:f.get('whatsapp'),email:f.get('email'),city:f.get('city'),sourceUrl:f.get('sourceUrl'),notes:f.get('notes')};
  try{
-  const r=await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({selection:design,customer})});
+  const r=await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestType:quoteMode?'quote':'template',selection:design,customer})});
   const raw=await r.text();let j={};try{j=raw?JSON.parse(raw):{}}catch{throw new Error('El servidor no devolvió una respuesta válida. Recarga el formulario e inténtalo de nuevo.')}if(!r.ok||!j.ok)throw new Error(j.error||'No se pudo enviar');
   document.getElementById('content').style.display='none';document.getElementById('done').classList.add('show');
  }catch(err){msg.className='msg err';msg.textContent=err.message||'No se pudo enviar';btn.disabled=false;btn.textContent='Enviar solicitud →'}
