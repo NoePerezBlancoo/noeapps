@@ -11,7 +11,7 @@
 .notice{background:var(--night);color:white;padding:.7rem 5vw;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem}.notice a{color:#fff}.wrap{width:min(1120px,90vw);margin:auto}
 nav{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 0;border-bottom:1px solid var(--line)}.brand{font-family:Georgia,serif;font-size:1.25rem;letter-spacing:.04em}.navlinks{display:flex;gap:1rem;align-items:center}a{color:inherit}.navlinks a{text-decoration:none}.btn{display:inline-flex;justify-content:center;align-items:center;padding:.82rem 1.2rem;border:1px solid var(--night);border-radius:999px;text-decoration:none;font-weight:700}.btn.dark{background:var(--night);color:#fff}
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:5vw;align-items:center;padding:6rem 0}.tag{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800;color:var(--plum)}h1,h2,h3{font-family:Georgia,serif;font-weight:500}.hero h1{font-size:clamp(3.2rem,7vw,6.5rem);line-height:.9;margin:.7rem 0 1.3rem}.hero p{font-size:1.08rem;max-width:620px}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
-.visual{height:510px;border-radius:15rem 15rem 2rem 2rem;background:linear-gradient(145deg,#f0dfe3,#a56f84 55%,#543444);position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(78,47,63,.2)}.visual:before{content:"";position:absolute;width:70%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,255,255,.7);top:8%;left:15%;box-shadow:0 0 0 45px rgba(255,255,255,.08),0 0 0 90px rgba(255,255,255,.05)}.visual span{position:absolute;left:2rem;right:2rem;bottom:2rem;color:white;font-family:Georgia,serif;font-size:1.4rem}
+.visual{height:510px;border-radius:15rem 15rem 2rem 2rem;background:linear-gradient(145deg,#f0dfe3,#a56f84 55%,#543444);position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(78,47,63,.2)}.visual:before{content:"";position:absolute;width:70%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,255,255,.7);top:8%;left:15%;box-shadow:0 0 0 45px rgba(255,255,255,.08),0 0 0 90px rgba(255,255,255,.05)}.visual svg{position:absolute;inset:0;width:100%;height:100%;display:block}.visual .caption{position:absolute;left:2rem;right:2rem;bottom:2rem;color:white;font-family:Georgia,serif;font-size:1.4rem;text-shadow:0 2px 22px rgba(37,33,40,.48)}
 section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.65fr 1.35fr;gap:2rem;margin-bottom:2.5rem}.head h2{font-size:clamp(2.4rem,5vw,4.2rem);line-height:1;margin:0}.head p{margin:0;max-width:670px}.services{background:var(--blush)}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{background:rgba(255,255,255,.78);border:1px solid rgba(111,67,88,.14);border-radius:1.5rem;padding:1.7rem;min-height:250px}.num{font-size:.72rem;letter-spacing:.14em;color:var(--plum);font-weight:800}.card h3{font-size:1.75rem;margin:2rem 0 .8rem}.card p{margin:0}
 .experience{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}.steps{border-top:1px solid var(--line)}.step{display:grid;grid-template-columns:42px 1fr;padding:1.1rem 0;border-bottom:1px solid var(--line)}.step strong{color:var(--plum)}.device{width:min(350px,90%);margin:auto;background:var(--night);padding:12px;border-radius:2.5rem;box-shadow:0 28px 70px rgba(37,33,40,.24)}.screen{background:var(--cream);border-radius:1.8rem;min-height:520px;padding:2rem 1.2rem}.screen h3{font-size:2.2rem;line-height:1.05;margin:.5rem 0}.screen .art{height:170px;border-radius:1.2rem;background:linear-gradient(145deg,#ead5db,#7e4a62);margin:1.5rem 0}.pill{padding:.75rem 0;border-top:1px solid var(--line);font-size:.9rem}
 .location{background:var(--night);color:#fff}.location .inner{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end}.location h2{font-size:clamp(2.7rem,6vw,5.2rem);line-height:.95;margin:.5rem 0}.facts{padding-left:2rem;border-left:1px solid rgba(255,255,255,.25)}.facts p{margin:.35rem 0}.cta{text-align:center}.cta h2{font-size:clamp(2.7rem,6vw,5.2rem);line-height:1;max-width:900px;margin:.7rem auto 2rem}.cta p{max-width:720px;margin:0 auto}footer{border-top:1px solid var(--line);padding:2rem 5vw;font-size:.78rem;color:#665c65}
@@ -22,7 +22,38 @@ section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.65fr 1.35fr;g
 <div class="notice"><span>Propuesta conceptual no oficial de NoeApps · No existe encargo</span><a href="https://catalogo.noeapps.com/">Ver catálogo ↗</a></div>
 <header class="wrap"><nav><div class="brand">ESTÉTICA SINALOA · CONCEPTO VISUAL</div><div class="navlinks"><a href="#servicios">Servicios</a><a href="#ubicacion">Ubicación</a><a class="btn" href="https://catalogo.noeapps.com/">Explorar diseños</a></div></nav></header>
 <main>
-<section class="hero wrap"><div><div class="tag">Concepto web · Ourense</div><h1>Cuidado que<br>se siente.</h1><p>Una propuesta digital serena para presentar tratamientos de estética, ordenar la información esencial y facilitar una futura consulta desde cualquier móvil.</p><div class="actions"><a class="btn dark" href="#servicios">Ver servicios</a><a class="btn" href="#ubicacion">Cómo llegar</a></div></div><div class="visual" aria-label="Composición abstracta en tonos ciruela"><span>Estética y bienestar<br><small>Concepto sin fotografías ni identidad oficial.</small></span></div></section>
+<section class="hero wrap"><div><div class="tag">Concepto web · Ourense</div><h1>Cuidado que<br>se siente.</h1><p>Una propuesta digital serena para presentar tratamientos de estética, ordenar la información esencial y facilitar una futura consulta desde cualquier móvil.</p><div class="actions"><a class="btn dark" href="#servicios">Ver servicios</a><a class="btn" href="#ubicacion">Cómo llegar</a></div></div><div class="visual">
+<svg viewBox="0 0 560 680" role="img" aria-labelledby="sinaloaTitle sinaloaDesc" xmlns="http://www.w3.org/2000/svg">
+<title id="sinaloaTitle">Ilustración editorial abstracta para Estética Sinaloa</title>
+<desc id="sinaloaDesc">Composición original en tonos ciruela con un perfil humano sereno, formas de manos y hojas, creada como recurso visual conceptual.</desc>
+<defs>
+<linearGradient id="sinaloaBg" x1="80" y1="20" x2="500" y2="660" gradientUnits="userSpaceOnUse"><stop stop-color="#F7E8EB"/><stop offset=".48" stop-color="#B77A91"/><stop offset="1" stop-color="#4D2D3C"/></linearGradient>
+<linearGradient id="sinaloaSkin" x1="180" y1="140" x2="360" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF7F2"/><stop offset="1" stop-color="#E6BFC8"/></linearGradient>
+<filter id="sinaloaShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#34212A" flood-opacity=".22"/></filter>
+</defs>
+<rect width="560" height="680" fill="url(#sinaloaBg)"/>
+<circle cx="280" cy="257" r="190" fill="none" stroke="#FFF8F5" stroke-opacity=".42" stroke-width="2"/>
+<circle cx="280" cy="257" r="145" fill="none" stroke="#FFF8F5" stroke-opacity=".18" stroke-width="32"/>
+<path d="M337 120c-75 9-134 67-139 145-5 78 33 111 20 181-8 43-40 68-57 96 54 31 127 34 187-2 45-27 68-74 67-126-1-57-31-79-19-127 9-36 32-68 15-104-14-30-43-58-74-63Z" fill="url(#sinaloaSkin)" filter="url(#sinaloaShadow)"/>
+<path d="M335 165c-41 18-66 54-67 98-1 42 15 65 7 94-6 22-21 39-35 56 35 11 78 5 106-18 30-25 42-67 29-104-8-24-26-38-28-64-2-24 3-43-12-62Z" fill="#9B6078" opacity=".32"/>
+<path d="M328 194c-18 26-23 57-14 86 7 22 23 35 44 41-20 8-42 1-56-15-20-24-19-64 1-91 7-10 15-17 25-21Z" fill="#5E3548" opacity=".7"/>
+<path d="M314 286c19 10 41 9 58-1" fill="none" stroke="#704057" stroke-width="6" stroke-linecap="round"/>
+<path d="M360 337c-17 13-40 15-59 5" fill="none" stroke="#704057" stroke-width="5" stroke-linecap="round"/>
+<path d="M84 430c59-50 116-65 171-45-25 24-52 46-83 64-31 18-62 30-88 31Z" fill="#F3DCE1" opacity=".82"/>
+<path d="M475 389c-52-17-93-5-122 35 31 10 64 13 98 5 23-5 39-18 24-40Z" fill="#D8A7B4" opacity=".72"/>
+<g fill="none" stroke="#FFF7F3" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+<path d="M111 518c39-47 74-77 111-96 22-11 44-7 47 8 3 14-12 27-39 38-20 8-34 18-45 30"/>
+<path d="M122 559c36-41 75-70 118-89 25-11 46-5 48 10 1 13-14 25-42 37-22 10-40 22-52 37"/>
+<path d="M449 482c-34-30-66-50-99-60-20-6-37 2-37 16 0 13 15 22 39 28 22 6 41 15 55 28"/>
+</g>
+<g fill="#FFF8F5" opacity=".82">
+<path d="M126 285c43-62 92-78 147-49-38 48-84 71-147 49Z"/>
+<path d="M112 334c51-34 96-34 134 0-42 28-87 28-134 0Z" opacity=".6"/>
+<path d="M427 238c-44-43-84-48-121-15 34 34 74 39 121 15Z" opacity=".5"/>
+</g>
+<path d="M98 587c117-55 251-64 379-15" fill="none" stroke="#E8BFC9" stroke-opacity=".45" stroke-width="2"/>
+</svg>
+<span class="caption">Estética y bienestar<br><small>Ilustración original · concepto no oficial.</small></span></div></section>
 <section id="servicios" class="services"><div class="wrap"><div class="head"><div class="tag">Actividad comprobada públicamente</div><div><h2>Una estructura clara para cada cuidado.</h2><p>El contenido se limita a categorías de servicio publicadas por directorios del negocio. Técnicas, productos, resultados y disponibilidad deberían validarse con el centro antes de una web oficial.</p></div></div><div class="cards">
 <article class="card"><div class="num">01 · ROSTRO</div><h3>Tratamientos faciales</h3><p>Una sección para explicar objetivos y protocolos únicamente cuando el centro confirme cada tratamiento.</p></article>
 <article class="card"><div class="num">02 · CUERPO</div><h3>Tratamientos corporales</h3><p>Presentación ordenada de cuidados corporales, sin atribuir técnicas, beneficios ni resultados no verificados.</p></article>
