@@ -11,7 +11,7 @@
 .notice{background:var(--ink);color:#fff;padding:.7rem 5vw;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem}.notice a{color:#fff}.wrap{width:min(1160px,90vw);margin:auto}
 nav{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 0;border-bottom:1px solid var(--line)}.brand{font-weight:900;letter-spacing:-.03em;font-size:1.25rem}.navlinks{display:flex;gap:1rem;align-items:center}.navlinks a{text-decoration:none;color:inherit}.btn{display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border:1px solid var(--ink);border-radius:.35rem;text-decoration:none;color:inherit;font-weight:800}.btn.hot{background:var(--lime)}
 .hero{display:grid;grid-template-columns:1.08fr .92fr;gap:5vw;align-items:center;padding:6rem 0}.eyebrow{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:900;color:var(--steel)}h1,h2,h3{margin-top:0}.hero h1{font-size:clamp(3.4rem,7.5vw,7rem);line-height:.86;letter-spacing:-.065em;margin:.7rem 0 1.5rem}.hero p{font-size:1.08rem;max-width:650px}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
-.visual{height:510px;background:linear-gradient(145deg,#889a91,#30423e);position:relative;overflow:hidden;border-radius:.5rem;box-shadow:18px 18px 0 var(--sand)}.visual:before{content:"";position:absolute;inset:12% 10%;background:repeating-linear-gradient(135deg,transparent 0 34px,rgba(200,227,77,.75) 35px 38px)}.visual:after{content:"J&S";position:absolute;right:1.4rem;bottom:-1.5rem;font-size:10rem;font-weight:950;letter-spacing:-.1em;color:rgba(255,255,255,.12)}.visual span{position:absolute;left:1.8rem;bottom:1.7rem;color:#fff;font-weight:850;font-size:1.25rem}
+.visual{height:510px;background:linear-gradient(145deg,#889a91,#30423e);position:relative;overflow:hidden;border-radius:.5rem;box-shadow:18px 18px 0 var(--sand)}.visual svg{position:absolute;inset:0;width:100%;height:100%;display:block}.visual .caption{position:absolute;left:1.8rem;right:1.8rem;bottom:1.7rem;color:#fff;font-weight:850;font-size:1.25rem;text-shadow:0 2px 18px rgba(18,27,25,.72)}
 section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.6fr 1.4fr;gap:2rem;margin-bottom:2.5rem}.head h2{font-size:clamp(2.4rem,5vw,4.5rem);line-height:.96;letter-spacing:-.05em}.head p{margin:0;max-width:700px}.services{background:#dce3dd}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{background:var(--paper);border:1px solid var(--line);padding:1.6rem;min-height:260px;border-radius:.4rem}.num{font-size:.72rem;letter-spacing:.15em;font-weight:900;color:var(--steel)}.card h3{font-size:1.75rem;line-height:1.05;margin:2.5rem 0 1rem;letter-spacing:-.035em}.card p{margin:0}
 .work{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}.list{border-top:1px solid var(--line)}.item{display:grid;grid-template-columns:45px 1fr;padding:1rem 0;border-bottom:1px solid var(--line)}.item strong{color:var(--steel)}.device{width:min(350px,90%);margin:auto;background:var(--ink);padding:12px;border-radius:2.2rem;box-shadow:0 28px 60px rgba(24,32,31,.25)}.screen{background:var(--paper);border-radius:1.55rem;padding:1.8rem 1.15rem;min-height:520px}.screen h3{font-size:2.2rem;line-height:1;margin:.5rem 0}.screen .art{height:160px;background:linear-gradient(145deg,var(--sand),var(--steel));margin:1.4rem 0;border-radius:.3rem}.pill{padding:.75rem 0;border-top:1px solid var(--line);font-weight:700;font-size:.9rem}
 .location{background:var(--ink);color:#fff}.location .inner{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end}.location h2{font-size:clamp(2.8rem,6vw,5.5rem);line-height:.92;letter-spacing:-.06em;margin:.5rem 0}.facts{border-left:1px solid rgba(255,255,255,.25);padding-left:2rem}.facts p{margin:.35rem 0}.cta{text-align:center}.cta h2{font-size:clamp(2.8rem,6vw,5.3rem);line-height:.94;letter-spacing:-.055em;max-width:900px;margin:.7rem auto 2rem}.cta p{max-width:730px;margin:auto}footer{border-top:1px solid var(--line);padding:2rem 5vw;font-size:.78rem;color:#5f6765}
@@ -22,7 +22,51 @@ section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.6fr 1.4fr;gap
 <div class="notice"><span>Propuesta conceptual no oficial de NoeApps · No existe encargo</span><a href="https://catalogo.noeapps.com/">Ver catálogo ↗</a></div>
 <header class="wrap"><nav><div class="brand">MANTENIMIENTOS J&amp;S · CONCEPTO VISUAL</div><div class="navlinks"><a href="#servicios">Servicios</a><a href="#zona">Zona</a><a class="btn" href="https://catalogo.noeapps.com/">Explorar diseños</a></div></nav></header>
 <main>
-<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Espacios<br>en marcha.</h1><p>Una propuesta digital directa para reunir reformas, mantenimiento exterior y trabajos de finca en una presencia clara, preparada para móvil y orientada a futuras solicitudes de información.</p><div class="actions"><a class="btn hot" href="#servicios">Ver especialidades</a><a class="btn" href="#zona">Zona de actividad</a></div></div><div class="visual" aria-label="Composición abstracta de obra y mantenimiento"><span>Reformas · Fincas · Jardines<br><small>Concepto sin fotografías ni identidad oficial.</small></span></div></section>
+<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Espacios<br>en marcha.</h1><p>Una propuesta digital directa para reunir reformas, mantenimiento exterior y trabajos de finca en una presencia clara, preparada para móvil y orientada a futuras solicitudes de información.</p><div class="actions"><a class="btn hot" href="#servicios">Ver especialidades</a><a class="btn" href="#zona">Zona de actividad</a></div></div><div class="visual">
+<svg viewBox="0 0 620 680" role="img" aria-labelledby="jsTitle jsDesc" xmlns="http://www.w3.org/2000/svg">
+<title id="jsTitle">Ilustración editorial de reformas y mantenimiento exterior</title>
+<desc id="jsDesc">Composición vectorial original con una vivienda geométrica, muro, árboles y herramientas de jardín en tonos verdes, arena y lima.</desc>
+<defs>
+<linearGradient id="jsSky" x1="70" y1="30" x2="570" y2="660" gradientUnits="userSpaceOnUse"><stop stop-color="#A9BBB1"/><stop offset=".52" stop-color="#435D56"/><stop offset="1" stop-color="#1E302D"/></linearGradient>
+<linearGradient id="jsWall" x1="170" y1="250" x2="430" y2="540" gradientUnits="userSpaceOnUse"><stop stop-color="#F1E9D6"/><stop offset="1" stop-color="#C9B89B"/></linearGradient>
+<filter id="jsShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#142421" flood-opacity=".35"/></filter>
+</defs>
+<rect width="620" height="680" fill="url(#jsSky)"/>
+<circle cx="490" cy="118" r="92" fill="#C8E34D" opacity=".82"/>
+<g opacity=".24" fill="none" stroke="#F7F4EA" stroke-width="2">
+<path d="M-10 138 217-10M31 217 349-10M298 680 630 348M421 680 630 471"/>
+</g>
+<g filter="url(#jsShadow)">
+<path d="M128 338 308 198 492 338v224H128Z" fill="url(#jsWall)"/>
+<path d="m90 345 218-174 222 174-30 38-192-150-190 150Z" fill="#283D39"/>
+<path d="M172 382h104v180H172Z" fill="#526B63"/>
+<path d="M336 378h104v92H336Z" fill="#EEF2E5"/>
+<path d="M350 391h76v66H350Z" fill="#B9CFCA"/>
+<path d="M336 500h104v62H336Z" fill="#E2D7BF"/>
+</g>
+<g stroke="#243A35" stroke-width="6" fill="none">
+<path d="M127 443h-57v119h490"/>
+<path d="M70 482h58M70 522h58"/>
+<path d="M490 404c35-41 69-52 101-35-8 48-42 72-101 73"/>
+</g>
+<g fill="#C8E34D">
+<path d="M472 402c-6-48 13-82 55-100 18 45 0 82-55 100Z"/>
+<path d="M506 447c23-45 58-62 104-50-13 48-48 69-104 50Z" opacity=".82"/>
+<path d="M81 429c-8-42 7-73 45-94 22 40 7 72-45 94Z" opacity=".7"/>
+</g>
+<g transform="translate(83 562)">
+<path d="M0 0h455" stroke="#E8DDC7" stroke-width="12" stroke-linecap="round"/>
+<path d="m75-6 31-88M107-95l24 31M106-95l-35 8" stroke="#C8E34D" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="m366-3-34-101M333-105l-23 27M333-105l39 4" stroke="#F1E9D6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g fill="#243A35" opacity=".82">
+<rect x="205" y="412" width="38" height="12" rx="6"/>
+<circle cx="475" cy="518" r="26"/>
+<circle cx="522" cy="526" r="19"/>
+</g>
+<path d="M28 624c135-46 287-52 564-3" fill="none" stroke="#C8E34D" stroke-opacity=".45" stroke-width="3"/>
+</svg>
+<span class="caption">Reformas · Fincas · Jardines<br><small>Ilustración original · concepto no oficial.</small></span></div></section>
 <section id="servicios" class="services"><div class="wrap"><div class="head"><div class="eyebrow">Servicios comprobados públicamente</div><div><h2>Una oferta amplia, explicada sin rodeos.</h2><p>El contenido se limita a trabajos publicados en fichas comerciales coincidentes. Cada alcance, material, disponibilidad y presupuesto tendría que validarse antes de una web oficial.</p></div></div><div class="grid">
 <article class="card"><div class="num">01 · REFORMAS</div><h3>Hogar y acabados</h3><p>Reformas, albañilería, cocinas, baños, pintura de suelos y soluciones de hormigón impreso.</p></article>
 <article class="card"><div class="num">02 · EXTERIORES</div><h3>Muros, tejados y fachadas</h3><p>Cierres de fincas y limpieza de muros, tejados y fachadas, sin atribuir técnicas o garantías no verificadas.</p></article>
