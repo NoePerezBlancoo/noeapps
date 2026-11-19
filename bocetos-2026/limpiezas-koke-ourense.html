@@ -11,7 +11,7 @@
 .notice{background:var(--navy);color:#fff;padding:.7rem 5vw;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem}.notice a{color:#fff}.wrap{width:min(1120px,90vw);margin:auto}
 nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 0;border-bottom:1px solid var(--line)}.brand{font-weight:900;letter-spacing:-.035em;font-size:1.25rem}.navlinks{display:flex;gap:1rem;align-items:center}.navlinks a{text-decoration:none;color:inherit}.btn{display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border:1px solid var(--navy);border-radius:999px;text-decoration:none;color:inherit;font-weight:800}.btn.primary{background:var(--navy);color:#fff}
 .hero{display:grid;grid-template-columns:1.08fr .92fr;gap:5vw;align-items:center;padding:6rem 0}.eyebrow{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:900;color:var(--blue)}h1,h2,h3{margin-top:0}.hero h1{font-size:clamp(3.4rem,7.5vw,7rem);line-height:.88;letter-spacing:-.06em;margin:.7rem 0 1.4rem}.hero p{font-size:1.08rem;max-width:650px}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
-.visual{height:500px;border-radius:2.5rem;background:linear-gradient(155deg,#dff4f8,#68bfd4 50%,#1d6483);position:relative;overflow:hidden;box-shadow:0 30px 65px rgba(18,42,58,.18)}.visual:before,.visual:after{content:"";position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.8)}.visual:before{width:330px;height:330px;right:-80px;top:-60px;box-shadow:0 0 0 45px rgba(255,255,255,.12),0 0 0 90px rgba(255,255,255,.07)}.visual:after{width:180px;height:180px;left:-40px;bottom:25px}.visual span{position:absolute;left:2rem;bottom:2rem;color:#fff;font-size:1.25rem;font-weight:850}
+.visual{height:500px;border-radius:2.5rem;background:#dff4f8;position:relative;overflow:hidden;box-shadow:0 30px 65px rgba(18,42,58,.18)}.visual svg{display:block;width:100%;height:100%}.visual-copy{position:absolute;left:2rem;right:2rem;bottom:1.7rem;color:#fff;font-size:1.2rem;font-weight:850;text-shadow:0 2px 18px rgba(18,42,58,.55)}.visual-copy small{display:block;font-size:.72rem;letter-spacing:.04em;margin-top:.2rem;font-weight:650;opacity:.9}
 section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.6fr 1.4fr;gap:2rem;margin-bottom:2.5rem}.head h2{font-size:clamp(2.4rem,5vw,4.5rem);line-height:.98;letter-spacing:-.045em}.head p{margin:0;max-width:700px}.services{background:var(--sky)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{background:rgba(255,255,255,.85);border:1px solid rgba(35,117,154,.15);border-radius:1.5rem;padding:1.6rem;min-height:255px}.num{font-size:.72rem;letter-spacing:.15em;font-weight:900;color:var(--blue)}.card h3{font-size:1.75rem;line-height:1.05;margin:2.3rem 0 1rem;letter-spacing:-.03em}.card p{margin:0}
 .flow{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}.steps{border-top:1px solid var(--line)}.step{display:grid;grid-template-columns:48px 1fr;padding:1.05rem 0;border-bottom:1px solid var(--line)}.step strong{color:var(--blue)}.device{width:min(350px,90%);margin:auto;background:var(--navy);padding:12px;border-radius:2.5rem;box-shadow:0 28px 65px rgba(18,42,58,.25)}.screen{background:var(--white);min-height:520px;border-radius:1.8rem;padding:1.8rem 1.15rem}.screen h3{font-size:2.1rem;line-height:1.05;margin:.5rem 0}.screen .art{height:165px;border-radius:1.2rem;background:linear-gradient(145deg,var(--sky),var(--blue));margin:1.4rem 0}.pill{padding:.75rem 0;border-top:1px solid var(--line);font-size:.9rem;font-weight:700}
 .area{background:var(--navy);color:#fff}.area .inner{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end}.area h2{font-size:clamp(2.8rem,6vw,5.3rem);line-height:.94;letter-spacing:-.05em;margin:.5rem 0}.facts{padding-left:2rem;border-left:1px solid rgba(255,255,255,.25)}.facts p{margin:.4rem 0}.cta{text-align:center}.cta h2{font-size:clamp(2.8rem,6vw,5.2rem);line-height:.96;letter-spacing:-.05em;max-width:900px;margin:.7rem auto 2rem}.cta p{max-width:720px;margin:auto}footer{padding:2rem 5vw;border-top:1px solid var(--line);font-size:.78rem;color:#60717b}
@@ -22,7 +22,38 @@ section{padding:5.5rem 0}.head{display:grid;grid-template-columns:.6fr 1.4fr;gap
 <div class="notice"><span>Propuesta conceptual no oficial de NoeApps · No existe encargo</span><a href="https://catalogo.noeapps.com/">Ver catálogo ↗</a></div>
 <header class="wrap"><nav><div class="brand">LIMPIEZAS KOKE · CONCEPTO VISUAL</div><div class="navlinks"><a href="#servicios">Servicios</a><a href="#zona">Zona</a><a class="btn" href="https://catalogo.noeapps.com/">Explorar diseños</a></div></nav></header>
 <main>
-<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Espacios que<br>respiran.</h1><p>Una propuesta digital limpia y directa para presentar servicios a comunidades, empresas y particulares, con una experiencia móvil pensada para localizar rápidamente el tipo de trabajo adecuado.</p><div class="actions"><a class="btn primary" href="#servicios">Ver servicios</a><a class="btn" href="#zona">Zona de trabajo</a></div></div><div class="visual" aria-label="Composición abstracta en tonos azules"><span>Limpieza profesional · Concepto visual<br><small>Sin fotografías ni identidad oficial.</small></span></div></section>
+<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Espacios que<br>respiran.</h1><p>Una propuesta digital limpia y directa para presentar servicios a comunidades, empresas y particulares, con una experiencia móvil pensada para localizar rápidamente el tipo de trabajo adecuado.</p><div class="actions"><a class="btn primary" href="#servicios">Ver servicios</a><a class="btn" href="#zona">Zona de trabajo</a></div></div><div class="visual">
+<svg viewBox="0 0 700 820" role="img" aria-labelledby="kokeTitle kokeDesc" preserveAspectRatio="xMidYMid slice">
+<title id="kokeTitle">Ilustración conceptual de limpieza de cristales y espacios</title>
+<desc id="kokeDesc">Una ventana luminosa, un paño y reflejos de agua representan los servicios de limpieza de forma ilustrativa.</desc>
+<defs>
+  <linearGradient id="kokeSky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#dff7fb"/><stop offset=".52" stop-color="#75c9da"/><stop offset="1" stop-color="#1f6888"/></linearGradient>
+  <linearGradient id="kokeGlass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#effcff" stop-opacity=".94"/><stop offset="1" stop-color="#8fd6e4" stop-opacity=".58"/></linearGradient>
+  <linearGradient id="kokeCloth" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#92ead3"/><stop offset="1" stop-color="#31a88f"/></linearGradient>
+  <filter id="kokeShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#12384d" flood-opacity=".28"/></filter>
+</defs>
+<rect width="700" height="820" fill="url(#kokeSky)"/>
+<circle cx="592" cy="116" r="168" fill="#fff" opacity=".13"/><circle cx="104" cy="700" r="184" fill="#fff" opacity=".08"/>
+<g filter="url(#kokeShadow)">
+  <rect x="112" y="128" width="476" height="492" rx="28" fill="#f8fdfe"/>
+  <rect x="138" y="154" width="424" height="438" rx="14" fill="url(#kokeGlass)"/>
+  <path d="M350 154v438M138 365h424" stroke="#f8fdfe" stroke-width="18"/>
+  <path d="M166 322c74-82 146-123 216-123 70 0 120 24 153 55v96H166z" fill="#fff" opacity=".18"/>
+  <path d="M172 535c82-20 145-63 190-129 44-65 104-105 180-120" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" opacity=".38"/>
+</g>
+<g fill="#fff" opacity=".95">
+  <path d="M522 99l8 24 24 8-24 8-8 24-8-24-24-8 24-8z"/>
+  <path d="M86 256l6 17 17 6-17 6-6 17-6-17-17-6 17-6z"/>
+  <circle cx="610" cy="340" r="8"/><circle cx="78" cy="422" r="5"/>
+</g>
+<g transform="translate(366 520) rotate(-10)" filter="url(#kokeShadow)">
+  <path d="M0 70c34-58 84-91 151-98 18 31 28 67 29 109-49 36-108 52-178 48z" fill="url(#kokeCloth)"/>
+  <path d="M20 76c41-35 87-56 138-63M33 103c41-22 84-34 129-35" fill="none" stroke="#d9fff4" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+</g>
+<path d="M98 654c48 31 101 48 158 51 52 3 98-7 140-30" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".5"/>
+</svg>
+<div class="visual-copy">Limpieza profesional · Concepto visual<small>Ilustración original; no representa instalaciones reales.</small></div>
+</div></section>
 <section id="servicios" class="services"><div class="wrap"><div class="head"><div class="eyebrow">Servicios comprobados públicamente</div><div><h2>Cada espacio, con su servicio.</h2><p>La propuesta organiza únicamente trabajos publicados en la ficha del negocio. Frecuencias, productos, disponibilidad y alcance deberían validarse antes de crear una web oficial.</p></div></div><div class="grid">
 <article class="card"><div class="num">01 · COMUNIDADES</div><h3>Zonas comunes</h3><p>Limpieza de escaleras, ascensores, suelos y buhardillas para comunidades de vecinos.</p></article>
 <article class="card"><div class="num">02 · FIN DE OBRA</div><h3>Puesta a punto</h3><p>Limpieza posterior a obra en suelos, paredes, ventanas, mobiliario, moquetas y alfombras.</p></article>
