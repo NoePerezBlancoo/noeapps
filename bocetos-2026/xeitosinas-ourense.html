@@ -11,7 +11,7 @@
 a{color:inherit}.notice{padding:.65rem 1rem;background:var(--ink);color:#fff;text-align:center;font-size:.72rem;letter-spacing:.1em;font-weight:800}
 nav{max-width:1180px;margin:auto;padding:1.2rem 5vw;display:flex;align-items:center;justify-content:space-between;gap:1rem}.brand{font-family:Georgia,serif;font-size:1.35rem;font-weight:700}.navlinks{display:flex;gap:1.4rem;align-items:center;font-size:.9rem}.navlinks a{text-decoration:none}.pill{border-radius:999px;background:var(--plum);color:#fff;padding:.75rem 1.05rem;font-weight:750}
 .hero{max-width:1180px;margin:auto;padding:5.4rem 5vw 4.5rem;display:grid;grid-template-columns:1.15fr .85fr;gap:4rem;align-items:center}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.72rem;font-weight:850;color:var(--plum)}h1{font-family:Georgia,serif;font-size:clamp(3.4rem,8vw,7rem);line-height:.88;margin:.8rem 0 1.4rem;font-weight:500}h1 em{color:var(--plum);font-style:italic}.lead{max-width:630px;font-size:1.12rem;line-height:1.75;color:var(--muted)}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}.btn{display:inline-flex;text-decoration:none;padding:.95rem 1.2rem;border-radius:999px;font-weight:800}.btn.primary{background:var(--plum);color:white}.btn.secondary{border:1px solid #aa969f}
-.art{min-height:440px;border-radius:180px 180px 28px 28px;background:linear-gradient(150deg,var(--rose),#f4dce3);position:relative;overflow:hidden;box-shadow:0 24px 70px #6d365f22}.art:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;border:55px solid var(--mint);right:-65px;top:55px}.art:after{content:"XEITOSIÑAS";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);font:700 clamp(2rem,5vw,4.2rem) Georgia,serif;letter-spacing:.08em;color:#fff;text-shadow:0 3px 15px #6d365f55}.art small{position:absolute;bottom:1.4rem;left:1.5rem;right:1.5rem;background:#ffffffd9;padding:.9rem 1rem;border-radius:14px;color:var(--muted)}
+.art{min-height:440px;border-radius:180px 180px 28px 28px;background:linear-gradient(150deg,var(--rose),#f4dce3);position:relative;overflow:hidden;box-shadow:0 24px 70px #6d365f22}.art svg{display:block;width:100%;height:100%;min-height:440px}.art-copy{position:absolute;bottom:1.25rem;left:1.25rem;right:1.25rem;background:#ffffffea;padding:.9rem 1rem;border-radius:14px;color:var(--muted);font-size:.82rem;line-height:1.45;backdrop-filter:blur(8px)}
 .section{padding:5rem 5vw}.inner{max-width:1180px;margin:auto}.head{display:grid;grid-template-columns:.8fr 1.2fr;gap:3rem;margin-bottom:2.5rem}.head h2{font:500 clamp(2.4rem,5vw,4.7rem)/1 Georgia,serif;margin:.5rem 0}.head p{color:var(--muted);line-height:1.75;align-self:end}
 .services{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{background:#fff;border-radius:24px;padding:1.7rem;min-height:245px;border:1px solid #eadde1}.num{font-size:.72rem;letter-spacing:.13em;color:var(--plum);font-weight:900}.card h3{font:600 1.7rem Georgia,serif;margin:2.5rem 0 .8rem}.card p{color:var(--muted);line-height:1.65;margin:0}
 .mobile{background:var(--ink);color:#fff}.mobile-grid{display:grid;grid-template-columns:1fr 360px;gap:5rem;align-items:center}.mobile h2{font:500 clamp(2.5rem,5vw,4.8rem)/1 Georgia,serif;margin:.7rem 0 1.3rem}.mobile p{color:#d9cfd5;line-height:1.75}.steps{display:grid;gap:1rem;margin-top:2rem}.step{display:flex;gap:1rem;align-items:center}.step b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--rose);color:var(--ink)}
@@ -28,16 +28,46 @@ footer{padding:1.5rem 5vw;background:#151216;color:#cbbfc5;font-size:.78rem;line
 <main>
 <section class="hero">
 <div><div class="eyebrow">Concepto web · Peluquería y estética · Ourense</div><h1>Tu estilo,<br><em>a tu manera.</em></h1><p class="lead">Una propuesta digital cálida y actual para ordenar peluquería, estética y cuidado de manos en una experiencia clara, especialmente cómoda desde el móvil.</p><div class="actions"><a class="btn primary" href="#servicios">Descubrir servicios</a><a class="btn secondary" href="#zona">Ver ubicación</a></div></div>
-<div class="art" aria-label="Composición abstracta sin fotografías ni identidad oficial"><small>Composición conceptual. No utiliza fotografías, logotipo ni recursos oficiales del negocio.</small></div>
+<div class="art">
+<svg viewBox="0 0 640 760" role="img" aria-labelledby="xeitoTitle xeitoDesc" preserveAspectRatio="xMidYMid slice">
+<title id="xeitoTitle">Ilustración conceptual de peluquería y estética</title>
+<desc id="xeitoDesc">Un espejo arqueado, un sillón y herramientas de cuidado representan de forma ilustrativa los servicios publicados.</desc>
+<defs>
+  <linearGradient id="xeitoBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5d6df"/><stop offset=".55" stop-color="#df9fb7"/><stop offset="1" stop-color="#8a4b77"/></linearGradient>
+  <linearGradient id="xeitoMirror" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9ffff"/><stop offset="1" stop-color="#c8ded6"/></linearGradient>
+  <linearGradient id="xeitoChair" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c426d"/><stop offset="1" stop-color="#4c2648"/></linearGradient>
+  <filter id="xeitoShadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#4b263f" flood-opacity=".25"/></filter>
+</defs>
+<rect width="640" height="760" fill="url(#xeitoBg)"/>
+<circle cx="530" cy="108" r="155" fill="#fff" opacity=".12"/><circle cx="92" cy="625" r="170" fill="#c8ded6" opacity=".25"/>
+<g filter="url(#xeitoShadow)">
+  <path d="M185 118h270a78 78 0 0 1 78 78v300H107V196a78 78 0 0 1 78-78z" fill="#fff" opacity=".92"/>
+  <path d="M190 146h260a55 55 0 0 1 55 55v265H135V201a55 55 0 0 1 55-55z" fill="url(#xeitoMirror)"/>
+  <path d="M167 399c55-74 118-111 190-111 55 0 103 21 144 63v115H135v-35c10-8 21-19 32-32z" fill="#fff" opacity=".22"/>
+</g>
+<g transform="translate(182 414)" filter="url(#xeitoShadow)">
+  <path d="M46 40h184a36 36 0 0 1 36 36v123a28 28 0 0 1-28 28H38a28 28 0 0 1-28-28V76a36 36 0 0 1 36-36z" fill="url(#xeitoChair)"/>
+  <path d="M55 0h166a25 25 0 0 1 25 25v74H30V25A25 25 0 0 1 55 0z" fill="#6d365f"/>
+  <path d="M70 227v52M206 227v52M42 279h192" stroke="#201a22" stroke-width="13" stroke-linecap="round"/>
+</g>
+<g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+  <path d="M79 250l50 50M129 250l-50 50"/><circle cx="70" cy="240" r="15"/><circle cx="138" cy="240" r="15"/>
+  <path d="M500 548c34-22 60-54 76-96M500 548c24 18 48 21 72 8"/>
+</g>
+<g fill="#fff"><path d="M510 190l8 24 24 8-24 8-8 24-8-24-24-8 24-8z"/><circle cx="93" cy="373" r="7"/><circle cx="550" cy="343" r="6"/></g>
+<path d="M80 650c86 37 170 49 252 36 77-12 145-43 204-91" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".36"/>
+</svg>
+<div class="art-copy">Ilustración original de concepto. No representa instalaciones, materiales ni identidad oficial del negocio.</div>
+</div>
 </section>
 <section class="section" id="servicios"><div class="inner"><div class="head"><div><div class="eyebrow">Servicios publicados</div><h2>Belleza con recorrido propio.</h2></div><p>La estructura usa únicamente categorías descritas en la ficha pública del negocio. Técnicas, productos, resultados, tiempos y tarifas tendrían que validarse antes de una web oficial.</p></div><div class="services">
-<article class="card"><div class="num">01 · PELUQUERÍA</div><h3>Corte, color y peinado</h3><p>Lavado y corte de pelo, tinte, mechas, peinado y recogido, presentados por necesidades para facilitar la consulta.</p></article>
-<article class="card"><div class="num">02 · ESTÉTICA</div><h3>Mirada y cuidado corporal</h3><p>Depilación con hilo y láser, lifting de pestañas y tratamientos corporales, sin promesas ni beneficios inventados.</p></article>
-<article class="card"><div class="num">03 · MANOS Y PIES</div><h3>Manicura y pedicura</h3><p>Una sección propia para los servicios de manos y pies, con espacio para detallar opciones una vez confirmadas.</p></article>
+<article class="card"><div class="num">PELUQUERÍA</div><h3>Corte, color y peinado</h3><p>Lavado y corte de pelo, tinte, mechas, peinado y recogido, presentados por necesidades para facilitar la consulta.</p></article>
+<article class="card"><div class="num">ESTÉTICA</div><h3>Mirada y cuidado corporal</h3><p>Depilación con hilo y láser, lifting de pestañas y tratamientos corporales, sin promesas ni beneficios inventados.</p></article>
+<article class="card"><div class="num">MANOS Y PIES</div><h3>Manicura y pedicura</h3><p>Una sección propia para los servicios de manos y pies, con espacio para detallar opciones una vez confirmadas.</p></article>
 </div></div></section>
 <section class="section mobile"><div class="inner mobile-grid"><div><div class="eyebrow" style="color:var(--rose)">Pensada para móvil</div><h2>Del servicio adecuado a la cita, sin rodeos.</h2><p>La futura web podría explicar cada categoría y conectar después el canal de reserva que el negocio autorice. Este boceto no incorpora reservas ni contacto funcional.</p><div class="steps"><div class="step"><b>1</b><span>Elegir peluquería, estética o manos y pies</span></div><div class="step"><b>2</b><span>Consultar los servicios publicados</span></div><div class="step"><b>3</b><span>Acceder a un canal validado por el negocio</span></div></div></div><div class="phone"><div class="screen"><div class="screen-top">Xeitosiñas</div><div class="screen-body"><div class="mini">Peluquería <small>Corte · color · peinado</small></div><div class="mini">Estética <small>Mirada · depilación · cuidado corporal</small></div><div class="mini">Manos y pies <small>Manicura · pedicura</small></div></div></div></div></div></section>
 <section class="section location" id="zona"><div class="inner loc"><div><div class="eyebrow">Ubicación contrastada</div><h2>En Ourense.</h2><p>La dirección se publica únicamente porque figura de forma inequívoca en la ficha sectorial consultada.</p></div><div class="address"><strong>Rúa Vicente Risco, 5</strong><p>32001 · Ourense · Galicia</p><p>El horario, la cobertura, las reservas y los canales de atención deberán confirmarse por el negocio antes de cualquier publicación oficial.</p></div></div></section>
-<section class="final"><div class="eyebrow">Aviso de alcance</div><h2>Un boceto tangible, no una web oficial.</h2><p>No existe encargo ni relación comercial acreditada. La propuesta no usa logotipo, fotografías, reseñas, precios, promociones ni resultados del negocio.</p><a class="btn primary" href="https://catalogo.noeapps.com/">Ver diseños NoeApps ↗</a></section>
+<section class="final"><div class="eyebrow">Aviso de alcance</div><h2>Un boceto tangible, no una web oficial.</h2><p>No existe encargo ni relación comercial acreditada. La propuesta no usa logotipo, fotografías, reseñas, precios, promociones ni resultados del negocio.</p><a class="btn primary" href="https://catalogo.noeapps.com/">Ver diseños NoeApps</a></section>
 </main>
 <footer>Propuesta conceptual no oficial de NoeApps. No existe encargo ni relación comercial con Xeitosiñas. Servicios y ubicación contrastados el 19/11/2026 en una ficha sectorial pública reciente. No se ha localizado una web corporativa inequívoca, pero no se afirma que el negocio carezca de ella. Boceto no indexable; CTA dirigido únicamente al catálogo NoeApps.</footer>
 </body></html>
