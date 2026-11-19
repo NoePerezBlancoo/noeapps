@@ -11,7 +11,7 @@
 .notice{background:var(--ink);color:#fff;padding:.7rem 5vw;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;gap:1rem;align-items:center}.notice a{color:#fff}
 .wrap{width:min(1120px,90vw);margin:auto}.nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 0;border-bottom:1px solid var(--line)}.brand{font-family:Georgia,serif;font-size:1.35rem;letter-spacing:.03em}.navlinks{display:flex;gap:1rem;align-items:center}.nav a{color:inherit;text-decoration:none}.button{display:inline-flex;align-items:center;justify-content:center;padding:.85rem 1.2rem;border:1px solid var(--ink);border-radius:999px;text-decoration:none;color:var(--ink);font-weight:700}.button.primary{background:var(--ink);color:#fff}
 .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:5vw;align-items:center;padding:6rem 0}.eyebrow{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--rose);font-weight:800}.hero h1{font-family:Georgia,serif;font-size:clamp(3.5rem,8vw,7rem);line-height:.88;margin:.6rem 0 1.4rem;font-weight:500}.hero p{font-size:1.08rem;max-width:640px}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
-.art{min-height:490px;border-radius:48% 48% 22% 22%;background:radial-gradient(circle at 34% 32%,#fff 0 6%,transparent 7%),linear-gradient(145deg,#ead1d3,#bd7c86 52%,#75816d);position:relative;overflow:hidden;box-shadow:0 30px 60px rgba(57,37,49,.18)}.art:before,.art:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.7);border-radius:50%}.art:before{width:72%;aspect-ratio:1;left:-20%;top:25%}.art:after{width:58%;aspect-ratio:1;right:-18%;top:5%}.art span{position:absolute;left:2rem;right:2rem;bottom:2rem;color:#fff;font-family:Georgia,serif;font-size:1.4rem}
+.art{min-height:490px;border-radius:48% 48% 22% 22%;background:radial-gradient(circle at 34% 32%,#fff 0 6%,transparent 7%),linear-gradient(145deg,#ead1d3,#bd7c86 52%,#75816d);position:relative;overflow:hidden;box-shadow:0 30px 60px rgba(57,37,49,.18)}.art:before,.art:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.7);border-radius:50%}.art:before{width:72%;aspect-ratio:1;left:-20%;top:25%}.art:after{width:58%;aspect-ratio:1;right:-18%;top:5%}.art-visual{position:absolute;inset:0;width:100%;height:100%}.art span{position:absolute;left:2rem;right:2rem;bottom:2rem;color:#fff;font-family:Georgia,serif;font-size:1.4rem}
 section{padding:5.5rem 0}.section-head{display:grid;grid-template-columns:.65fr 1.35fr;gap:2rem;margin-bottom:2.5rem}.section-head h2{font-family:Georgia,serif;font-size:clamp(2.2rem,5vw,4rem);line-height:1;margin:0}.section-head p{margin:0;max-width:660px}
 .services{background:#f3e8e7}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.card{background:#fff;border:1px solid var(--line);border-radius:1.5rem;padding:1.6rem;min-height:260px}.num{font-size:.75rem;letter-spacing:.14em;color:var(--rose);font-weight:800}.card h3{font-family:Georgia,serif;font-size:1.75rem;margin:2rem 0 .8rem}.card p{margin:0}
 .mobile{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}.phone{width:min(340px,85%);margin:auto;background:var(--ink);padding:12px;border-radius:2.4rem;box-shadow:0 25px 60px rgba(38,29,39,.25)}.screen{background:var(--paper);border-radius:1.8rem;padding:2rem 1.2rem;min-height:520px}.screen .mini{height:150px;border-radius:1.2rem;background:linear-gradient(145deg,#ecd4d6,#8f9b84);margin:1.4rem 0}.screen h3{font-family:Georgia,serif;font-size:2rem;line-height:1.05;margin:.4rem 0}.pill{padding:.7rem;border-top:1px solid var(--line);font-size:.9rem}
@@ -25,7 +25,32 @@ footer{border-top:1px solid var(--line);padding:2rem 5vw;font-size:.78rem;color:
 <div class="notice"><span>Propuesta conceptual no oficial de NoeApps · No existe encargo</span><a href="https://catalogo.noeapps.com/">Ver catálogo ↗</a></div>
 <header class="wrap"><nav class="nav"><div class="brand">MÍMATE · CONCEPTO VISUAL</div><div class="navlinks"><a href="#servicios">Servicios</a><a href="#ubicacion">Ubicación</a><a class="button" href="https://catalogo.noeapps.com/">Explorar diseños</a></div></nav></header>
 <main>
-<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Tu tiempo.<br>Tu cuidado.</h1><p>Una propuesta visual cálida para presentar peluquería y estética en un mismo espacio, organizar los tratamientos por necesidades y facilitar que cada persona encuentre la información esencial desde el móvil.</p><div class="actions"><a class="button primary" href="#servicios">Descubrir servicios</a><a class="button" href="#ubicacion">Ver ubicación</a></div></div><div class="art" aria-label="Composición abstracta en tonos rosa y verde"><span>Belleza, cabello y bienestar<br><small>Concepto sin fotografías ni identidad oficial.</small></span></div></section>
+<section class="hero wrap"><div><div class="eyebrow">Concepto web · Ourense</div><h1>Tu tiempo.<br>Tu cuidado.</h1><p>Una propuesta visual cálida para presentar peluquería y estética en un mismo espacio, organizar los tratamientos por necesidades y facilitar que cada persona encuentre la información esencial desde el móvil.</p><div class="actions"><a class="button primary" href="#servicios">Descubrir servicios</a><a class="button" href="#ubicacion">Ver ubicación</a></div></div><div class="art">
+<svg class="art-visual" viewBox="0 0 520 620" role="img" aria-labelledby="mimateTitle mimateDesc">
+<title id="mimateTitle">Un momento para ti</title>
+<desc id="mimateDesc">Ilustración vectorial original de un rostro sereno, ondas de cabello, hojas y una flor abstracta.</desc>
+<defs>
+<linearGradient id="mimateBg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5dfe1"/><stop offset=".55" stop-color="#bd7c86"/><stop offset="1" stop-color="#75816d"/></linearGradient>
+<radialGradient id="mimateGlow" cx="32%" cy="28%" r="68%"><stop stop-color="#fff" stop-opacity=".84"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="520" height="620" fill="url(#mimateBg)"/>
+<circle cx="160" cy="160" r="175" fill="url(#mimateGlow)" opacity=".72"/>
+<path d="M284 100c-93 2-160 72-157 171 2 77 42 132 112 164-28-42-35-83-20-122 12-33 37-57 76-73-15-20-23-41-22-64 1-27 15-52 41-76-9 0-19 0-30 0Z" fill="#fffaf8" opacity=".84"/>
+<path d="M297 130c-35 39-45 83-30 131 9 31 29 54 60 69-19 12-29 30-27 54 2 31 20 57 55 77" fill="none" stroke="#715764" stroke-width="7" stroke-linecap="round"/>
+<path d="M267 257c20 7 39 7 57 0" fill="none" stroke="#715764" stroke-width="6" stroke-linecap="round"/>
+<path d="M293 333c15 4 30 4 44-1-7 13-17 21-31 23-7-5-12-13-13-22Z" fill="#b66d79" opacity=".82"/>
+<path d="M124 174c-43 31-72 73-86 126 50-12 88-38 115-78M109 385c-38 29-58 66-60 113 43-12 74-39 92-79M390 178c47 24 77 61 90 111-49-7-86-31-111-72" fill="#98a58d" opacity=".83"/>
+<g fill="#fbecee" opacity=".92">
+<path d="M377 438c-34-5-52-25-51-60 33 1 52 21 51 60Z"/>
+<path d="M378 438c-3-35 13-57 47-65 8 32-8 54-47 65Z"/>
+<path d="M378 438c21-28 47-35 78-21-17 29-42 36-78 21Z"/>
+<path d="M377 439c25 24 28 51 9 80-27-21-30-47-9-80Z"/>
+<path d="M376 439c-11 34-34 48-68 43 7-34 30-48 68-43Z"/>
+</g>
+<circle cx="378" cy="439" r="18" fill="#b66d79"/>
+<path d="M92 524c88-62 193-74 316-35" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" opacity=".32"/>
+</svg>
+<span>Un momento para ti<br><small>Ilustración vectorial original de NoeApps; no representa instalaciones, personal ni resultados del salón.</small></span></div></section>
 <section id="servicios" class="services"><div class="wrap"><div class="section-head"><div class="eyebrow">Servicios comprobados públicamente</div><div><h2>Todo el cuidado, ordenado con claridad.</h2><p>La propuesta agrupa únicamente servicios publicados en directorios del negocio. El alcance, las técnicas y cualquier contenido definitivo tendrían que validarse antes de una web oficial.</p></div></div><div class="grid">
 <article class="card"><div class="num">01 · CABELLO</div><h3>Peluquería</h3><p>Cortes, peinados, recogidos, coloración, alisados, permanentes y tratamientos capilares.</p></article>
 <article class="card"><div class="num">02 · ROSTRO Y CUERPO</div><h3>Estética</h3><p>Tratamientos faciales y corporales, radiofrecuencia, presoterapia, limpiezas de cutis y maquillaje.</p></article>
