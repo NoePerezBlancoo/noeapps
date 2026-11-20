@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Cabelos · Propuesta conceptual NoeApps</title>
+  <meta name="description" content="Propuesta conceptual no oficial para Peluquería Cabelos en Ourense.">
+  <style>
+    :root{--ink:#12121a;--paper:#fffaf0;--blue:#2537d9;--red:#f24b3f;--lime:#d9ff72;--line:rgba(18,18,26,.18)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.55}
+    a{color:inherit}.notice{padding:.7rem 1rem;background:var(--ink);color:white;text-align:center;font-size:.85rem;letter-spacing:.04em}
+    .shell{width:min(1180px,calc(100% - 2rem));margin:auto}
+    header{position:sticky;top:0;z-index:8;background:rgba(255,250,240,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    nav{height:74px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{font-size:1.25rem;font-weight:900;letter-spacing:-.04em;text-decoration:none}.brand span{color:var(--blue)}
+    .links{display:flex;align-items:center;gap:1.2rem}.links a{text-decoration:none;font-weight:700;font-size:.9rem}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:.75rem 1.1rem;border:2px solid var(--ink);background:var(--lime);font-weight:900;text-decoration:none;box-shadow:4px 4px 0 var(--ink);transition:.18s}
+    .pill:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+    .hero{min-height:720px;display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:3rem;padding:5rem 0}
+    .eyebrow{display:inline-block;padding:.35rem .65rem;background:var(--red);color:white;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.1em;transform:rotate(-1deg)}
+    h1{font-size:clamp(4.2rem,10vw,8.7rem);line-height:.78;letter-spacing:-.085em;margin:1.5rem 0 1.8rem;max-width:8ch}
+    h1 em{display:block;color:var(--blue);font-style:normal}
+    .intro{font-size:1.18rem;max-width:600px;margin-bottom:1.8rem}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:1rem}.text-link{padding:.75rem .25rem;font-weight:900;text-underline-offset:5px}
+    .art{position:relative;min-height:590px;border:3px solid var(--ink);background:var(--blue);overflow:hidden;box-shadow:14px 14px 0 var(--red)}
+    .art svg{position:absolute;inset:0;width:100%;height:100%}.art-note{position:absolute;right:1.2rem;bottom:1.2rem;max-width:220px;background:var(--paper);border:2px solid var(--ink);padding:1rem;font-weight:900;transform:rotate(2deg)}
+    section{padding:6rem 0;border-top:1px solid var(--line)}.section-head{display:grid;grid-template-columns:.75fr 1.25fr;gap:2rem;align-items:end;margin-bottom:3rem}
+    .kicker{font-size:.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:var(--blue)}
+    h2{font-size:clamp(2.6rem,6vw,5.5rem);line-height:.94;letter-spacing:-.065em;margin:.5rem 0}
+    .section-head p{max-width:600px;font-size:1.05rem;margin:0}
+    .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .card{min-height:310px;padding:1.5rem;border:2px solid var(--ink);display:flex;flex-direction:column;justify-content:space-between;background:white}
+    .card:nth-child(2){background:var(--lime)}.card:nth-child(3){background:var(--red);color:white}
+    .card-tag{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;font-weight:900}.card h3{font-size:2rem;line-height:1;letter-spacing:-.04em;margin:1rem 0}.card p{margin:0}
+    .detail{background:var(--ink);color:white}.detail-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+    .detail h2{color:var(--lime)}.steps{display:grid;gap:1rem}
+    .step{display:grid;grid-template-columns:56px 1fr;gap:1rem;align-items:start;padding:1.1rem;border:1px solid rgba(255,255,255,.25)}
+    .step b{display:grid;place-items:center;aspect-ratio:1;background:var(--red);font-size:1.2rem}.step h3{margin:0 0 .3rem;font-size:1.25rem}.step p{margin:0;color:rgba(255,255,255,.75)}
+    .location{display:grid;grid-template-columns:1.1fr .9fr;gap:1rem}
+    .address{padding:2.2rem;background:var(--blue);color:white;min-height:340px;display:flex;flex-direction:column;justify-content:space-between}
+    .address h3{font-size:clamp(2.2rem,5vw,4rem);letter-spacing:-.06em;line-height:.95;margin:0}.address p{font-size:1.1rem}
+    .concept{padding:2.2rem;border:2px solid var(--ink);background:white}.concept h3{font-size:1.7rem;margin-top:0}.concept ul{padding-left:1.2rem}
+    .cta{padding:7rem 0;background:var(--red);color:white;text-align:center}.cta h2{max-width:900px;margin:0 auto 1.4rem}.cta p{max-width:650px;margin:0 auto 2rem;font-size:1.1rem}.cta .pill{background:var(--lime);color:var(--ink)}
+    footer{padding:2rem 0;background:var(--ink);color:white}.foot{display:flex;justify-content:space-between;gap:2rem;align-items:center}.foot small{color:rgba(255,255,255,.65)}
+    @media(max-width:850px){.links a:not(.pill){display:none}.hero{grid-template-columns:1fr;padding:3.5rem 0}.art{min-height:480px}.section-head,.detail-wrap,.location{grid-template-columns:1fr}.service-grid{grid-template-columns:1fr}.card{min-height:240px}.foot{align-items:flex-start;flex-direction:column}}
+    @media(max-width:520px){.shell{width:min(100% - 1.2rem,1180px)}nav{height:64px}h1{font-size:4rem}.hero{gap:2rem}.art{min-height:400px;box-shadow:8px 8px 0 var(--red)}section{padding:4rem 0}.hero-actions{flex-direction:column;align-items:stretch}.pill{text-align:center}.notice{font-size:.76rem}}
+  </style>
+</head>
+<body>
+  <div class="notice">Propuesta conceptual no oficial de NoeApps · No existe encargo</div>
+  <header>
+    <nav class="shell" aria-label="Navegación principal">
+      <a class="brand" href="#inicio">CABE<span>LOS</span></a>
+      <div class="links">
+        <a href="#servicios">Servicios</a><a href="#experiencia">Experiencia</a><a href="#ubicacion">Ubicación</a>
+        <a class="pill" href="https://catalogo.noeapps.com/" rel="noopener">Explorar diseños</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell" id="inicio">
+      <div>
+        <span class="eyebrow">Concepto digital · Ourense</span>
+        <h1>Tu pelo. <em>Tu gesto.</em></h1>
+        <p class="intro">Una propuesta web editorial para reunir peluquería, color y cuidados estéticos en una experiencia clara, expresiva y cómoda desde el móvil.</p>
+        <div class="hero-actions">
+          <a class="pill" href="#servicios">Descubrir la propuesta</a>
+          <a class="text-link" href="#ubicacion">Ver ubicación</a>
+        </div>
+      </div>
+      <div class="art" role="img" aria-label="Ilustración conceptual original de cabello y tijeras">
+        <svg viewBox="0 0 650 720" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="650" height="720" fill="#2537d9"/>
+          <circle cx="455" cy="155" r="110" fill="#d9ff72" stroke="#12121a" stroke-width="10"/>
+          <path d="M100 617C90 470 154 335 279 263c33-19 57-63 46-101-12-41 15-89 62-95 54-7 93 49 74 98-13 34 3 73 35 91 91 53 128 166 110 361Z" fill="#fffaf0" stroke="#12121a" stroke-width="12"/>
+          <path d="M147 617c12-138 72-252 177-320 38-25 79-43 120-59-32 63-30 114 6 153 51 55 50 141 17 226Z" fill="#f24b3f" stroke="#12121a" stroke-width="12"/>
+          <path d="M182 282c58 44 125 68 201 70M178 367c67 42 148 55 242 37M177 460c71 35 154 40 248 13" fill="none" stroke="#12121a" stroke-width="10" stroke-linecap="round"/>
+          <g transform="translate(70 72) rotate(-14)">
+            <circle cx="46" cy="46" r="35" fill="#fffaf0" stroke="#12121a" stroke-width="9"/>
+            <circle cx="46" cy="147" r="35" fill="#fffaf0" stroke="#12121a" stroke-width="9"/>
+            <path d="M73 66 248 210M73 126 248 7" fill="none" stroke="#12121a" stroke-width="13" stroke-linecap="round"/>
+          </g>
+          <path d="M76 659h507" stroke="#12121a" stroke-width="12" stroke-linecap="round"/>
+        </svg>
+        <div class="art-note">Identidad visual ilustrativa. Sin usar logotipo ni fotografías del establecimiento.</div>
+      </div>
+    </section>
+
+    <section id="servicios">
+      <div class="shell">
+        <div class="section-head">
+          <div><span class="kicker">Servicios publicados</span><h2>Todo el cuidado, bien ordenado.</h2></div>
+          <p>La estructura propone separar las necesidades más habituales para que cada visitante entienda la oferta sin perderse y encuentre rápido el siguiente paso.</p>
+        </div>
+        <div class="service-grid">
+          <article class="card"><span class="card-tag">Corte y peinado</span><div><h3>Forma para cada día y ocasión</h3><p>Cortes para hombre y mujer, lavado, secado y peinados para distintas ocasiones.</p></div></article>
+          <article class="card"><span class="card-tag">Color</span><div><h3>Tintes y mechas, visibles de un vistazo</h3><p>Un espacio propio para presentar los servicios de color comprobados con futuros trabajos autorizados.</p></div></article>
+          <article class="card"><span class="card-tag">Estética y cuidado</span><div><h3>Detalles que completan el look</h3><p>Depilación, manicura, maquillaje y tratamientos capilares reunidos en una sección sencilla.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail" id="experiencia">
+      <div class="shell detail-wrap">
+        <div><span class="kicker" style="color:#f24b3f">Experiencia móvil</span><h2>Menos búsquedas. Más claridad.</h2><p>El concepto está pensado para convertir una consulta rápida desde el teléfono en una visita informada, sin añadir reservas, precios ni promociones no confirmadas.</p></div>
+        <div class="steps">
+          <article class="step"><b>01</b><div><h3>Elegir el área</h3><p>Cabello, color o estética, con navegación directa.</p></div></article>
+          <article class="step"><b>02</b><div><h3>Entender el servicio</h3><p>Textos breves y una futura galería únicamente con material aprobado.</p></div></article>
+          <article class="step"><b>03</b><div><h3>Contactar por el canal acordado</h3><p>La versión oficial podría enlazar el sistema de cita que el negocio autorice.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ubicacion">
+      <div class="shell">
+        <div class="section-head"><div><span class="kicker">Presencia local</span><h2>Cabelos, en Ourense.</h2></div><p>Una página propia puede reunir ubicación, propuesta de valor y servicios sin depender de que el visitante recomponga la información entre varios directorios.</p></div>
+        <div class="location">
+          <div class="address"><span class="card-tag">Ubicación pública contrastada</span><h3>Rúa Bellao, 6 Bajo<br>32001 Ourense</h3><p>La dirección coincide en las fuentes consultadas. Cualquier dato definitivo se validaría antes de publicar una web oficial.</p></div>
+          <aside class="concept"><h3>Qué incluiría una siguiente versión</h3><ul><li>Identidad y fotografías autorizadas.</li><li>Galería de trabajos reales aprobados.</li><li>Canal de cita o consulta elegido por el negocio.</li><li>Información legal y contenidos validados.</li></ul><p><strong>No incluido en este concepto:</strong> formulario de datos, precios, promociones, reseñas, horarios o garantías.</p></aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="shell"><h2>Una idea visual lista para conversar.</h2><p>Este boceto demuestra una posible dirección. No representa una web oficial ni una contratación y puede adaptarse solo con autorización del establecimiento.</p><a class="pill" href="https://catalogo.noeapps.com/" rel="noopener">Ver catálogo NoeApps</a></div>
+    </section>
+  </main>
+
+  <footer><div class="shell foot"><strong>NoeApps · Propuesta conceptual</strong><small>Contenido basado únicamente en servicios públicos contrastados · 20/11/2026</small></div></footer>
+</body>
+</html>
