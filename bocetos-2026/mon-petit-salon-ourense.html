@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="Propuesta conceptual no oficial de NoeApps para Mon Petit Salón, Ourense.">
+  <title>Mon Petit Salón · Propuesta conceptual NoeApps</title>
+  <style>
+    :root{
+      --ink:#17251f;--cream:#fffaf0;--mint:#c9f6d4;--violet:#8d6bff;
+      --orange:#ff7347;--pink:#ffc7da;--line:#17251f;--soft:#f0ebff;
+      --shadow:8px 8px 0 var(--ink);--radius:30px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.55}
+    a{color:inherit}
+    .notice{background:var(--ink);color:#fff;text-align:center;padding:.65rem 1rem;font-size:.82rem;font-weight:800;letter-spacing:.05em}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,250,240,.96);border-bottom:2px solid var(--line);backdrop-filter:blur(12px)}
+    nav{max-width:1180px;margin:auto;min-height:78px;padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .wordmark{text-decoration:none;font-family:Georgia,serif;font-size:1.45rem;font-weight:800}
+    .wordmark span{color:var(--violet);font-style:italic}
+    .navlinks{display:flex;align-items:center;gap:1.5rem;font-weight:750}
+    .navlinks a{text-decoration:none}
+    .pill,.btn{display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--line);border-radius:999px;padding:.75rem 1.15rem;text-decoration:none;font-weight:850;box-shadow:4px 4px 0 var(--ink);transition:.18s transform,.18s box-shadow;background:var(--mint)}
+    .pill:hover,.btn:hover{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+    main{overflow:hidden}
+    .hero{max-width:1180px;margin:auto;padding:5.4rem 1.5rem 4.5rem;display:grid;grid-template-columns:1.02fr .98fr;gap:4rem;align-items:center}
+    .eyebrow{display:inline-block;border:2px solid var(--line);border-radius:999px;background:var(--pink);padding:.38rem .8rem;font-size:.78rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-family:Georgia,serif;font-size:clamp(4.1rem,8vw,7.4rem);line-height:.81;letter-spacing:-.07em;margin:1.3rem 0 1.7rem}
+    h1 em{display:block;color:var(--violet);font-weight:500}
+    .lead{font-size:1.12rem;max-width:38rem}
+    .actions{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem}
+    .btn.secondary{background:transparent;box-shadow:none}
+    .hero-art{position:relative;min-height:560px}
+    .art-card{position:absolute;inset:20px 0 0 30px;background:var(--mint);border:2px solid var(--line);border-radius:48% 52% 35% 65%/42% 45% 55% 58%;box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center;padding:2rem}
+    .spark{position:absolute;border:2px solid var(--line);border-radius:50%;z-index:2}
+    .spark.one{width:72px;height:72px;background:var(--orange);top:0;right:1rem}
+    .spark.two{width:46px;height:46px;background:var(--violet);bottom:2rem;left:0}
+    .art-label{position:absolute;right:-.1rem;bottom:1.2rem;background:#fff;border:2px solid var(--line);border-radius:999px;padding:.6rem 1rem;font-weight:850;box-shadow:4px 4px 0 var(--ink);max-width:80%;text-align:center}
+    .ticker{border-block:2px solid var(--line);background:var(--violet);color:white;overflow:hidden;white-space:nowrap;font-weight:900;letter-spacing:.08em;padding:.8rem 0}
+    .ticker span{display:inline-block;padding-left:1.8rem}
+    section{padding:6rem 1.5rem}
+    .wrap{max-width:1180px;margin:auto}
+    .section-head{display:grid;grid-template-columns:.8fr 1.2fr;gap:3rem;align-items:end;margin-bottom:3rem}
+    .kicker{font-size:.78rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#5a36db}
+    h2{font-family:Georgia,serif;font-size:clamp(2.6rem,5vw,4.7rem);line-height:.98;letter-spacing:-.045em;margin:.6rem 0}
+    .section-head p{font-size:1.1rem;margin-bottom:.35rem}
+    .services{background:#fff;border-block:2px solid var(--line)}
+    .service-grid{display:grid;grid-template-columns:1.15fr .85fr .85fr;gap:1.2rem}
+    .card{border:2px solid var(--line);border-radius:var(--radius);padding:2rem;min-height:320px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:5px 5px 0 var(--ink)}
+    .card:first-child{background:var(--pink)}
+    .card:nth-child(2){background:var(--soft)}
+    .card:nth-child(3){background:var(--orange)}
+    .card-tag{font-size:.76rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .card h3{font-family:Georgia,serif;font-size:2rem;line-height:1.05;margin-top:auto;margin-bottom:1rem}
+    .card p{margin-bottom:0}
+    .story{background:var(--ink);color:white}
+    .story-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .story h2{color:var(--mint)}
+    .journey{display:grid;gap:1rem}
+    .step{background:#fff;color:var(--ink);border-radius:22px;padding:1.3rem 1.4rem;display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+    .step b{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--violet);color:#fff}
+    .step h3{font-size:1.05rem;margin:.1rem 0 .25rem}
+    .step p{font-size:.92rem;margin:0}
+    .place{background:var(--mint)}
+    .place-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:1.3rem}
+    .address,.limits{border:2px solid var(--line);border-radius:var(--radius);padding:2.3rem;background:#fff}
+    .address{background:var(--cream);box-shadow:var(--shadow)}
+    .address h3{font-family:Georgia,serif;font-size:2.5rem;line-height:1.05;margin-bottom:1rem}
+    .address p:last-child{margin-bottom:0}
+    .limits{background:var(--violet);color:#fff}
+    .limits h3{font-family:Georgia,serif;font-size:1.7rem}
+    .limits ul{padding-left:1.25rem;margin-bottom:0}
+    .limits li+li{margin-top:.55rem}
+    .closing{padding:6rem 1.5rem;background:var(--orange);border-top:2px solid var(--line)}
+    .closing .wrap{display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center}
+    .closing h2{max-width:760px;margin-bottom:.75rem}
+    .closing p{margin:0;max-width:700px}
+    .closing .btn{background:#fff}
+    footer{background:var(--ink);color:#fff;padding:1.6rem;text-align:center;font-size:.85rem}
+    @media(max-width:900px){
+      .navlinks a:not(.pill){display:none}
+      .hero{grid-template-columns:1fr;padding-top:3.6rem;gap:2rem}
+      h1{font-size:clamp(4rem,17vw,6.5rem)}
+      .hero-art{min-height:460px}
+      .art-card{inset:10px 8px 10px 8px}
+      .section-head,.story-grid,.place-grid,.closing .wrap{grid-template-columns:1fr}
+      .service-grid{grid-template-columns:1fr 1fr}
+      .service-grid .card:first-child{grid-column:1/-1}
+      .closing .btn{justify-self:start}
+    }
+    @media(max-width:600px){
+      body{font-size:16px}
+      nav{min-height:68px;padding-inline:1rem}
+      .pill{padding:.62rem .85rem}
+      .hero{padding-inline:1rem}
+      .hero-art{min-height:380px}
+      .art-card{padding:1rem}
+      .art-label{font-size:.78rem}
+      section,.closing{padding:4.3rem 1rem}
+      .service-grid{grid-template-columns:1fr}
+      .service-grid .card:first-child{grid-column:auto}
+      .card{min-height:260px}
+      .actions{align-items:stretch}
+      .actions .btn{width:100%}
+      .section-head{gap:1rem}
+      h2{font-size:2.65rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="notice">Propuesta conceptual no oficial de NoeApps · No existe encargo</div>
+  <header>
+    <nav aria-label="Navegación principal">
+      <a class="wordmark" href="#inicio">MON <span>PETIT</span></a>
+      <div class="navlinks">
+        <a href="#servicios">Servicios</a>
+        <a href="#experiencia">Experiencia</a>
+        <a href="#ubicacion">Ubicación</a>
+        <a class="pill" href="https://catalogo.noeapps.com/">Ver diseños</a>
+      </div>
+    </nav>
+  </header>
+  <main>
+    <section class="hero" id="inicio">
+      <div>
+        <span class="eyebrow">Concepto web · Ourense</span>
+        <h1>Tu pausa.<em>Tu ritual.</em></h1>
+        <p class="lead">Una dirección digital luminosa y editorial para presentar cuidados de uñas, mirada y estética con una navegación clara desde el móvil.</p>
+        <div class="actions">
+          <a class="btn" href="#servicios">Explorar el concepto</a>
+          <a class="btn secondary" href="#ubicacion">Ver ubicación</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Ilustración conceptual original inspirada en manicura y cuidado personal">
+        <div class="spark one"></div><div class="spark two"></div>
+        <div class="art-card">
+          <svg viewBox="0 0 520 520" role="img" aria-label="Ilustración vectorial original de manos y flores" width="100%" height="100%">
+            <circle cx="260" cy="260" r="190" fill="#fffaf0" stroke="#17251f" stroke-width="5"/>
+            <path d="M155 365c-18-49-8-91 30-126 19-18 38-37 54-62 10-15 28-19 40-8 12 11 11 28 2 43l-28 45 13 9 49-86c10-17 30-22 44-11 13 10 13 29 4 45l-46 81 12 8 36-59c10-16 29-20 42-9 12 11 11 29 1 44l-55 85c-28 43-68 73-114 75-34 2-67-10-84-24z" fill="#ffc7da" stroke="#17251f" stroke-width="6" stroke-linejoin="round"/>
+            <path d="M139 359c-10-25-16-51-13-75 2-18 14-30 30-29 17 2 26 17 24 34l-2 28 34-23c15-10 34-6 43 8 9 14 4 32-11 42l-51 34c-19 12-43 4-54-19z" fill="#8d6bff" stroke="#17251f" stroke-width="6" stroke-linejoin="round"/>
+            <g fill="#ff7347" stroke="#17251f" stroke-width="5">
+              <path d="M125 157c30-3 53 18 56 48-30 3-53-18-56-48z"/>
+              <path d="M183 100c3 30-18 53-48 56-3-30 18-53 48-56z"/>
+              <path d="M184 157c-30-3-51 20-48 50 30 3 51-20 48-50z"/>
+              <circle cx="184" cy="157" r="13" fill="#c9f6d4"/>
+            </g>
+            <path d="M111 412c72-28 142-27 214 3" fill="none" stroke="#17251f" stroke-width="6" stroke-linecap="round"/>
+            <g fill="#c9f6d4" stroke="#17251f" stroke-width="4">
+              <circle cx="395" cy="123" r="25"/><circle cx="425" cy="153" r="20"/><circle cx="384" cy="165" r="17"/>
+            </g>
+          </svg>
+        </div>
+        <div class="art-label">Ilustración propia · Sin fotografías del negocio</div>
+      </div>
+    </section>
+    <div class="ticker" aria-hidden="true">
+      <span>MANICURA · PEDICURA · PESTAÑAS · CEJAS · DEPILACIÓN · CUIDADO PERSONAL ·</span>
+      <span>MANICURA · PEDICURA · PESTAÑAS · CEJAS · DEPILACIÓN · CUIDADO PERSONAL ·</span>
+    </div>
+
+    <section class="services" id="servicios">
+      <div class="wrap">
+        <div class="section-head">
+          <div><span class="kicker">Servicios comprobados</span><h2>Cada cuidado, en su lugar.</h2></div>
+          <p>La propuesta organiza la actividad publicada en tres recorridos sencillos, sin inventar precios, resultados ni promociones.</p>
+        </div>
+        <div class="service-grid">
+          <article class="card">
+            <span class="card-tag">Uñas</span>
+            <div><h3>Manicura y pedicura</h3><p>Un bloque protagonista para descubrir cuidados de manos y pies y, en una web oficial, incorporar trabajos reales previamente autorizados.</p></div>
+          </article>
+          <article class="card">
+            <span class="card-tag">Mirada</span>
+            <div><h3>Pestañas y cejas</h3><p>Tintes, extensiones, lifting de pestañas y diseño de cejas mediante microblading.</p></div>
+          </article>
+          <article class="card">
+            <span class="card-tag">Bienestar</span>
+            <div><h3>Depilación y reiki</h3><p>Ceras, depilación con hilo, tratamientos láser y reiki reunidos en una sección clara.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="story" id="experiencia">
+      <div class="wrap story-grid">
+        <div>
+          <span class="kicker" style="color:#ffc7da">Experiencia móvil</span>
+          <h2>De descubrir a consultar, sin ruido.</h2>
+          <p>El concepto prioriza lectura rápida, contraste alto y botones cómodos. Una versión oficial conectaría únicamente el canal de cita o consulta que el salón autorice.</p>
+        </div>
+        <div class="journey">
+          <div class="step"><b>1</b><div><h3>Entender la propuesta</h3><p>Portada breve y categorías reconocibles desde la primera pantalla.</p></div></div>
+          <div class="step"><b>2</b><div><h3>Explorar servicios</h3><p>Información esencial organizada por necesidades, sin afirmaciones no contrastadas.</p></div></div>
+          <div class="step"><b>3</b><div><h3>Elegir el siguiente paso</h3><p>Acceso futuro al canal vigente que el negocio confirme antes de publicar.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="place" id="ubicacion">
+      <div class="wrap">
+        <div class="section-head">
+          <div><span class="kicker">Presencia local</span><h2>Mon Petit, en Ourense.</h2></div>
+          <p>La dirección y la actividad coinciden en varias fuentes públicas. Todo dato definitivo se validaría con el establecimiento.</p>
+        </div>
+        <div class="place-grid">
+          <div class="address">
+            <span class="card-tag">Ubicación contrastada</span>
+            <h3>Ramón Cabanillas, 1<br>Bajo 3 · 32004 Ourense</h3>
+            <p>El teléfono, el correo y los horarios públicos no se muestran ni se usan en este concepto.</p>
+          </div>
+          <div class="limits">
+            <h3>Lo que este boceto no afirma</h3>
+            <ul>
+              <li>No es una web encargada ni oficial.</li>
+              <li>No incluye precios, horarios, promociones ni reseñas.</li>
+              <li>No utiliza logotipo, fotografías o resultados del salón.</li>
+              <li>No recoge datos ni simula reservas.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing">
+      <div class="wrap">
+        <div>
+          <h2>Una base visual lista para conversar.</h2>
+          <p>NoeApps puede adaptar el concepto con identidad, materiales y canal de cita aprobados por Mon Petit.</p>
+        </div>
+        <a class="btn" href="https://catalogo.noeapps.com/">Explorar catálogo NoeApps</a>
+      </div>
+    </section>
+  </main>
+  <footer>NoeApps · Propuesta conceptual basada en información pública contrastada · 20/11/2026</footer>
+</body>
+</html>
