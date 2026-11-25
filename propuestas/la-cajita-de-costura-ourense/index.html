@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>La Cajita de Costura · Mercería y arreglos en Ourense</title>
+<meta name="description" content="Propuesta conceptual para La Cajita de Costura, mercería, moda y arreglos de ropa en Ourense.">
+<style>
+:root{--ink:#302535;--berry:#a63d66;--rose:#f3c8d4;--cream:#fffaf2;--mint:#b9d8cb;--gold:#d69b4e;--paper:#fffefa;--line:#e8d9dc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
+a{color:inherit}.notice{background:var(--ink);color:#fff;text-align:center;padding:.55rem 1rem;font-size:.78rem;letter-spacing:.07em;text-transform:uppercase}
+header{position:sticky;top:0;z-index:10;background:rgba(255,250,242,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav{max-width:1180px;margin:auto;padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-family:Georgia,serif;font-weight:700;font-size:1.05rem}.mark{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--berry);color:#fff;box-shadow:inset 0 0 0 5px rgba(255,255,255,.18)}
+.links{display:flex;gap:1.2rem;align-items:center}.links a{text-decoration:none;font-size:.91rem;font-weight:700}.pill{background:var(--berry);color:#fff!important;padding:.68rem 1rem;border-radius:999px}
+.hero{max-width:1180px;margin:auto;padding:4.5rem 1.25rem 3.5rem;display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center}
+.kicker{display:inline-flex;align-items:center;gap:.5rem;color:var(--berry);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem}.kicker:before{content:"";width:28px;height:2px;background:var(--berry)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.08}h1{font-size:clamp(3rem,7vw,6.6rem);margin:.65rem 0 1rem;letter-spacing:-.045em}h1 span{display:block;color:var(--berry);font-style:italic}
+.lead{font-size:1.12rem;max-width:610px}.actions{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.7rem}.btn{display:inline-block;text-decoration:none;border-radius:999px;padding:.85rem 1.2rem;font-weight:800;border:2px solid var(--ink)}.btn.primary{background:var(--ink);color:#fff}
+.visual{position:relative;min-height:540px;border-radius:46% 46% 20px 20px;background:linear-gradient(145deg,var(--rose),#ffe8c9);overflow:hidden;box-shadow:18px 18px 0 var(--mint)}.visual svg{width:100%;height:100%;position:absolute;inset:0}.tag{position:absolute;right:1rem;bottom:1rem;background:var(--paper);padding:.75rem 1rem;border-radius:12px;font-size:.76rem;box-shadow:0 8px 30px #79556628}
+.section{max-width:1180px;margin:auto;padding:5rem 1.25rem}.intro{display:grid;grid-template-columns:.7fr 1.3fr;gap:2rem;align-items:end}.intro h2{font-size:clamp(2.2rem,5vw,4.2rem);margin:.35rem 0}.intro p{max-width:610px;margin-left:auto}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.2rem}.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:1.5rem;min-height:235px;position:relative;overflow:hidden}.card:after{content:"";position:absolute;width:85px;height:85px;border-radius:50%;background:var(--rose);right:-25px;bottom:-25px}.card:nth-child(2):after{background:var(--mint)}.card:nth-child(3):after{background:#f4d29f}.num{font:700 2.4rem Georgia;color:var(--berry)}.card h3{font-size:1.45rem;margin:.8rem 0 .5rem}.card p{font-size:.94rem}
+.ribbon{background:var(--berry);color:#fff;overflow:hidden;transform:rotate(-1deg);margin:1rem 0}.ribbon div{white-space:nowrap;padding:.85rem 0;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.categories{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-top:2rem}.cat{border-radius:24px;padding:2rem;min-height:260px;background:#edd8de;display:flex;flex-direction:column;justify-content:flex-end}.cat:nth-child(2){background:#dcece5}.cat:nth-child(3){background:#f4dfbd}.cat:nth-child(4){background:#e2dff0}.cat strong{font:700 2rem Georgia}.cat small{text-transform:uppercase;letter-spacing:.1em;font-weight:800}
+.visit{background:var(--ink);color:#fff;border-radius:30px;padding:2.3rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center}.visit h2{font-size:clamp(2.2rem,5vw,4rem);margin:0 0 .7rem}.facts{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.2rem}.fact{border:1px solid #ffffff35;border-radius:14px;padding:.7rem .9rem;font-size:.9rem}.visit .btn{border-color:#fff;color:#fff}
+footer{max-width:1180px;margin:auto;padding:2rem 1.25rem 3rem;display:flex;justify-content:space-between;gap:1rem;border-top:1px solid var(--line);font-size:.85rem}
+@media(max-width:800px){.links a:not(.pill){display:none}.hero{grid-template-columns:1fr;padding-top:3rem}.visual{min-height:390px}.intro{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.categories{grid-template-columns:1fr}.visit{grid-template-columns:1fr}footer{flex-direction:column}h1{font-size:3.7rem}}
+</style>
+</head>
+<body>
+<div class="notice">Propuesta conceptual no oficial de NoeApps</div>
+<header><nav><a class="brand" href="#inicio"><span class="mark">✂</span>La Cajita de Costura</a><div class="links"><a href="#servicios">Qué encontrarás</a><a href="#visita">Visítanos</a><a class="pill" href="tel:988602297">Llamar</a></div></nav></header>
+<main>
+<section class="hero" id="inicio">
+<div><div class="kicker">Mercería · moda · arreglos</div><h1>Todo empieza con <span>un buen hilo.</span></h1><p class="lead">Un rincón de barrio en Ourense para arreglar tus prendas, descubrir artículos de mercería y encontrar moda y complementos para el día a día.</p><div class="actions"><a class="btn primary" href="#servicios">Explorar la tienda</a><a class="btn" href="#visita">Cómo llegar</a></div></div>
+<div class="visual" role="img" aria-label="Ilustración conceptual de hilos, botones y útiles de costura">
+<svg viewBox="0 0 560 600" xmlns="http://www.w3.org/2000/svg">
+<defs><pattern id="st" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 12h10" stroke="#fff" stroke-width="2" stroke-dasharray="3 4" opacity=".55"/></pattern></defs>
+<rect width="560" height="600" fill="url(#st)"/>
+<circle cx="120" cy="125" r="68" fill="#a63d66"/><circle cx="120" cy="125" r="17" fill="#f9dce4"/><circle cx="98" cy="104" r="8" fill="#f9dce4"/><circle cx="142" cy="104" r="8" fill="#f9dce4"/><circle cx="98" cy="146" r="8" fill="#f9dce4"/><circle cx="142" cy="146" r="8" fill="#f9dce4"/>
+<g transform="translate(270 65) rotate(8)"><path d="M45 0h90l-12 55H57z" fill="#fffaf2"/><rect x="58" y="48" width="64" height="245" rx="20" fill="#d69b4e"/><path d="M59 78c24 22 39-24 63 0M59 105c24 22 39-24 63 0M59 132c24 22 39-24 63 0M59 159c24 22 39-24 63 0M59 186c24 22 39-24 63 0M59 213c24 22 39-24 63 0" fill="none" stroke="#fff4dc" stroke-width="14"/><path d="M54 290h72l14 45H40z" fill="#fffaf2"/></g>
+<path d="M65 370C170 310 215 500 340 420s95-160 155-115" fill="none" stroke="#a63d66" stroke-width="6" stroke-linecap="round"/>
+<g transform="translate(94 400) rotate(-15)"><ellipse cx="70" cy="70" rx="28" ry="70" fill="#302535"/><ellipse cx="140" cy="70" rx="28" ry="70" fill="#302535"/><circle cx="70" cy="70" r="12" fill="#fffaf2"/><circle cx="140" cy="70" r="12" fill="#fffaf2"/><path d="M85 93l110 95M125 93L20 190" stroke="#302535" stroke-width="13" stroke-linecap="round"/></g>
+<circle cx="445" cy="450" r="62" fill="#b9d8cb"/><circle cx="445" cy="450" r="13" fill="#fff"/><circle cx="423" cy="428" r="7" fill="#fff"/><circle cx="467" cy="428" r="7" fill="#fff"/><circle cx="423" cy="472" r="7" fill="#fff"/><circle cx="467" cy="472" r="7" fill="#fff"/>
+</svg><div class="tag">Imagen ilustrativa creada para esta propuesta</div></div>
+</section>
+<div class="ribbon" aria-hidden="true"><div>Hilos · botones · arreglos · complementos · moda de mujer · mercería · hilos · botones · arreglos · complementos ·</div></div>
+<section class="section" id="servicios">
+<div class="intro"><div><div class="kicker">Tu tienda cercana</div><h2>Una cajita llena de posibilidades</h2></div><p>La propuesta organiza la variedad de la tienda de forma sencilla: servicios de arreglo, artículos de mercería y una selección de prendas y complementos.</p></div>
+<div class="cards"><article class="card"><div class="num">01</div><h3>Arreglos de ropa</h3><p>Un espacio claro para presentar el servicio de arreglos para distintos tipos de prendas.</p></article><article class="card"><div class="num">02</div><h3>Mercería</h3><p>Una selección de artículos de mercería para tus proyectos, reparaciones y labores cotidianas.</p></article><article class="card"><div class="num">03</div><h3>Moda y complementos</h3><p>Ropa de mujer, bisutería, bolsos, carteras, sombreros y otros complementos.</p></article></div>
+<div class="categories"><div class="cat"><small>Para cada temporada</small><strong>Prendas térmicas</strong></div><div class="cat"><small>Comodidad diaria</small><strong>Calcetines, medias y pijamas</strong></div><div class="cat"><small>Selección en tienda</small><strong>Calzado y complementos</strong></div><div class="cat"><small>Novedades</small><strong>Moda para mujer</strong></div></div>
+</section>
+<section class="section" id="visita"><div class="visit"><div><h2>Ven a descubrirlo</h2><p>Avda. de Santiago, 68 · 32001 Ourense</p><div class="facts"><span class="fact">Acceso para movilidad reducida</span><span class="fact">Pago con tarjeta</span><span class="fact">Consulta disponibilidad en tienda</span></div></div><div><a class="btn" href="tel:988602297">988 602 297</a><br><br><a class="btn" href="https://www.instagram.com/lacajitadecostura" rel="noopener noreferrer">Instagram</a></div></div></section>
+</main>
+<footer><span>La Cajita de Costura · Ourense</span><span>Concepto visual de NoeApps · La información debe validarse antes de publicación oficial.</span></footer>
+</body></html>
