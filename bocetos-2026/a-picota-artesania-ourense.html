@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>A Picota Artesanía · Ourense — propuesta conceptual</title>
+<meta name="description" content="Propuesta conceptual no oficial para A Picota Artesanía, joyería de plata en Ourense.">
+<style>
+:root{--coal:#171b1d;--graphite:#292f32;--silver:#c8d0d1;--mist:#eef1ef;--copper:#b9573e;--stone:#ded7c9;--paper:#faf9f5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--coal);font:16px/1.62 ui-sans-serif,system-ui,-apple-system,sans-serif}a{color:inherit}
+.notice{background:var(--coal);color:#fff;text-align:center;padding:.55rem 1rem;font-size:.78rem;letter-spacing:.04em}
+header{position:sticky;top:0;z-index:9;background:#faf9f5eb;backdrop-filter:blur(12px);border-bottom:1px solid #d7d4cd}nav{max-width:1160px;margin:auto;padding:.9rem 1.2rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.brand{text-decoration:none;text-transform:uppercase;letter-spacing:.16em;font-weight:950}.brand i{color:var(--copper);font-style:normal}.links{display:flex;align-items:center;gap:1.2rem}.links a{text-decoration:none;font-size:.88rem;font-weight:750}
+.btn{display:inline-flex;padding:.75rem 1.1rem;background:var(--copper);color:#fff!important;text-decoration:none!important;font-weight:900;letter-spacing:.02em}
+.hero{background:var(--coal);color:#fff;overflow:hidden;position:relative}.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 76% 44%,#ffffff0d 0 18%,transparent 19%),linear-gradient(115deg,transparent 0 62%,#ffffff05 62%)}
+.hero-grid{position:relative;max-width:1160px;margin:auto;min-height:700px;padding:5.5rem 1.2rem;display:grid;grid-template-columns:.95fr 1.05fr;gap:4rem;align-items:center}.over{color:#c8d0d1;text-transform:uppercase;font-size:.74rem;letter-spacing:.18em;font-weight:850}
+h1{font:500 clamp(3.3rem,6.5vw,6.5rem)/.94 Georgia,serif;letter-spacing:-.045em;margin:1rem 0 1.35rem}h1 em{color:#d27a61;font-style:italic}.lead{font-size:1.16rem;max-width:53ch;color:#c9d0d0}.actions{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.9rem}.ghost{padding:.69rem 1rem;border:1px solid #aeb8b8;text-decoration:none;font-weight:800}
+.art{position:relative}.artboard{border:1px solid #8e999a;background:linear-gradient(150deg,#2d3437,#15191b);padding:1rem;box-shadow:18px 18px 0 #0b0d0e}.artboard svg{display:block;width:100%;height:auto}.seal{position:absolute;right:-1.2rem;bottom:1.7rem;border:1px solid var(--silver);background:var(--coal);padding:.8rem .95rem;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;font-weight:900;transform:rotate(-4deg)}
+section{padding:6rem 1.2rem}.wrap{max-width:1160px;margin:auto}.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;font-weight:900;color:var(--copper)}h2{font:500 clamp(2.4rem,4.5vw,4.2rem)/1.05 Georgia,serif;letter-spacing:-.035em;margin:.6rem 0 1.4rem}.intro{max-width:66ch;color:#596164}
+.collection{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--coal);border:1px solid var(--coal);margin-top:2.2rem}.piece{background:var(--paper);padding:1.5rem;min-height:240px}.piece .mark{font:500 2.4rem/1 Georgia,serif;color:var(--copper)}.piece h3{margin:1.1rem 0 .4rem}.piece p{font-size:.92rem;color:#61696c;margin:0}
+.origin{background:var(--mist)}.origin-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:4rem;align-items:center}.motifs{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.motif{aspect-ratio:1;display:grid;place-items:center;background:#fff;border:1px solid #c9cfcc}.motif svg{width:74%;height:74%}.motif:nth-child(2){background:var(--coal)}
+.workshop{background:var(--graphite);color:#fff}.work-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:4rem;align-items:center}.workshop .intro{color:#c8d0d1}.steps{display:grid;gap:.8rem}.step{display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.1rem;border-left:3px solid var(--copper);background:#ffffff08}.step b{font:500 1.7rem Georgia,serif;color:#d27a61}.step strong{display:block}.step span{font-size:.91rem;color:#c9d0d1}
+.gift{background:linear-gradient(180deg,var(--paper),#e7e3db)}.giftbox{display:grid;grid-template-columns:1.15fr .85fr;border:1px solid var(--coal);background:#fff}.giftcopy{padding:clamp(1.8rem,4vw,3.5rem)}.giftart{background:var(--stone);display:grid;place-items:center;padding:2rem}.giftart svg{width:min(100%,310px)}
+.visitcard{display:grid;grid-template-columns:1.2fr .8fr;border:1px solid var(--coal);box-shadow:12px 12px 0 var(--copper)}.visitcopy{padding:clamp(1.8rem,4vw,3.5rem)}.visitcopy address{font-style:normal;font-size:1.18rem;font-weight:850;margin:1rem 0}.fine{font-size:.86rem;color:#646d70;max-width:65ch}.mapart{background:var(--coal);display:grid;place-items:center;padding:2rem}.mapart svg{width:min(100%,300px)}
+footer{background:var(--coal);color:#c8d0d1;padding:2.2rem 1.2rem}.foot{max-width:1160px;margin:auto;display:flex;justify-content:space-between;gap:1rem}.foot a{color:#fff}
+@media(max-width:900px){.hero-grid,.origin-grid,.work-grid,.giftbox,.visitcard{grid-template-columns:1fr}.hero-grid{min-height:auto;padding-top:4rem}.art{max-width:650px}.collection{grid-template-columns:repeat(2,1fr)}.giftart,.mapart{min-height:330px}}
+@media(max-width:620px){.links a:not(.btn){display:none}.hero-grid{padding-bottom:4rem}h1{font-size:3.4rem}.collection,.motifs{grid-template-columns:1fr}.seal{right:.2rem}.foot{flex-direction:column}section{padding:4.2rem 1rem}}
+</style></head><body>
+<div class="notice">Propuesta conceptual no oficial de NoeApps · Ilustraciones originales y contenido sujeto a validación</div>
+<header><nav><a class="brand" href="#inicio">A <i>Picota</i></a><div class="links"><a href="#piezas">Piezas</a><a href="#origen">Inspiración</a><a href="#taller">Taller</a><a class="btn" href="https://catalogo.noeapps.com/" rel="noopener">Ver NoeApps</a></div></nav></header>
+<main>
+<section class="hero" id="inicio"><div class="hero-grid">
+<div><div class="over">Ourense · Artesanía gallega · Joyería en plata</div><h1>Metal, memoria y <em>forma.</em></h1><p class="lead">Una propuesta digital sobria para presentar piezas de fabricación propia, joyería artesanal y regalos con identidad, desde el corazón histórico de Ourense.</p><div class="actions"><a class="btn" href="#piezas">Descubrir el universo</a><a class="ghost" href="#visita">Visitar el taller</a></div></div>
+<div class="art"><div class="artboard"><svg viewBox="0 0 600 580" role="img" aria-labelledby="t d"><title id="t">Joyería artesanal en plata</title><desc id="d">Ilustración original de un torque, un colgante y formas geométricas inspiradas en metal trabajado.</desc>
+<rect x="10" y="10" width="580" height="560" fill="#202629" stroke="#8d9899" stroke-width="3"/>
+<circle cx="300" cy="292" r="178" fill="none" stroke="#c8d0d1" stroke-width="30" stroke-linecap="round" stroke-dasharray="920 200" transform="rotate(32 300 292)"/>
+<circle cx="164" cy="397" r="35" fill="#b9573e" stroke="#0f1213" stroke-width="12"/><circle cx="437" cy="393" r="35" fill="#b9573e" stroke="#0f1213" stroke-width="12"/>
+<path d="M300 91v106" stroke="#c8d0d1" stroke-width="8"/><path d="M259 196h82l-41 72Z" fill="#b9573e" stroke="#c8d0d1" stroke-width="8" stroke-linejoin="round"/>
+<path d="M300 267q61 3 66 59 4 47-43 54-38 5-47-28-7-28 22-34 22-4 27 15" fill="none" stroke="#d7dede" stroke-width="9" stroke-linecap="round"/>
+<path d="M102 104l69 40-69 40-69-40Z" fill="none" stroke="#738082" stroke-width="5"/><path d="M498 104l69 40-69 40-69-40Z" fill="none" stroke="#738082" stroke-width="5"/>
+<path d="M90 492h420" stroke="#738082" stroke-width="3"/><circle cx="235" cy="492" r="8" fill="#b9573e"/><circle cx="365" cy="492" r="8" fill="#b9573e"/>
+</svg></div><div class="seal">Ilustración conceptual · no oficial</div></div>
+</div></section>
+
+<section id="piezas"><div class="wrap"><div class="kicker">Colección y oficio</div><h2>Pequeños objetos, historias duraderas.</h2><p class="intro">El boceto organiza la oferta pública conocida sin atribuir diseños concretos, precios o existencias. Cada categoría se podría completar solo con fotografías y piezas autorizadas por el taller.</p>
+<div class="collection">
+<article class="piece"><div class="mark">01</div><h3>Pendientes y anillos</h3><p>Joyería artesanal en plata, presentada por tipología y colección.</p></article>
+<article class="piece"><div class="mark">02</div><h3>Colgantes y gargantillas</h3><p>Piezas para llevar cerca, con espacio para contar su inspiración.</p></article>
+<article class="piece"><div class="mark">03</div><h3>Pulseras y brazaletes</h3><p>Diseño propio y fabricación artesanal, sujetos a validación de cada pieza.</p></article>
+<article class="piece"><div class="mark">04</div><h3>Regalos artesanos</h3><p>Una selección para obsequiar artesanía gallega con contexto y procedencia.</p></article>
+</div></div></section>
+
+<section class="origin" id="origen"><div class="wrap origin-grid">
+<div><div class="kicker">Inspiración documentada</div><h2>Geometrías con raíz gallega.</h2><p class="intro">Turismo de Galicia describe piezas inspiradas en motivos celtas y romanos, como torques, trisqueles y entrelazados. Esta propuesta utiliza geometría original, sin reproducir joyas ni identidad gráfica del establecimiento.</p></div>
+<div class="motifs">
+<div class="motif"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="67" fill="none" stroke="#292f32" stroke-width="15" stroke-linecap="round" stroke-dasharray="330 90" transform="rotate(35 100 100)"/><circle cx="47" cy="142" r="16" fill="#b9573e"/><circle cx="155" cy="138" r="16" fill="#b9573e"/></svg></div>
+<div class="motif"><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M100 100q52-3 54 39 2 31-29 34-25 3-30-20-4-19 17-22M100 100q-29-43 7-64 27-16 44 10 14 21-4 36-15 12-29-4M100 100q-26 45-64 25-28-15-13-44 12-22 34-14 18 7 12 27" fill="none" stroke="#c8d0d1" stroke-width="11" stroke-linecap="round"/></svg></div>
+</div></div></section>
+
+<section class="workshop" id="taller"><div class="wrap work-grid">
+<div><div class="kicker">Hecho y cuidado en el taller</div><h2>Fabricación propia y arreglos.</h2><p class="intro">La web podría explicar el valor del proceso y facilitar consultas, sin prometer plazos ni aceptar encargos automáticos bajo la identidad del negocio.</p></div>
+<div class="steps"><div class="step"><b>I</b><div><strong>Diseño artesanal</strong><span>Una idea se convierte en forma mediante el oficio.</span></div></div><div class="step"><b>II</b><div><strong>Trabajo en plata</strong><span>Material y técnicas se documentarían con validación del taller.</span></div></div><div class="step"><b>III</b><div><strong>Arreglos</strong><span>El establecimiento valora cada intervención de manera individual.</span></div></div></div>
+</div></section>
+
+<section class="gift"><div class="wrap"><div class="giftbox">
+<div class="giftcopy"><div class="kicker">Artesanía para regalar</div><h2>Una pieza con procedencia.</h2><p class="intro">Un catálogo visual podría ayudar a descubrir categorías e inspiración antes de visitar el establecimiento, manteniendo la elección final y la disponibilidad bajo confirmación directa.</p><a class="btn" href="#visita">Dónde encontrar A Picota</a></div>
+<div class="giftart"><svg viewBox="0 0 300 300" role="img" aria-label="Ilustración original de una caja y un colgante"><rect x="48" y="116" width="204" height="137" fill="#faf9f5" stroke="#171b1d" stroke-width="10"/><path d="M35 91h230v45H35z" fill="#b9573e" stroke="#171b1d" stroke-width="10"/><path d="M150 91v162" stroke="#171b1d" stroke-width="9"/><path d="M150 89q-62-58-73-12-8 36 73 12Zm0 0q62-58 73-12 8 36-73 12Z" fill="#c8d0d1" stroke="#171b1d" stroke-width="9"/><circle cx="150" cy="184" r="25" fill="none" stroke="#b9573e" stroke-width="8"/></svg></div>
+</div></div></section>
+
+<section id="visita"><div class="wrap"><div class="visitcard">
+<div class="visitcopy"><div class="kicker">Ourense histórica</div><h2>El taller, en Rúa Colón.</h2><address>Rúa Colón, 27 · Bajo<br>32005 Ourense</address><p class="fine">Dirección y actividad contrastadas en Artesanía de Galicia, ADAO y Turismo de Galicia. Antes de una publicación oficial se validarían contacto, horarios, catálogo, materiales y cualquier imagen directamente con A Picota.</p><a class="btn" href="https://catalogo.noeapps.com/" rel="noopener">Conocer el catálogo NoeApps</a></div>
+<div class="mapart"><svg viewBox="0 0 300 300" role="img" aria-label="Marcador con motivo de joyería"><path d="M150 28q-78 0-78 78 0 63 78 166 78-103 78-166 0-78-78-78Z" fill="#c8d0d1" stroke="#080a0b" stroke-width="12"/><circle cx="150" cy="108" r="48" fill="#171b1d"/><circle cx="150" cy="108" r="26" fill="none" stroke="#b9573e" stroke-width="9" stroke-dasharray="125 35" transform="rotate(30 150 108)"/><circle cx="130" cy="127" r="8" fill="#c8d0d1"/><circle cx="172" cy="125" r="8" fill="#c8d0d1"/></svg></div>
+</div></div></section>
+</main>
+<footer><div class="foot"><span>A Picota Artesanía · Propuesta conceptual no oficial</span><span>Diseño demostrativo por <a href="https://catalogo.noeapps.com/" rel="noopener">NoeApps</a></span></div></footer>
+</body></html>
