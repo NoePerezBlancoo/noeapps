@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Arlequín · Librería y papelería en Ourense — propuesta conceptual</title>
+  <meta name="description" content="Propuesta conceptual no oficial para Librería Papelería Arlequín, Ourense.">
+  <style>
+    :root{--ink:#26213a;--violet:#7057d9;--cyan:#30b7c7;--sun:#ffd659;--rose:#ff7e9f;--paper:#fffdf7;--mist:#f3f0ff}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 ui-rounded,"Nunito",system-ui,-apple-system,sans-serif}
+    a{color:inherit} .notice{padding:.55rem 1rem;text-align:center;background:var(--ink);color:white;font-size:.82rem;letter-spacing:.02em}
+    header{position:sticky;top:0;z-index:5;background:rgba(255,253,247,.94);backdrop-filter:blur(12px);border-bottom:1px solid #e8e2ff}
+    nav{max-width:1120px;margin:auto;padding:.8rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .brand{font-weight:900;font-size:1.25rem;text-decoration:none}.brand span{color:var(--violet)}
+    .links{display:flex;gap:1.15rem;align-items:center}.links a{text-decoration:none;font-weight:750;font-size:.93rem}
+    .pill{display:inline-flex;align-items:center;justify-content:center;padding:.72rem 1rem;border-radius:999px;background:var(--violet);color:white;text-decoration:none;font-weight:850;box-shadow:0 8px 22px #7057d930}
+    .hero{overflow:hidden;background:
+      radial-gradient(circle at 10% 20%,#ffd65955 0 8%,transparent 9%),
+      radial-gradient(circle at 88% 25%,#30b7c733 0 12%,transparent 13%),
+      linear-gradient(135deg,#fffdf7 0%,#f1edff 100%)}
+    .hero-grid{max-width:1120px;margin:auto;min-height:640px;padding:5rem 1.2rem;display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center}
+    .eyebrow{display:inline-block;background:var(--sun);padding:.35rem .75rem;border-radius:999px;font-weight:900;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;transform:rotate(-1deg)}
+    h1{font-size:clamp(3rem,6vw,5.6rem);line-height:.98;letter-spacing:-.055em;margin:1.1rem 0 1.2rem}
+    h1 em{font-style:normal;color:var(--violet);position:relative} h1 em:after{content:"";position:absolute;left:0;right:0;bottom:-.08em;height:.14em;background:var(--rose);border-radius:8px;transform:rotate(-2deg)}
+    .lead{font-size:1.18rem;max-width:57ch;color:#514a67}.actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.7rem}
+    .ghost{padding:.68rem 1rem;border:2px solid var(--ink);border-radius:999px;text-decoration:none;font-weight:850}
+    .art{position:relative}.art-card{border:3px solid var(--ink);border-radius:34px;background:white;padding:1rem;box-shadow:14px 16px 0 var(--sun);transform:rotate(1.5deg)}
+    .art svg{display:block;width:100%;height:auto}.sticker{position:absolute;padding:.7rem .9rem;border:2px solid var(--ink);border-radius:14px;background:var(--rose);color:white;font-weight:900;box-shadow:4px 5px 0 var(--ink);transform:rotate(-8deg);left:-1rem;bottom:2rem}
+    section{padding:5.5rem 1.2rem}.wrap{max-width:1120px;margin:auto}.kicker{color:var(--violet);font-weight:900;text-transform:uppercase;letter-spacing:.1em;font-size:.78rem}
+    h2{font-size:clamp(2rem,4vw,3.6rem);line-height:1.08;letter-spacing:-.035em;margin:.45rem 0 2rem}.intro{max-width:64ch;color:#625a75}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem}.card{border:2px solid #ded6ff;border-radius:24px;padding:1.4rem;background:white;min-height:210px;transition:.2s transform,.2s box-shadow}
+    .card:hover{transform:translateY(-5px);box-shadow:0 15px 30px #7057d91a}.icon{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;font-size:1.5rem;background:var(--mist)}.card:nth-child(2) .icon{background:#dff8f8}.card:nth-child(3) .icon{background:#fff2bf}.card:nth-child(4) .icon{background:#ffe5ed}
+    .card h3{margin:.9rem 0 .4rem;font-size:1.08rem}.card p{margin:0;color:#685f79;font-size:.94rem}
+    .family{background:var(--ink);color:white}.family-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:4rem;align-items:center}.family .intro{color:#dcd6ec}
+    .steps{display:grid;gap:.8rem}.step{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start;padding:1rem 1.1rem;background:#ffffff10;border:1px solid #ffffff24;border-radius:18px}.num{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;background:var(--sun);color:var(--ink);font-weight:950}.step strong{display:block}.step span{color:#dcd6ec;font-size:.92rem}
+    .visit{background:linear-gradient(180deg,#fffdf7,#f5f2ff)}.visitbox{display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;background:white;border:2px solid var(--ink);border-radius:30px;padding:clamp(1.5rem,4vw,3rem);box-shadow:10px 12px 0 var(--cyan)}
+    .address{font-size:1.18rem;font-weight:850}.note{color:#6b627b;font-size:.91rem}.mini{align-self:center;background:var(--mist);border-radius:22px;padding:1.4rem}.mini ul{padding-left:1.2rem;margin:.7rem 0 0}
+    footer{padding:2rem 1.2rem;background:var(--ink);color:#dcd6ec}.foot{max-width:1120px;margin:auto;display:flex;justify-content:space-between;gap:1rem;align-items:center}.foot a{color:white}
+    @media(max-width:900px){.hero-grid,.family-grid,.visitbox{grid-template-columns:1fr}.hero-grid{padding-top:3.5rem;gap:2.5rem}.art{max-width:590px}.cards{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:620px){.links a:not(.pill){display:none}.hero-grid{min-height:auto;padding-bottom:3.5rem}h1{font-size:3.2rem}.cards{grid-template-columns:1fr}.sticker{left:.2rem;bottom:.6rem}.foot{align-items:flex-start;flex-direction:column}section{padding:4rem 1rem}}
+  </style>
+</head>
+<body>
+  <div class="notice">Propuesta conceptual no oficial de NoeApps · Contenido e imágenes ilustrativas</div>
+  <header><nav>
+    <a class="brand" href="#inicio">Arlequín<span>.</span></a>
+    <div class="links"><a href="#descubrir">Descubrir</a><a href="#actividades">Actividades</a><a href="#visita">Visítanos</a><a class="pill" href="https://catalogo.noeapps.com/" rel="noopener">Ver propuesta NoeApps</a></div>
+  </nav></header>
+
+  <main>
+    <section class="hero" id="inicio"><div class="hero-grid">
+      <div>
+        <span class="eyebrow">Librería · Papelería · Ourense</span>
+        <h1>Historias y cosas <em>bonitas</em>.</h1>
+        <p class="lead">Un rincón de barrio para escoger lecturas, material de papelería y pequeños detalles con calma, pensado también para disfrutar en familia.</p>
+        <div class="actions"><a class="pill" href="#descubrir">Explorar la tienda</a><a class="ghost" href="#visita">Cómo llegar</a></div>
+      </div>
+      <div class="art" aria-label="Ilustración conceptual de un libro abierto con lápices y piezas de juego">
+        <div class="art-card">
+          <svg viewBox="0 0 560 500" role="img" aria-labelledby="title desc">
+            <title id="title">Mundo Arlequín</title><desc id="desc">Libro abierto, arco de color, lápiz y piezas de juego en una ilustración original.</desc>
+            <rect x="10" y="10" width="540" height="480" rx="30" fill="#f3f0ff"/>
+            <path d="M80 185 Q280 -10 480 185" fill="none" stroke="#ff7e9f" stroke-width="36" stroke-linecap="round"/>
+            <path d="M100 190 Q280 30 460 190" fill="none" stroke="#ffd659" stroke-width="32" stroke-linecap="round"/>
+            <path d="M123 196 Q280 73 437 196" fill="none" stroke="#30b7c7" stroke-width="28" stroke-linecap="round"/>
+            <path d="M84 232 Q180 205 280 258 L280 442 Q185 387 84 410Z" fill="#fff" stroke="#26213a" stroke-width="8" stroke-linejoin="round"/>
+            <path d="M476 232 Q380 205 280 258 L280 442 Q375 387 476 410Z" fill="#fff" stroke="#26213a" stroke-width="8" stroke-linejoin="round"/>
+            <path d="M280 258V442" stroke="#26213a" stroke-width="7"/>
+            <path d="M118 273Q190 254 248 282M118 312Q190 293 248 321M118 351Q190 332 238 358" fill="none" stroke="#7057d9" stroke-width="8" stroke-linecap="round"/>
+            <path d="M312 282Q375 254 445 273M312 321Q375 293 445 312M320 358Q375 332 445 351" fill="none" stroke="#30b7c7" stroke-width="8" stroke-linecap="round"/>
+            <g transform="translate(413 80) rotate(18)"><rect x="0" y="0" width="34" height="150" rx="14" fill="#ffd659" stroke="#26213a" stroke-width="7"/><path d="M0 128L17 166 34 128" fill="#ffead0" stroke="#26213a" stroke-width="7"/><path d="M12 155L17 166 22 155" fill="#26213a"/></g>
+            <g transform="translate(56 90)"><path d="M0 30h42V0h38v30h40v39H82v40H42V69H0Z" fill="#7057d9" stroke="#26213a" stroke-width="7" stroke-linejoin="round"/><circle cx="61" cy="49" r="12" fill="#ffd659"/></g>
+            <circle cx="74" cy="433" r="18" fill="#ff7e9f"/><circle cx="495" cy="438" r="15" fill="#30b7c7"/>
+          </svg>
+        </div>
+        <div class="sticker">Para leer, crear y jugar</div>
+      </div>
+    </div></section>
+
+    <section id="descubrir"><div class="wrap">
+      <div class="kicker">Qué puedes encontrar</div><h2>Una tienda con muchas puertas de entrada.</h2>
+      <p class="intro">Esta propuesta organiza la actividad pública conocida de Arlequín en cuatro universos claros, para que cada visitante sepa enseguida qué puede descubrir en el local.</p>
+      <div class="cards">
+        <article class="card"><div class="icon">📚</div><h3>Libros para cada etapa</h3><p>Literatura infantil, juvenil y para personas adultas, reunida en un espacio cercano.</p></article>
+        <article class="card"><div class="icon">✏️</div><h3>Papelería creativa</h3><p>Material para estudiar, escribir, dibujar y poner color a las ideas cotidianas.</p></article>
+        <article class="card"><div class="icon">🧩</div><h3>Juegos y detalles</h3><p>Puzles, juguetes y pequeños regalos para cumpleaños y otros momentos especiales.</p></article>
+        <article class="card"><div class="icon">🎒</div><h3>Accesorios útiles</h3><p>Mochilas y otros artículos prácticos seleccionados para el día a día en familia.</p></article>
+      </div>
+    </div></section>
+
+    <section class="family" id="actividades"><div class="wrap family-grid">
+      <div><div class="kicker" style="color:#ffd659">Más que una tienda</div><h2>Un lugar para compartir curiosidad.</h2><p class="intro">La web podría reservar un espacio vivo para anunciar actividades cuando el negocio las confirme, sin publicar fechas ni condiciones que todavía no estén verificadas.</p></div>
+      <div class="steps">
+        <div class="step"><div class="num">A</div><div><strong>Manualidades y creatividad</strong><span>Un área preparada para presentar futuros talleres de forma clara.</span></div></div>
+        <div class="step"><div class="num">B</div><div><strong>Lettering</strong><span>Ideas para descubrir el gusto por las letras y el papel.</span></div></div>
+        <div class="step"><div class="num">C</div><div><strong>Presentaciones de libros</strong><span>Una agenda editorial sencilla, actualizable y fácil de compartir.</span></div></div>
+      </div>
+    </div></section>
+
+    <section class="visit" id="visita"><div class="wrap">
+      <div class="visitbox"><div>
+        <div class="kicker">Encuéntranos</div><h2 style="margin-bottom:1rem">Tu próxima historia puede empezar aquí.</h2>
+        <p class="address">Rúa Nosa Señora da Saínza, 4 · Bajo derecha · 32005 Ourense</p>
+        <p class="note">Dirección contrastada en directorios públicos y documentación local. Antes de publicar una web oficial se validarían contacto, horarios, disponibilidad y cualquier enlace social directamente con el negocio.</p>
+        <a class="pill" href="https://catalogo.noeapps.com/" rel="noopener">Conocer NoeApps</a>
+      </div><aside class="mini"><strong>Esta demo propone</strong><ul><li>Catálogo visual por categorías</li><li>Espacio para actividades</li><li>Lectura cómoda en móvil</li><li>Llamadas a la acción claras</li></ul></aside></div>
+    </div></section>
+  </main>
+
+  <footer><div class="foot"><span>Arlequín · Propuesta conceptual no oficial</span><span>Diseño demostrativo por <a href="https://catalogo.noeapps.com/" rel="noopener">NoeApps</a></span></div></footer>
+</body>
+</html>
