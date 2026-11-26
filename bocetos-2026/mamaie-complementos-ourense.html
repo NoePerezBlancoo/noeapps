@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Mamaié · Complementos de moda artesanos — propuesta conceptual</title>
+<meta name="description" content="Propuesta conceptual no oficial para Mamaié, taller de complementos de moda en Ourense.">
+<style>
+:root{--ink:#251d35;--purple:#6236a8;--coral:#f07167;--lime:#c9dc62;--sky:#b9dbea;--sand:#f5ead9;--paper:#fffdf8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 ui-sans-serif,system-ui,-apple-system,sans-serif}a{color:inherit}
+.notice{background:var(--ink);color:#fff;text-align:center;padding:.55rem 1rem;font-size:.8rem;letter-spacing:.03em}
+header{position:sticky;top:0;z-index:9;background:#fffdf8ed;backdrop-filter:blur(12px);border-bottom:1px solid #dfd6e7}nav{max-width:1150px;margin:auto;padding:.85rem 1.2rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.brand{text-decoration:none;font:900 1.45rem/1 Georgia,serif;letter-spacing:-.03em}.brand span{color:var(--coral)}.links{display:flex;align-items:center;gap:1.15rem}.links a{text-decoration:none;font-size:.9rem;font-weight:800}.btn{display:inline-flex;padding:.75rem 1.1rem;border-radius:999px;background:var(--purple);color:#fff!important;text-decoration:none!important;font-weight:900;box-shadow:0 8px 20px #6236a833}
+.hero{overflow:hidden;background:linear-gradient(125deg,var(--sand) 0 55%,var(--sky) 55%)}.hero-grid{max-width:1150px;margin:auto;min-height:680px;padding:5rem 1.2rem;display:grid;grid-template-columns:1.02fr .98fr;gap:4rem;align-items:center}
+.eyebrow{text-transform:uppercase;letter-spacing:.15em;font-size:.75rem;font-weight:900;color:var(--purple)}h1{font:900 clamp(3.2rem,6.3vw,6rem)/.94 Georgia,serif;letter-spacing:-.055em;margin:1rem 0 1.3rem}h1 em{font-style:italic;color:var(--coral)}
+.lead{font-size:1.18rem;max-width:52ch;color:#594f62}.actions{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1.8rem}.plain{padding:.7rem .2rem;font-weight:900;text-underline-offset:5px}
+.collage{position:relative}.card{border:3px solid var(--ink);background:#fff;padding:1rem;box-shadow:14px 15px 0 var(--coral);transform:rotate(1.5deg)}.card svg{display:block;width:100%;height:auto}.sticker{position:absolute;right:-1rem;top:1.5rem;background:var(--lime);border:2px solid var(--ink);padding:.75rem .9rem;font-weight:950;transform:rotate(7deg);box-shadow:4px 4px 0 var(--ink)}
+section{padding:5.8rem 1.2rem}.wrap{max-width:1150px;margin:auto}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:.74rem;font-weight:900;color:var(--purple)}h2{font:900 clamp(2.2rem,4.3vw,4.1rem)/1.04 Georgia,serif;letter-spacing:-.04em;margin:.55rem 0 1.4rem}.intro{max-width:65ch;color:#61576a}
+.blocks{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2.2rem}.block{border:2px solid var(--ink);border-radius:25px;padding:1.5rem;min-height:255px;background:#fff}.block:nth-child(2){background:#f5e2df}.block:nth-child(3){background:#e3efd1}.num{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:var(--purple);color:#fff;font:900 1.3rem Georgia,serif}.block h3{margin:1rem 0 .4rem}.block p{margin:0;color:#635a6b;font-size:.93rem}
+.handmade{background:var(--ink);color:#fff}.hand-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:4rem;align-items:center}.handmade .kicker{color:var(--lime)}.handmade .intro{color:#d8d2de}.process{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.phase{padding:1.2rem;border:1px solid #ffffff30;background:#ffffff09;min-height:145px}.phase b{display:block;color:var(--lime);font:900 1.55rem Georgia,serif}.phase span{font-weight:850}.phase p{margin:.35rem 0 0;color:#d4cfda;font-size:.89rem}
+.events{background:linear-gradient(180deg,#fffdf8,#efe9f6)}.eventbox{display:grid;grid-template-columns:1.1fr .9fr;border:2px solid var(--ink);background:#fff;border-radius:28px;overflow:hidden}.eventcopy{padding:clamp(1.7rem,4vw,3.4rem)}.eventart{background:var(--purple);display:grid;place-items:center;padding:2rem}.eventart svg{width:min(100%,320px)}
+.webgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem}.webitem{padding:1.25rem;border-top:4px solid var(--coral);background:var(--sand)}.webitem b{display:block;font-family:Georgia,serif;font-size:1.9rem;color:var(--purple)}.webitem strong{display:block}.webitem p{margin:.35rem 0 0;color:#655c6c;font-size:.9rem}
+.contactcard{display:grid;grid-template-columns:1.2fr .8fr;border:3px solid var(--ink);box-shadow:11px 12px 0 var(--lime)}.contactcopy{padding:clamp(1.8rem,4vw,3.5rem)}.fine{font-size:.87rem;color:#675d6f;max-width:65ch}.contactart{background:var(--sky);display:grid;place-items:center;padding:2rem}.contactart svg{width:min(100%,300px)}
+footer{background:var(--ink);color:#ddd6e3;padding:2rem 1.2rem}.foot{max-width:1150px;margin:auto;display:flex;justify-content:space-between;gap:1rem}.foot a{color:#fff}
+@media(max-width:900px){.hero-grid,.hand-grid,.eventbox,.contactcard{grid-template-columns:1fr}.hero-grid{min-height:auto;gap:3rem;padding-top:4rem}.collage{max-width:620px}.blocks{grid-template-columns:1fr}.webgrid{grid-template-columns:repeat(2,1fr)}.eventart,.contactart{min-height:320px}}
+@media(max-width:620px){.links a:not(.btn){display:none}.hero-grid{padding-bottom:4rem}h1{font-size:3.25rem}.process,.webgrid{grid-template-columns:1fr}.sticker{right:.2rem}.card{box-shadow:8px 9px 0 var(--coral)}.foot{flex-direction:column}section{padding:4.1rem 1rem}}
+</style></head><body>
+<div class="notice">Propuesta conceptual no oficial de NoeApps · Ilustraciones originales y contenido sujeto a validación</div>
+<header><nav><a class="brand" href="#inicio">mamaié<span>•</span></a><div class="links"><a href="#universo">Universo</a><a href="#proceso">Proceso</a><a href="#presencia">Presencia</a><a class="btn" href="https://catalogo.noeapps.com/" rel="noopener">Ver NoeApps</a></div></nav></header>
+<main>
+<section class="hero" id="inicio"><div class="hero-grid">
+<div><div class="eyebrow">Ourense · Artesanía de Galicia · Moda</div><h1>Complementos con <em>carácter propio.</em></h1><p class="lead">Una propuesta digital expresiva para presentar el universo de un taller artesano de complementos de moda, sin reducirlo a un catálogo genérico.</p><div class="actions"><a class="btn" href="#universo">Descubrir el concepto</a><a class="plain" href="#presencia">Presencia artesanal →</a></div></div>
+<div class="collage"><div class="card"><svg viewBox="0 0 580 540" role="img" aria-labelledby="t d"><title id="t">Texturas y complementos artesanos</title><desc id="d">Collage original de formas textiles, puntadas, cintas y piezas abstractas.</desc>
+<rect x="12" y="12" width="556" height="516" fill="#fffdf8" stroke="#251d35" stroke-width="4"/>
+<path d="M65 94h205v170H65z" fill="#f07167" stroke="#251d35" stroke-width="10"/><path d="M92 121l151 116M243 121L92 237" stroke="#f5ead9" stroke-width="10" stroke-linecap="round"/>
+<path d="M330 75q103 28 135 113-93 58-164-7Z" fill="#c9dc62" stroke="#251d35" stroke-width="10"/><path d="M349 102q58 21 87 70" fill="none" stroke="#6236a8" stroke-width="9" stroke-linecap="round" stroke-dasharray="3 17"/>
+<path d="M102 340q62-77 158-23l19 114q-111 55-194-11Z" fill="#b9dbea" stroke="#251d35" stroke-width="10"/><path d="M130 356q50-36 100-4M119 391q60-36 121 3" fill="none" stroke="#6236a8" stroke-width="9" stroke-linecap="round"/>
+<circle cx="408" cy="367" r="91" fill="#6236a8" stroke="#251d35" stroke-width="10"/><circle cx="408" cy="367" r="46" fill="#fffdf8" stroke="#f07167" stroke-width="11" stroke-dasharray="12 10"/><path d="M408 276v182M317 367h182" stroke="#c9dc62" stroke-width="7" stroke-linecap="round"/>
+<path d="M60 302q60 27 120-3t120 3 120-3 100 3" fill="none" stroke="#251d35" stroke-width="6" stroke-dasharray="2 16" stroke-linecap="round"/>
+</svg></div><div class="sticker">Feito a man · Ilustración conceptual</div></div>
+</div></section>
+
+<section id="universo"><div class="wrap"><div class="kicker">Una presencia a medida</div><h2>La moda artesana necesita espacio para contar.</h2><p class="intro">Las fuentes actuales identifican a Mamaié como taller de complementos de moda. Por prudencia, el boceto no inventa categorías concretas: propone una arquitectura flexible que se completaría con piezas y textos autorizados.</p>
+<div class="blocks">
+<article class="block"><div class="num">A</div><h3>Colecciones</h3><p>Un escaparate visual por series, temporadas o ideas, solo con nombres y piezas confirmados por el taller.</p></article>
+<article class="block"><div class="num">B</div><h3>Pieza y detalle</h3><p>Espacio para explicar materiales, técnica y cuidados de cada complemento sin asumirlos de antemano.</p></article>
+<article class="block"><div class="num">C</div><h3>Historia artesana</h3><p>Una presentación del taller, su forma de crear y su pertenencia a Artesanía de Galicia.</p></article>
+</div></div></section>
+
+<section class="handmade" id="proceso"><div class="wrap hand-grid">
+<div><div class="kicker">Hecho a mano</div><h2>Del gesto al complemento.</h2><p class="intro">El proceso se representa de forma conceptual, sin atribuir técnicas específicas. La versión oficial definiría cada etapa con la información que Mamaié decida compartir.</p></div>
+<div class="process"><div class="phase"><b>01</b><span>Idea</span><p>Una referencia, una forma, un color.</p></div><div class="phase"><b>02</b><span>Prueba</span><p>La búsqueda de proporción y combinación.</p></div><div class="phase"><b>03</b><span>Elaboración</span><p>Trabajo manual documentado con permiso.</p></div><div class="phase"><b>04</b><span>Pieza</span><p>Presentación y cuidados validados.</p></div></div>
+</div></section>
+
+<section class="events"><div class="wrap"><div class="eventbox">
+<div class="eventcopy"><div class="kicker">Actividad pública en 2026</div><h2>Artesanía que sale al encuentro.</h2><p class="intro">Mamaié participó en la sexta edición del festival Espírito Ribeiro de Cenlle dentro de la representación de moda de Artesanía de Galicia. Una futura agenda podría reunir ferias y citas confirmadas por el taller.</p><a class="btn" href="#presencia">Ver propuesta de presencia</a></div>
+<div class="eventart"><svg viewBox="0 0 320 300" role="img" aria-label="Ilustración de un puesto artesano y banderines"><path d="M43 118h234v132H43z" fill="#fffdf8" stroke="#251d35" stroke-width="10"/><path d="M30 91h260l-24 52H54Z" fill="#f07167" stroke="#251d35" stroke-width="10"/><path d="M58 91l30 52 29-52 29 52 29-52 29 52 29-52 29 52 24-52" fill="none" stroke="#251d35" stroke-width="7"/><path d="M102 250v-61h116v61" fill="#b9dbea" stroke="#251d35" stroke-width="9"/><path d="M51 47l28 18 28-18 28 18 28-18 28 18 28-18 28 18 28-18" fill="none" stroke="#c9dc62" stroke-width="9" stroke-linecap="round"/></svg></div>
+</div></div></section>
+
+<section><div class="wrap"><div class="kicker">Diseño útil</div><h2>Una web preparada para crecer con el taller.</h2><div class="webgrid">
+<div class="webitem"><b>1</b><strong>Catálogo flexible</strong><p>Solo categorías y piezas confirmadas.</p></div><div class="webitem"><b>2</b><strong>Agenda</strong><p>Ferias y eventos cuando estén validados.</p></div><div class="webitem"><b>3</b><strong>Proceso</strong><p>Materiales y técnicas con permiso.</p></div><div class="webitem"><b>4</b><strong>Móvil</strong><p>Lectura rápida y canales oficiales.</p></div>
+</div></div></section>
+
+<section id="presencia"><div class="wrap"><div class="contactcard">
+<div class="contactcopy"><div class="kicker">Taller artesano en Ourense</div><h2>Una identidad digital tan singular como las piezas.</h2><p class="intro">Mamaié figura como taller registrado de complementos de moda y participó en actividad pública de Artesanía de Galicia en 2026.</p><p class="fine">Por privacidad, esta demo no reproduce la dirección detallada que aparece en el registro público. Antes de una publicación oficial se validarían con el negocio ubicación, contacto, catálogo, materiales, técnicas e imágenes.</p><a class="btn" href="https://catalogo.noeapps.com/" rel="noopener">Conocer el catálogo NoeApps</a></div>
+<div class="contactart"><svg viewBox="0 0 300 300" role="img" aria-label="Ilustración de marcador con puntadas"><path d="M150 25q-80 0-80 80 0 68 80 170 80-102 80-170 0-80-80-80Z" fill="#fffdf8" stroke="#251d35" stroke-width="11"/><circle cx="150" cy="106" r="50" fill="#f07167" stroke="#251d35" stroke-width="9"/><path d="M119 106q31-35 62 0t-62 0Z" fill="#c9dc62" stroke="#251d35" stroke-width="7"/><circle cx="150" cy="106" r="13" fill="#6236a8"/><path d="M94 218q56 23 112 0" fill="none" stroke="#6236a8" stroke-width="8" stroke-dasharray="3 15" stroke-linecap="round"/></svg></div>
+</div></div></section>
+</main>
+<footer><div class="foot"><span>Mamaié · Propuesta conceptual no oficial</span><span>Diseño demostrativo por <a href="https://catalogo.noeapps.com/" rel="noopener">NoeApps</a></span></div></footer>
+</body></html>
